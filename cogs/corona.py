@@ -1,0 +1,296 @@
+from decorators import help
+import discord
+from discord.ext import commands
+from enums.help_categories import Category
+from functions import checks, timeFormatters
+import requests
+
+
+class Corona(commands.Cog):
+
+    def __init__(self, client):
+        self.client = client
+
+    # Don't allow any commands to work when locked
+    def cog_check(self, ctx):
+        return not self.client.locked
+
+    # Gets the information & calls other functions if necessary
+    @commands.group(name="Corona", usage="[Land]*", case_insensitive=True, invoke_without_command=True)
+    @commands.check(checks.allowedChannels)
+    @help.Category(category=Category.Other)
+    async def corona(self, ctx, country: str = "Belgium"):
+        """
+        Command that shows the corona stats for a certain country.
+        :param ctx: Discord Context
+        :param country: the country to show the stats for
+        """
+        dic = await self.getCountryStats(country)
+        if dic is None:
+            # Country was not found
+            await self.sendError(ctx)
+            return
+
+        await self.sendEmbed(ctx, dic)
+
+    @corona.command(aliases=["lb", "leaderboards"], hidden=True)
+    async def leaderboard(self, ctx):
+        """
+        Command that shows the Corona Leaderboard.
+        Alias for Lb Corona.
+        :param ctx: Discord Context
+        :return: y
+        """
+        await self.client.get_cog("Leaderboards").callLeaderboard("corona", ctx)
+
+    async def sendEmbed(self, ctx, dic):
+        """
+        Function that sends a Corona embed from a dictionary.
+        :param ctx: Discord Context
+        :param dic: the dictionary corresponding to this country
+        """
+        embed = discord.Embed(colour=discord.Colour.red(), title="Coronatracker {}".format(dic["today"]["country"]))
+        embed.set_thumbnail(url="https://i.imgur.com/aWnDuBt.png")
+
+        # Total
+        embed.add_field(name="Totale Gevallen (Vandaag):",
+                        value="{:,} **(+{:,})** {}".format(
+                            dic["today"]["cases"],
+                            dic["today"]["todayCases"],
+                            self.trendIndicator(dic, "todayCases")
+                        ),
+                        inline=False)
+
+        # Active
+        embed.add_field(name="Actieve Gevallen (Vandaag):",
+                        value="{:,} **(+{:,})** {}".format(
+                            dic["today"]["activeCases"],
+                            dic["today"]["activeCases"] - dic["yesterday"]["activeCases"],
+                            self.activeTrendIndicator(dic)
+                        ),
+                        inline=False)
+
+        # Deaths
+        embed.add_field(name="Sterfgevallen (Vandaag):",
+                        value="{:,} **(+{:,})** {}".format(
+                            dic["today"]["deaths"],
+                            dic["today"]["todayDeaths"],
+                            self.trendIndicator(dic, "todayDeaths")
+                        ),
+                        inline=False)
+
+        # Recovered
+        embed.add_field(name="Hersteld (Vandaag):",
+                        value="{:,} **(+{:,}) {}**".format(
+                            dic["today"]["recovered"],
+                            dic["today"]["todayRecovered"],
+                            self.trendIndicator(dic, "todayRecovered")
+                        ),
+                        inline=False)
+
+        # Test Cases
+        embed.add_field(name="Aantal uitgevoerde tests:",
+                        value="{:,}".format(dic["today"]["tests"]),
+                        inline=False)
+
+        # Timestamp of last update
+        timeFormatted = timeFormatters.epochToDate(dic["today"]["updated"])
+        embed.set_footer(text="Laatst geüpdatet op {} ({} geleden)".format(
+            timeFormatted["date"], timeFormatted["timeAgo"]))
+        await ctx.send(embed=embed)
+
+    @commands.command(name="Trends", aliases=["Ct"], usage="[Land]*")
+    @commands.check(checks.allowedChannels)
+    @help.Category(category=Category.Other)
+    async def trends(self, ctx, country: str = "Belgium"):
+        """
+        Command that gives more precise stats & changes.
+        :param ctx: Discord Context
+        :param country: the country to get the stats for
+        """
+        dic = await self.getCountryStats(country)
+        if dic is None:
+            await self.sendError(ctx)
+            return
+
+        # Get the distribution for this country
+        distribution = self.distribution(dic)
+
+        embed = discord.Embed(colour=discord.Colour.red(), title="Coronatrends {}".format(dic["today"]["country"]))
+        embed.set_thumbnail(url="https://i.imgur.com/aWnDuBt.png")
+
+        # Calculate the trends & add them into the fields
+        embed.add_field(name="Totale Gevallen\n({:,})".format(dic["today"]["cases"]),
+                        value=self.trend(dic, "cases"),
+                        inline=True)
+
+        embed.add_field(name="Sterfgevallen\n({:,})".format(dic["today"]["deaths"]),
+                        value=self.trend(dic, "deaths"),
+                        inline=True)
+
+        embed.add_field(name="Hersteld\n({:,})".format(dic["today"]["recovered"]),
+                        value=self.trend(dic, "recovered"))
+
+        embed.add_field(name="Totale Gevallen\nVandaag ({:,})".format(dic["today"]["todayCases"]),
+                        value=self.trend(dic, "todayCases"),
+                        inline=True)
+
+        embed.add_field(name="Sterfgevallen\nVandaag ({:,})".format(dic["today"]["todayDeaths"]),
+                        value=self.trend(dic, "todayDeaths"),
+                        inline=True)
+
+        embed.add_field(name="Hersteld\nVandaag ({:,})".format(dic["today"]["todayRecovered"]),
+                        value=self.trend(dic, "todayRecovered"))
+
+        embed.add_field(name="Verdeling", value="Actief: {} | Overleden: {} | Hersteld: {}".format(
+            distribution[0], distribution[1], distribution[2]), inline=False)
+
+        # Timestamp of last update
+        timeFormatted = timeFormatters.epochToDate(dic["today"]["updated"])
+        embed.set_footer(text="Laatst geüpdatet op {} ({} geleden)".format(
+            timeFormatted["date"], timeFormatted["timeAgo"]))
+        await ctx.send(embed=embed)
+
+    async def getCountryStats(self, country):
+        """
+        Function that gets the stats for a specific country.
+        :param country: the country to get the stats for
+        :return: a dictionary containing the info for today & yesterday
+        """
+        # Check if Global or a country was passed
+        if country.lower() == "global":
+            country = "all?"
+        else:
+            country = "countries/{}?strict=false&".format(country)
+
+        today = requests.get("https://disease.sh/v3/covid-19/{}yesterday=false&allowNull=false".format(country)).json()
+
+        # Send error message
+        if "message" in today:
+            return None
+
+        yesterday = requests.get("https://disease.sh/v3/covid-19/{}yesterday=true&allowNull=false".format(country)) \
+            .json()
+
+        # Divide into today & yesterday to be able to calculate the changes
+        dic = {
+            "today": {
+                "country": today["country"] if country != "all?" else "Global",
+                "cases": today["cases"],
+                "activeCases": today["active"],
+                "todayCases": today["todayCases"],
+                "deaths": today["deaths"],
+                "todayDeaths": today["todayDeaths"],
+                "recovered": today["recovered"],
+                "todayRecovered": today["todayRecovered"],
+                "tests": today["tests"],
+                "updated": today["updated"]
+            },
+            "yesterday": {
+                "cases": yesterday["cases"],
+                "activeCases": yesterday["active"],
+                "todayCases": yesterday["todayCases"],
+                "deaths": yesterday["deaths"],
+                "todayDeaths": yesterday["todayDeaths"],
+                "recovered": yesterday["recovered"],
+                "todayRecovered": yesterday["todayRecovered"],
+                "tests": yesterday["tests"],
+                "updated": yesterday["updated"]
+            }
+        }
+        return dic
+
+    def distribution(self, dic):
+        """
+        Calculates the percentage distribution for every key & shows an indicator.
+        :param dic: the today/yesterday dictionary for this country
+        :return: a list containing the distribution + indicator for active, recovered & deaths
+        """
+        totalToday = dic["today"]["cases"] if dic["today"]["cases"] != 0 else 1
+        totalYesterday = dic["yesterday"]["cases"] if dic["yesterday"]["cases"] != 0 else 1
+
+        tap = round(100 * dic["today"]["activeCases"]/totalToday, 2)  # Today Active Percentage
+        trp = round(100 * dic["today"]["recovered"]/totalToday, 2)  # Today Recovered Percentage
+        tdp = round(100 * dic["today"]["deaths"]/totalToday, 2)  # Today Deaths Percentage
+        yap = round(100 * dic["yesterday"]["activeCases"] / totalYesterday, 2)  # Yesterday Active Percentage
+        yrp = round(100 * dic["yesterday"]["recovered"] / totalYesterday, 2)  # Yesterday Recovered Percentage
+        ydp = round(100 * dic["yesterday"]["deaths"] / totalYesterday, 2)  # Yesterday Deaths Percentage
+
+        return ["{}% {}".format(tap, self.indicator(tap, yap)),
+                "{}% {}".format(tdp, self.indicator(tdp, ydp)),
+                "{}% {}".format(trp, self.indicator(trp, yrp))]
+
+    async def sendError(self, ctx):
+        """
+        Function that sends an error embed when an invalid country was passed.
+        :param ctx: Discord Context
+        """
+        embed = discord.Embed(colour=discord.Colour.red())
+        embed.add_field(name="Error", value="Dit land staat niet in de database.", inline=False)
+        await ctx.send(embed=embed)
+
+    # Returns a number and a percentage of rise/decline
+    def trend(self, dic, key):
+        """
+        Function that creates a string representing a number & percentage of
+        rise & decline for a certain key of the dict.
+        :param dic: the today/yesterday dictionary for this country
+        :param key: the key to compare
+        :return: a string showing the increase in numbers & percentages
+        """
+        # Difference vs yesterday
+        change = dic["today"][key] - dic["yesterday"][key]
+
+        # Don't divide by 0
+        yesterday = dic["yesterday"][key] if dic["yesterday"][key] != 0 else 1
+
+        # Percentage
+        perc = round(100 * change/yesterday, 2)
+
+        # Sign to add to the number
+        sign = "+" if change >= 0 else ""
+
+        return "{}{:,} ({}{:,}%)".format(sign, change, sign, perc)
+
+    # Requires a bit of math so this is a separate function
+    def activeTrendIndicator(self, dic):
+        """
+        Function that returns a rise/decline indicator for the active cases of the day.
+        This is a separate function as it requires some math to get right.
+        New cases have to take into account the deaths & recovered cases being
+        subtracted as well.
+        :param dic: the today/yesterday dictionary for this country
+        :return: a triangle emoji or empty string
+        """
+        todayNew = dic["today"]["todayCases"] - dic["today"]["todayDeaths"] - dic["today"]["todayRecovered"]
+        yesterdayNew = dic["yesterday"]["todayCases"] - dic["yesterday"]["todayDeaths"] - dic["yesterday"]["todayRecovered"]
+
+        return ":small_red_triangle:" if todayNew > yesterdayNew else \
+            (":small_red_triangle_down:" if todayNew < yesterdayNew else "")
+
+    # Returns an arrow indicating rise or decline
+    def trendIndicator(self, dic, key):
+        """
+        Function that returns a rise/decline indicator for the target key.
+        :param dic: the today/yesterday dictionary for this country
+        :param key: the key to get the indicator for
+        :return: a triangle emoji or empty string
+        """
+        return ":small_red_triangle:" if dic["today"][key] > dic["yesterday"][key] else \
+            (":small_red_triangle_down:" if dic["today"][key] < dic["yesterday"][key] else "")
+
+    # Also returns an indicator, but compares instead of pulling it out of the dic (for custom numbers)
+    def indicator(self, today, yesterday):
+        """
+        Function that also returns an indicator but for two numbers
+        instead of comparing values out of the dictionary.
+        :param today: the number representing today
+        :param yesterday: the number representing yesterday
+        :return: a triangle emoji or empty string
+        """
+        return ":small_red_triangle:" if today > yesterday else \
+            (":small_red_triangle_down:" if yesterday > today else "")
+
+
+def setup(client):
+    client.add_cog(Corona(client))

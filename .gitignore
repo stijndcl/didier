@@ -1,0 +1,13 @@
+files/status.txt
+files/readyMessage.txt
+files/client.txt
+files/lastTasks.json
+files/c4.json
+files/hangman.json
+files/stats.json
+files/lost.json
+files/locked.json
+files/database.json
+.idea/
+__pycache__
+.env

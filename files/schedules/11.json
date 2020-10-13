@@ -1,0 +1,205 @@
+[
+  {
+    "course": "Programmeren",
+    "icon": "laptop-code",
+    "slots": [
+      {
+        "campus": "Sterre",
+        "building": "S9",
+        "room": "A2",
+        "time": [
+          "maandag",
+          1430,
+          1700
+        ]
+      },
+      {
+        "locations": [
+          {
+            "campus": "Sterre",
+            "building": "S5",
+            "room": "Grace Hopper"
+          },
+          {
+            "campus": "Sterre",
+            "building": "S5",
+            "room": "Resto 1"
+          }
+        ],
+        "time": ["dinsdag", 1430, 1700]
+      }
+    ]
+  },
+  {
+    "course": "Databanken",
+    "icon": "database",
+    "slots": [
+      {
+        "campus": "Sterre",
+        "building": "S9",
+        "room": "A3",
+        "time": [
+          "donderdag",
+          1000,
+          1100
+        ]
+      },
+      {
+        "campus": "Sterre",
+        "building": "S9",
+        "room": "A3",
+        "time": [
+          "vrijdag",
+          1430,
+          1530
+        ]
+      },
+      {
+        "locations": [
+          {
+            "campus": "Sterre",
+            "building": "S5",
+            "room": "Grace Hopper"
+          },
+          {
+            "campus": "Sterre",
+            "building": "S5",
+            "room": "Resto 1"
+          }
+        ],
+        "time": [
+          "donderdag",
+          1130,
+          1230
+        ]
+      },
+      {
+        "locations": [
+          {
+            "campus": "Sterre",
+            "building": "S5",
+            "room": "Grace Hopper"
+          },
+          {
+            "campus": "Sterre",
+            "building": "S5",
+            "room": "Resto 1"
+          }
+        ],
+        "time": [
+          "vrijdag",
+          1300,
+          1400
+        ]
+      }
+    ]
+  },
+  {
+    "course": "Computergebruik",
+    "icon": "linux",
+    "icon_type": "fab",
+    "slots": [
+      {
+        "campus": "Sterre",
+        "building": "S9",
+        "room": "A3",
+        "time": [
+          "dinsdag",
+          1130,
+          1230
+        ]
+      },
+      {
+        "locations": [
+          {
+            "campus": "Sterre",
+            "building": "S5",
+            "room": "Grace Hopper"
+          },
+          {
+            "campus": "Sterre",
+            "building": "S5",
+            "room": "Resto 1"
+          }
+        ],
+        "time": [
+          "donderdag",
+          1430,
+          1700
+        ]
+      },
+      {
+        "campus": "Sterre",
+        "building": "S9",
+        "room": "A3",
+        "time": [
+          "vrijdag",
+          1000,
+          1100
+        ]
+      }
+    ]
+  },
+  {
+    "course": "RAF",
+    "icon": "brain",
+    "slots": [
+      {
+        "campus": "Sterre",
+        "building": "S9",
+        "room": "A3",
+        "time": [
+          "dinsdag",
+          1000,
+          1100
+        ]
+      },
+      {
+        "campus": "Sterre",
+        "building": "S25",
+        "room": "Emmy Noether",
+        "time": [
+          "woensdag",
+          830,
+          1000
+        ]
+      },
+      {
+        "campus": "Sterre",
+        "building": "S9",
+        "room": "A3",
+        "time": [
+          "woensdag",
+          1430,
+          1700
+        ]
+      }
+    ]
+  },
+  {
+    "course": "Discrete Wiskunde",
+    "icon": "square-root-alt",
+    "slots": [
+      {
+        "campus": "Sterre",
+        "building": "S9",
+        "room": "A3",
+        "time": [
+          "maandag",
+          1000,
+          1230
+        ]
+      },
+      {
+        "campus": "Sterre",
+        "building": "S25",
+        "room": "Emmy Noether",
+        "time": [
+          "woensdag",
+          1000,
+          1230
+        ]
+      }
+    ]
+  }
+]
