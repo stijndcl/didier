@@ -104,7 +104,8 @@ class Stats(commands.Cog):
             description = ""
             for c in sorted(res, key=lambda x: int(x[1]), reverse=True):
                 if not any(tc.id == int(c[0]) for tc in ctx.guild.text_channels):
-                    return
+                    continue
+
                 channel_instance = self.client.get_channel(int(c[0]))
 
                 description += "{}: {:,}\n".format(channel_instance.mention, round(float(c[1]), 2))
