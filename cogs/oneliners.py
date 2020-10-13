@@ -128,7 +128,7 @@ class Oneliners(commands.Cog):
     @commands.command()
     async def open(self, ctx):
         # await ctx.send(file=discord.File("files/images/open_source_bad.jpg"))
-        await ctx.send("Soon:tm:")
+        await ctx.send("Shut, it already is.")
 
     @commands.command()
     async def sc(self, ctx, *args):
@@ -137,7 +137,7 @@ class Oneliners(commands.Cog):
     @commands.command(aliases=["src", "os"])
     async def source(self, ctx):
         # await ctx.send("<https://bit.ly/31z3BuH>")
-        await ctx.send("Soon:tm:")
+        await ctx.send("https://github.com/stijndcl/didier")
 
     @commands.command(aliases=["sunrise", "sunshine"])
     async def sun(self, ctx):
