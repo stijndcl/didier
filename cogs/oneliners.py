@@ -134,7 +134,7 @@ class Oneliners(commands.Cog):
     async def sc(self, ctx, *args):
         await ctx.send("http://take-a-screenshot.org/")
 
-    @commands.command(aliases=["src", "os"])
+    @commands.command(aliases=["os", "sauce", "src"])
     async def source(self, ctx):
         # await ctx.send("<https://bit.ly/31z3BuH>")
         await ctx.send("https://github.com/stijndcl/didier")
