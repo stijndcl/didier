@@ -119,6 +119,10 @@ class Dinks(commands.Cog):
         if amount is None:
             return
 
+        # Disable DM abuse
+        if ctx.guild is None:
+            return await ctx.send("Muttn")
+
         valid = checks.isValidAmount(ctx, amount)
         if not valid[0]:
             return await ctx.send(valid[1])
