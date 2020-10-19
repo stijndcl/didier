@@ -127,14 +127,10 @@ class Dinks(commands.Cog):
         if not valid[0]:
             return await ctx.send(valid[1])
 
-        authorDinks = float(currency.dinks(ctx.author.id))
-        if amount == "all":
-            amount = authorDinks
+        amount = float(valid[1])
 
-        amount = float(amount)
-
+        currency.update(ctx.author.id, "dinks", float(currency.dinks(ctx.author.id)) - amount)
         currency.update(person.id, "dinks", float(currency.dinks(person.id)) + amount)
-        currency.update(ctx.author.id, "dinks", authorDinks - amount)
 
         rep = getRep(math.floor(amount), Numbers.t.value)
 
