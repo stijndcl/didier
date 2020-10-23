@@ -204,6 +204,10 @@ class Tasks(commands.Cog):
                 lastTasks["remind"] = round(time.time())
                 json.dump(lastTasks, fp)
 
+    @sendReminders.before_loop
+    async def beforeSendReminders(self):
+        await self.client.wait_until_ready()
+
     def getCurrentHour(self):
         return timeFormatters.dateTimeNow().hour
 
