@@ -5,11 +5,11 @@ import dateutil.relativedelta
 import pytz
 
 
-def epochToDate(epochTimeStamp):
+def epochToDate(epochTimeStamp, strFormat="%m/%d/%Y om %H:%M:%S"):
     now = dateTimeNow()
-    updateTime = datetime.datetime.fromtimestamp(int(epochTimeStamp) / 1000, pytz.timezone("Europe/Brussels"))
+    updateTime = datetime.datetime.fromtimestamp(int(epochTimeStamp), pytz.timezone("Europe/Brussels"))
     diff = now - updateTime
-    updateFormatted = str(updateTime.strftime('%m/%d/%Y om %H:%M:%S'))
+    updateFormatted = str(updateTime.strftime(strFormat))
     timeAgo = str(time.strftime('%H:%M:%S', time.gmtime(diff.total_seconds())))
     return {"date": updateFormatted, "timeAgo": timeAgo}
 

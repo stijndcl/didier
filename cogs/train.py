@@ -4,7 +4,7 @@ from decorators import help
 import discord
 from discord.ext import commands, menus
 from enums.help_categories import Category
-from functions import checks
+from functions import checks, timeFormatters
 import requests
 
 
@@ -69,7 +69,7 @@ class Train(commands.Cog):
                 return str(minutes) + "m"
             return "{}h{:02}m".format(minutes // 60, minutes % 60)
         else:
-            return datetime.datetime.fromtimestamp(int(timestamp)).strftime("%H:%M")
+            return timeFormatters.epochToDate(int(timestamp), "%H:%M")["date"]
 
     def formatDelay(self, seconds):
         seconds = int(seconds)

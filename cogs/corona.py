@@ -94,7 +94,7 @@ class Corona(commands.Cog):
                         inline=False)
 
         # Timestamp of last update
-        timeFormatted = timeFormatters.epochToDate(dic["today"]["updated"])
+        timeFormatted = timeFormatters.epochToDate(int(dic["today"]["updated"])/1000)
         embed.set_footer(text="Laatst geüpdatet op {} ({} geleden)".format(
             timeFormatted["date"], timeFormatted["timeAgo"]))
         await ctx.send(embed=embed)
@@ -146,7 +146,7 @@ class Corona(commands.Cog):
             distribution[0], distribution[1], distribution[2]), inline=False)
 
         # Timestamp of last update
-        timeFormatted = timeFormatters.epochToDate(dic["today"]["updated"])
+        timeFormatted = timeFormatters.epochToDate(int(dic["today"]["updated"])/1000)
         embed.set_footer(text="Laatst geüpdatet op {} ({} geleden)".format(
             timeFormatted["date"], timeFormatted["timeAgo"]))
         await ctx.send(embed=embed)
