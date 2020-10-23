@@ -21,7 +21,7 @@ class School(commands.Cog):
     @commands.check(checks.allowedChannels)
     @help.Category(category=Category.School)
     async def eten(self, ctx, *day):
-        day = self.getWeekDay(None if len(day) == 0 else day)[1]
+        day = les.getWeekDay(None if len(day) == 0 else day)[1]
 
         # Create embed
         menu = eten.etenScript(day)
