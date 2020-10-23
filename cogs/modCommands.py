@@ -150,9 +150,17 @@ class ModCommands(commands.Cog):
         twitch.add(userid, link)
         await ctx.send("{}'s Twitch is toegevoegd aan de database.".format(self.utilsCog.getDisplayName(ctx, userid)))
 
-    @commands.command(name="WhoIs", aliases=["Info"], usage="[@User]")
+    @commands.command(name="WhoIs", aliases=["Info", "Whodis"], usage="[@User]")
     @help.Category(Category.Mod)
-    async def whois(self, ctx, user: discord.User):
+    async def whois(self, ctx, user):
+        if ctx.message.mentions:
+            user = ctx.message.mentions[0].id
+
+        user = await self.client.fetch_user(int(user))
+
+        if user is None:
+            await ctx.send("None")
+
         embed = discord.Embed(colour=discord.Colour.blue())
 
         embed.set_author(name=user.display_name, icon_url=user.avatar_url)
