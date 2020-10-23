@@ -1,9 +1,11 @@
 from data import constants
+from data.remind import Reminders
 from discord.ext import commands, tasks
 from enums.numbers import Numbers
 from functions import timeFormatters
 from functions.database import currency, poke, prison, birthdays, stats
 import json
+from random import random
 import requests
 import time
 
@@ -181,8 +183,22 @@ class Tasks(commands.Cog):
         # Don't do it multiple times a day if bot dc's, ...
         with open("files/lastTasks.json", "r") as fp:
             lastTasks = json.load(fp)
-        if int(self.getCurrentHour()) == 0 and int(time.time()) - int(lastTasks["remind"]) > 10000:
-            pass
+        if int(self.getCurrentHour()) == 21 and int(time.time()) - int(lastTasks["remind"]) > 10000:
+            reminders = Reminders()
+
+            for category in reminders.categories:
+                for user in category["users"]:
+                    userInstance = await self.client.fetch_user(user)
+
+                    # User can't be fetched for whatever reason, ignore instead of crashing
+                    if userInstance is None:
+                        continue
+
+                    # Check if a special embed has to be attached for this reminder
+                    if "embed" not in category:
+                        await userInstance.send(random.choice(category["messages"]))
+                    else:
+                        await userInstance.send(random.choice(category["messages"]), embed=category["embed"])
 
             # with open("files/lastTasks.json", "w") as fp:
             #     lastTasks["remind"] = round(time.time())

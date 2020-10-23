@@ -41,7 +41,7 @@ class School(commands.Cog):
             embed.set_footer(text="Omwille van de coronamaatregelen is er een beperkter aanbod, en kan je enkel nog eten afhalen. Ter plaatse eten is niet meer mogelijk.")
         await ctx.send(embed=embed)
 
-    @commands.command(name="Les", aliases=["Sched", "Schedule", "Class"], usage="[Jaargang]* [Dag]*")
+    @commands.command(name="Les", aliases=["Class", "Classes", "Sched", "Schedule"], usage="[Jaargang]* [Dag]*")
     @commands.check(checks.allowedChannels)
     @help.Category(category=Category.School)
     async def les(self, ctx, *day):
