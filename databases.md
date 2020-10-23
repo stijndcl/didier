@@ -140,6 +140,14 @@ Used in dinks.py - Prison commands. Contains information on who is in prison.
     2 days: integer                                     | The remaining days this user has to spend in prison
     3 daily: numeric                                    | The amount of Didier Dinks that [daily] decreases by every day
 
+### remind
+
+Used in tasks.py - sendReminders task.
+
+    0 userid: bigint, unique, primary key               | The user's Discord id
+    1 nightly: boolean, default false                   | A boolean indicating whether or not the user wants Nightly reminders
+    2 les: boolean, default false                       | A boolean indicating whether or not the user wants Les reminders
+
 ### store
 
 Used in store.py - Store commands. Contains info on items that are available for purchase.
