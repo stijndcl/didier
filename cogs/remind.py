@@ -14,6 +14,7 @@ class Remind(commands.Cog):
         return not self.client.locked
 
     @commands.group(name="Remind", aliases=["Remindme"], usage="[Categorie]", case_insensitive=True, invoke_without_command=True)
+    @help.Category(Category.Other)
     async def remind(self, ctx):
         """
         Command group to remind the user of a certain thing every day.
