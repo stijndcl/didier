@@ -159,7 +159,7 @@ class ModCommands(commands.Cog):
         user = await self.client.fetch_user(int(user))
 
         if user is None:
-            await ctx.send("None")
+            return
 
         embed = discord.Embed(colour=discord.Colour.blue())
 
