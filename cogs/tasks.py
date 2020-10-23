@@ -183,7 +183,7 @@ class Tasks(commands.Cog):
         # Don't do it multiple times a day if bot dc's, ...
         with open("files/lastTasks.json", "r") as fp:
             lastTasks = json.load(fp)
-        if int(self.getCurrentHour()) == 7 and int(time.time()) - int(lastTasks["remind"]) > 10000:
+        if self.getCurrentWeekday() < 5 and int(self.getCurrentHour()) == 7 and int(time.time()) - int(lastTasks["remind"]) > 10000:
             reminders = Reminders()
 
             for category in reminders.categories:
@@ -210,6 +210,9 @@ class Tasks(commands.Cog):
 
     def getCurrentHour(self):
         return timeFormatters.dateTimeNow().hour
+
+    def getCurrentWeekday(self):
+        return timeFormatters.dateTimeNow().weekday()
 
     def getCurrentBitcoinPrice(self):
         result = requests.get("https://api.coindesk.com/v1/bpi/currentprice.json").json()
