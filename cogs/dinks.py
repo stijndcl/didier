@@ -438,8 +438,8 @@ class Dinks(commands.Cog):
                 ))
             else:
                 # Escape
-                await ctx.send("Je poging is mislukt, maar je kon nog net op tijd vluchten, **{}**.".format(
-                    ctx.author.display_name))
+                await ctx.send("Je poging is mislukt, maar je kon nog net op tijd vluchten, **{}**."
+                               "\nAllez, 't is goed voor ene keer e, deugeniet.".format(ctx.author.display_name))
 
             stats.update(ctx.author.id, "robs_failed", int(stat[3]) + 1)
 
