@@ -186,7 +186,7 @@ def getExtras(extra):
             start, end
         )
     elif "online" in extra["slot"]:
-        return "**{}** gaat vandaag uitzonderlijk online door {} van **{} tot {}**.".format(
+        return "**{}** gaat vandaag uitzonderlijk **online** door {} van **{} tot {}**.".format(
             extra["course"], location[7:],
             start, end
         )

@@ -63,7 +63,13 @@ class School(commands.Cog):
     def customizeSchedule(self, ctx, year, semester):
         schedule = les.getSchedule(semester, year)
 
-        member = self.client.get_guild(int(constants.CallOfCode)).get_member(ctx.author.id)
+        COC = self.client.get_guild(int(constants.CallOfCode))
+
+        if COC is None:
+            return schedule
+
+        member = COC.get_member(ctx.author.id)
+
         for role in member.roles:
             for univYear in years:
                 for course in univYear:

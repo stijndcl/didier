@@ -58,17 +58,49 @@
     "slots": [
       {
         "online": "Bongo Virtual Classroom",
+        "campus": "Sterre",
+        "building": "S9",
+        "room": "A3",
         "time": ["dinsdag", 1300, 1400]
       },
       {
         "online": "ZOOM",
-        "time": ["dinsdag", 1400, 1530]
+        "campus": "Sterre",
+        "building": "S9",
+        "room": "A3",
+        "time": ["dinsdag", 1430, 1530]
       },
       {
+        "online": "Bongo Virtual Classroom",
+        "campus": "Sterre",
+        "building": "S9",
+        "room": "A3",
+        "time": ["vrijdag", 830, 930]
+      },
+      {
+        "online": "MS Teams",
+        "campus": "Sterre",
+        "building": "S9",
+        "room": "3.1 Kondrad Zuse",
+        "time": ["vrijdag", 1000, 1100]
+      },
+      {
+        "weeks": [6, 7, 8, 9, 10, 11, 12],
+        "online": "Bongo Virtual Classroom",
+        "time": ["dinsdag", 1300, 1400]
+      },
+      {
+        "weeks": [6, 7, 8, 9, 10, 11, 12],
+        "online": "ZOOM",
+        "time": ["dinsdag", 1430, 1530]
+      },
+      {
+        "weeks": [6, 7, 8, 9, 10, 11, 12],
         "online": "Bongo Virtual Classroom",
         "time": ["vrijdag", 830, 930]
       },
       {
+        "weeks": [6, 7, 8, 9, 10, 11, 12],
         "online": "MS Teams",
         "time": ["vrijdag", 1000, 1100]
       }
@@ -80,32 +112,27 @@
     "slots": [
       {
         "online": "ZOOM",
-        "time": ["woensdag", 1100, 1200]
+        "campus": "Ardoyen",
+        "building": "Locus",
+        "room": "Resto Locus",
+        "time": ["woensdag", 1000, 1230]
       },
       {
         "online": "ZOOM",
-        "time": ["woensdag", 1430, 1600]
+        "campus": "Ardoyen",
+        "building": "Locus",
+        "room": "Resto Locus",
+        "time": ["woensdag", 1430, 1700]
       },
       {
-        "weeks": [4, 7],
-        "locations": [
-          {
-            "campus": "Ardoyen",
-            "building": "iGent",
-            "room": "0.1"
-          },
-          {
-            "campus": "Ardoyen",
-            "building": "iGent",
-            "room": "0.1 PRA"
-          },
-          {
-            "campus": "Ardoyen",
-            "building": "iGent",
-            "room": "0.2"
-          }
-        ],
-        "time": ["woensdag", 1430, 1700]
+        "weeks": [6, 7, 8, 9, 10, 11, 12],
+        "online": "ZOOM",
+        "time": ["woensdag", 1100, 1200]
+      },
+      {
+        "weeks": [6, 7, 8, 9, 10, 11, 12],
+        "online": "ZOOM",
+        "time": ["woensdag", 1430, 1600]
       }
     ]
   },
