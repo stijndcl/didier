@@ -115,14 +115,14 @@
         "campus": "Ardoyen",
         "building": "Locus",
         "room": "Resto Locus",
-        "time": ["woensdag", 1000, 1230]
+        "time": ["woensdag", 1100, 1200]
       },
       {
         "online": "ZOOM",
         "campus": "Ardoyen",
         "building": "Locus",
         "room": "Resto Locus",
-        "time": ["woensdag", 1430, 1700]
+        "time": ["woensdag", 1430, 1600]
       },
       {
         "weeks": [6, 7, 8, 9, 10, 11, 12],
