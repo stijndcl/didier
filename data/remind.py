@@ -1,3 +1,4 @@
+from functions import les
 from functions.database import remind
 
 
@@ -11,6 +12,13 @@ class Reminders:
 
         self._les = [int(user[0]) for user in rows if user[2]]
         self._lesMessages = ["Lessenrooster voor vandaag:"]
-        self.les = {"users": self._les, "messages": self._lesMessages, "embed": None}
+        self.les = {"users": self._les, "messages": self._lesMessages, "embed": self.lesEmbed()}
 
         self.categories = [self.nightly, self.les]
+
+    def lesEmbed(self):
+        day, dayDatetime, semester, year = les.parseArgs([])[1:]
+
+        schedule = les.getSchedule(semester, year)
+
+        return les.createEmbed(day, dayDatetime, semester, year, schedule)

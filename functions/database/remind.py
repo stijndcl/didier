@@ -17,7 +17,7 @@ def getOrAddUser(userid):
     res = cursor.fetchall()
 
     if not res:
-        cursor.execute("INSERT INTO remind(userid) VALUES %s", (int(userid),))
+        cursor.execute("INSERT INTO remind(userid) VALUES(%s)", (int(userid),))
         connection.commit()
 
         return getOrAddUser(userid)
@@ -36,7 +36,7 @@ def switchReminder(userid, column):
     # Switch the column value
     to = not (res[columns.index(column)])
 
-    cursor.execute("UPDATE remind SET %s = %s WHERE userid = %s", (column, to, int(userid),))
+    cursor.execute("UPDATE remind SET {} = %s WHERE userid = %s".format(column), (to, int(userid),))
     connection.commit()
 
     return to

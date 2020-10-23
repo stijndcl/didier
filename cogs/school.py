@@ -61,8 +61,7 @@ class School(commands.Cog):
 
     # Add all the user's courses
     def customizeSchedule(self, ctx, year, semester):
-        with open("files/schedules/{}{}.json".format(year, semester), "r") as fp:
-            schedule = json.load(fp)
+        schedule = les.getSchedule(semester, year)
 
         member = self.client.get_guild(int(constants.CallOfCode)).get_member(ctx.author.id)
         for role in member.roles:
