@@ -1,9 +1,11 @@
 from data import constants
+from data.remind import Reminders
 from discord.ext import commands, tasks
 from enums.numbers import Numbers
 from functions import timeFormatters
 from functions.database import currency, poke, prison, birthdays, stats
 import json
+import random
 import requests
 import time
 
@@ -18,9 +20,13 @@ class Tasks(commands.Cog):
         # self.resetPoke.start()
         self.checkBirthdays.start()
         self.updateMessageCounts.start()
+        self.sendReminders.start()
 
     @tasks.loop(hours=1.0)
     async def bankInterest(self):
+        """
+        Task that gives daily interest
+        """
         # Don't do it multiple times a day if bot dc's, ...
         with open("files/lastTasks.json", "r") as fp:
             lastTasks = json.load(fp)
@@ -58,6 +64,9 @@ class Tasks(commands.Cog):
 
     @tasks.loop(hours=1.0)
     async def resetLost(self):
+        """
+        Task that resets Lost Today
+        """
         # Don't do it multiple times a day if bot dc's, ...
         with open("files/lastTasks.json", "r") as fp:
             lastTasks = json.load(fp)
@@ -79,6 +88,9 @@ class Tasks(commands.Cog):
 
     @tasks.loop(hours=6.0)
     async def resetPoke(self):
+        """
+        Task that resets Poke
+        """
         if int(time.time()) - int(poke.get()[1]) > 259200:
             await self.client.get_guild(int(self.client.constants.CallOfCode))\
                 .get_channel(int(self.client.constants.DidierPosting))\
@@ -90,6 +102,9 @@ class Tasks(commands.Cog):
 
     @tasks.loop(hours=1.0)
     async def resetPrison(self):
+        """
+        Task that lowers prison time daily
+        """
         # Don't do it multiple times a day if bot dc's, ...
         with open("files/lastTasks.json", "r") as fp:
             lastTasks = json.load(fp)
@@ -107,6 +122,9 @@ class Tasks(commands.Cog):
 
     @tasks.loop(hours=1.0)
     async def checkBirthdays(self):
+        """
+        Task that wishes people a happy birthday
+        """
         # Don't do it multiple times a day if bot dc's, ...
         with open("files/lastTasks.json", "r") as fp:
             lastTasks = json.load(fp)
@@ -138,6 +156,9 @@ class Tasks(commands.Cog):
 
     @tasks.loop(hours=1.0)
     async def updateMessageCounts(self):
+        """
+        Task that updates the activity counter for channels
+        """
         # Don't do it multiple times a day if bot dc's, ...
         with open("files/lastTasks.json", "r") as fp:
             lastTasks = json.load(fp)
@@ -152,6 +173,39 @@ class Tasks(commands.Cog):
 
     @updateMessageCounts.before_loop
     async def beforeupdateMessageCounts(self):
+        await self.client.wait_until_ready()
+
+    @tasks.loop(hours=1.0)
+    async def sendReminders(self):
+        """
+        Task that sends people daily reminders
+        """
+        # Don't do it multiple times a day if bot dc's, ...
+        with open("files/lastTasks.json", "r") as fp:
+            lastTasks = json.load(fp)
+        if int(self.getCurrentHour()) == 7 and int(time.time()) - int(lastTasks["remind"]) > 10000:
+            reminders = Reminders()
+
+            for category in reminders.categories:
+                for user in category["users"]:
+                    userInstance = await self.client.fetch_user(user)
+
+                    # User can't be fetched for whatever reason, ignore instead of crashing
+                    if userInstance is None:
+                        continue
+
+                    # Check if a special embed has to be attached for this reminder
+                    if "embed" not in category:
+                        await userInstance.send(random.choice(category["messages"]))
+                    else:
+                        await userInstance.send(random.choice(category["messages"]), embed=category["embed"])
+
+            with open("files/lastTasks.json", "w") as fp:
+                lastTasks["remind"] = round(time.time())
+                json.dump(lastTasks, fp)
+
+    @sendReminders.before_loop
+    async def beforeSendReminders(self):
         await self.client.wait_until_ready()
 
     def getCurrentHour(self):

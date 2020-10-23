@@ -48,7 +48,8 @@ Contains timestamps for when every `task` in `cogs/tasks.py` ran for the last ti
   "interest": 0,
   "lost": 0,
   "prison": 0,
-  "poke": 0
+  "poke": 0,
+  "remind": 0
 }
 ```
 
