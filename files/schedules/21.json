@@ -6,16 +6,10 @@
     "slots": [
       {
         "online": "Bongo Virtual Classroom",
-        "campus": "Sterre",
-        "building": "S8",
-        "room": "LES 3.1",
         "time": ["maandag", 1000, 1230]
       },
       {
         "online": "ZOOM",
-        "campus": "Sterre",
-        "building": "S8",
-        "room": "LES 2.4",
         "time": ["vrijdag", 1300, 1530]
       }
     ]
@@ -25,32 +19,12 @@
     "bongo": "https://ufora.ugent.be/d2l/ext/rp/222035/lti/framedlaunch/7f4120b3-8827-44ad-8b02-a79066c396cf",
     "slots": [
       {
-        "campus": "Sterre",
-        "building": "S8",
-        "room": "LES 2.1",
-        "time": ["donderdag", 1430, 1700]
-      },
-      {
         "online": "Bongo Virtual Classroom",
-        "weeks": [1],
-        "group": 1,
-        "campus": "Sterre",
-        "building": "S4",
-        "room": "LES 0.1",
         "time": ["maandag", 1430, 1700]
       },
       {
         "online": "Bongo Virtual Classroom",
-        "weeks": [1],
         "time": ["donderdag", 1430, 1700]
-      },
-      {
-        "weeks": [2],
-        "group": 2,
-        "campus": "Sterre",
-        "building": "S4",
-        "room": "LES 0.1",
-        "time": ["maandag", 1430, 1700]
       },
       {
         "weeks": [3],
@@ -73,73 +47,44 @@
           }
         ],
         "time": ["maandag", 1430, 1700]
-      },
-      {
-        "weeks": [5],
-        "group": 1,
-        "locations": [
-          {
-            "campus": "Sterre",
-            "building": "S8",
-            "room": "LES 0.1 Victor Van Straelen"
-          },
-          {
-            "campus": "Sterre",
-            "building": "S9",
-            "room": "3.1 Konrad Zuse"
-          }
-        ],
-        "time": ["maandag", 1430, 1700]
       }
     ]
   },
   {
     "course": "AD 2",
     "bongo": "https://ufora.ugent.be/d2l/ext/rp/222018/lti/framedlaunch/7f4120b3-8827-44ad-8b02-a79066c396cf",
+    "msteams": "https://teams.microsoft.com/_?culture=nl-nl&country=NL&lm=deeplink&lmsrc=homePageWeb&cmpid=WebSignIn#/conversations/19:8ee7593d50924201a43ed9373dd6b05d@thread.v2?ctx=chat",
+    "zoom": "https://ufora.ugent.be/d2l/ext/rp/222018/lti/framedlaunch/556e197e-e87b-4c27-be5d-53adc7a41826",
     "slots": [
       {
-        "campus": "Sterre",
-        "building": "S9",
-        "room": "A3",
-        "time": ["dinsdag", 1300, 1530]
+        "online": "Bongo Virtual Classroom",
+        "time": ["dinsdag", 1300, 1400]
       },
       {
-        "campus": "Sterre",
-        "building": "S9",
-        "room": "A3",
+        "online": "ZOOM",
+        "time": ["dinsdag", 1400, 1530]
+      },
+      {
+        "online": "Bongo Virtual Classroom",
         "time": ["vrijdag", 830, 930]
       },
       {
-        "locations": [
-          {
-            "campus": "Sterre",
-            "building": "S8",
-            "room": "Victor Van Straelen"
-          },
-          {
-            "campus": "Sterre",
-            "building": "S9",
-            "room": "3.1 Konrad Zuse"
-          }
-        ],
+        "online": "MS Teams",
         "time": ["vrijdag", 1000, 1100]
       }
     ]
   },
   {
     "course": "Communicatienetwerken",
+    "zoom": "https://ufora.ugent.be/d2l/ext/rp/221184/lti/framedlaunch/556e197e-e87b-4c27-be5d-53adc7a41826",
     "slots": [
       {
-        "campus": "Ardoyen",
-        "building": "Locus",
-        "room": "Resto Locus",
-        "time": ["woensdag", 1000, 1230]
+        "online": "ZOOM",
+        "time": ["woensdag", 1100, 1200]
       },
       {
-        "campus": "Ardoyen",
-        "building": "Locus",
-        "room": "Resto Locus",
-        "time": ["woensdag", 1430, 1700]
+        "online": "ZOOM",
+        "time": ["woensdag", 1430, 1600]
       },
       {
         "weeks": [4, 7],
@@ -170,32 +115,14 @@
     "slots": [
       {
         "online": "Bongo Virtual Classroom",
-        "campus": "Sterre",
-        "building": "S12",
-        "room": "Auditorium 1",
         "time": ["dinsdag", 1600, 1700]
       },
       {
-        "locations": [
-          {
-            "campus": "Sterre",
-            "building": "S9",
-            "room": "1.1 Alan Turing"
-          },
-          {
-            "campus": "Sterre",
-            "building": "S9",
-            "room": "3.1 Konrad Zuse"
-          }
-        ],
         "online": "Bongo Virtual Classroom",
         "time": ["donderdag", 830, 1100]
       },
       {
         "online": "Bongo Virtual Classroom",
-        "campus": "Sterre",
-        "building": "S9",
-        "room": "A2",
         "time": ["donderdag", 1300, 1400]
       }
     ]

@@ -4,6 +4,10 @@ from functions import config, timeFormatters, stringFormatters
 from functions.numbers import clamp
 import json
 
+
+# TODO use constants & enums instead of hardcoding platform names
+#   also make the naming in the jsons more consistent
+
 def createCourseString(courses):
     courseString = ""
     for course in sorted(courses, key=lambda item: item["slot"]["time"][1]):
@@ -42,15 +46,23 @@ def createEmbed(day, dayDatetime, semester, year, schedule):
         if extras:
             embed.add_field(name="Extra", value="\n".join(getExtras(extra) for extra in extras), inline=False)
 
-        # Add online links
+        # TODO uncomment this when covid rules slow down
+        # Add online links - temporarily removed because everything is online right now
         if online:
-            embed.add_field(name="Online Links", value="\n".join(getLink(onlineClass) for onlineClass in online))
+            uniqueLinks: dict = getUniqueLinks(online)
+            embed.add_field(name="Online Links", value="\n".join(
+                sorted(getLinks(onlineClass, links) for onlineClass, links in uniqueLinks.items())))
 
         embed.set_footer(text="Semester  {} | Lesweek {}".format(semester, round(week)))
     return embed
 
 
 def findDate(targetWeekday):
+    """
+    Function that finds the datetime object that corresponds to
+    the next occurence of [targetWeekday].
+    :param targetWeekday: The weekday to find
+    """
     now = timeFormatters.dateTimeNow()
     while now.weekday() != targetWeekday:
         now = now + datetime.timedelta(days=1)
@@ -58,14 +70,23 @@ def findDate(targetWeekday):
 
 
 def getCourses(schedule, day, week):
+    """
+    Function that creates a list of all courses of this day,
+    a list of all online links, and extra information for these courses.
+    :param schedule: A user's (customized) schedule
+    :param day: The current weekday
+    :param week: The current week
+    """
     # Add all courses & their corresponding times + locations of today
     courses = []
     extras = []
     prev = []
     onlineLinks = []
+
     for course in schedule:
         for slot in course["slots"]:
             if day in slot["time"]:
+                # Basic dict containing the course name & the class' time slot
                 classDic = {"course": course["course"], "slot": slot}
 
                 # Class was canceled
@@ -74,17 +95,33 @@ def getCourses(schedule, day, week):
                     continue
 
                 # Add online links for those at home
-                if not any(el["course"] == course["course"] for el in onlineLinks):
-                    if "bongo" in course:
-                        onlineDic = {"course": course["course"], "online": "Bongo Virtual Classroom", "link": course["bongo"]}
-                        onlineLinks.append(onlineDic)
-                    elif "zoom" in course:
-                        onlineDic = {"course": course["course"], "online": "Zoom", "link": course["zoom"]}
+                # Check if link hasn't been added yet
+                if not any(el["course"] == course["course"] and
+                           # Avoid KeyErrors: if either of these don't have an online link yet,
+                           # add it as well
+                           ("online" not in el or "online" not in slot or el["online"] == slot["online"])
+                           for el in onlineLinks):
+                    # Some courses have multiple links on the same day,
+                    # add all of them
+                    if "bongo" in slot["online"].lower():
+                        onlineDic = {"course": course["course"], "online": "Bongo Virtual Classroom",
+                                     "link": course["bongo"]}
                         onlineLinks.append(onlineDic)
 
-                # Add this class' bongo & zoom links
+                    if "zoom" in slot["online"].lower():
+                        onlineDic = {"course": course["course"], "online": "ZOOM", "link": course["zoom"]}
+                        onlineLinks.append(onlineDic)
+
+                    if "teams" in slot["online"].lower():
+                        onlineDic = {"course": course["course"], "online": "MS Teams", "link": course["msteams"]}
+                        onlineLinks.append(onlineDic)
+
+                # Add this class' bongo, msteams & zoom links
                 if "bongo" in course:
                     classDic["slot"]["bongo"] = course["bongo"]
+
+                if "msteams" in course:
+                    classDic["slot"]["msteams"] = course["msteams"]
 
                 if "zoom" in course:
                     classDic["slot"]["zoom"] = course["zoom"]
@@ -99,11 +136,14 @@ def getCourses(schedule, day, week):
                             courses.append(classDic)
                         extras.append(classDic)
                 elif "weeks" in slot and "online" in slot and "group" not in slot:
+                    # This class is only online for this week
                     if week in slot["weeks"]:
                         if "custom" not in course:
                             courses.append(classDic)
                         extras.append(classDic)
                 else:
+                    # Nothing special happening, just add it to the list of courses
+                    # in case this is a course for everyone in this year
                     if "custom" not in course:
                         courses.append(classDic)
 
@@ -126,6 +166,10 @@ def getCourses(schedule, day, week):
 
 
 def getExtras(extra):
+    """
+    Function that returns a formatted string giving clear info
+    when a course is happening somewhere else (or canceled).
+    """
     start = timeFormatters.timeFromInt(extra["slot"]["time"][1])
     end = timeFormatters.timeFromInt(extra["slot"]["time"][2])
 
@@ -153,16 +197,52 @@ def getExtras(extra):
         )
 
 
-def getLink(onlineClass):
-    return "{}: **[{}]({})**".format(onlineClass["course"], onlineClass["online"], onlineClass["link"])
+def getUniqueLinks(onlineClasses):
+    """
+    Function that returns a dict of all online unique online links for every class
+    in case some classes have multiple links on the same day.
+    """
+    # Create a list of all unique course names
+    courseNames = list(set(oc["course"] for oc in onlineClasses))
+    uniqueLinks: dict = {}
+
+    # Add every link of every class into the dict
+    for name in courseNames:
+        uniqueLinks[name] = {}
+        for oc in onlineClasses:
+            if oc["course"] == name:
+                # Add the link for this platform
+                uniqueLinks[name][oc["online"]] = oc["link"]
+
+    return uniqueLinks
+
+
+def getLinks(onlineClass, links):
+    """
+    Function that returns a formatted string giving a hyperlink
+    to every online link for this class today.
+    """
+    return "{}: {}".format(onlineClass,
+                           " | ".join(
+                               ["**[{}]({})**".format(platform, url) for platform, url in
+                                links.items()])
+                           )
 
 
 def getLocation(slot):
+    """
+    Function that returns a formatted string indicating where this course
+    is happening.
+    """
     if "canceled" in slot:
         return None
 
+    # TODO fix this because it's ugly
     if "online" in slot:
-        return "online @ **[{}]({})**".format(slot["online"], slot["zoom"] if slot["online"] == "ZOOM" else slot["bongo"])
+        return "online @ **[{}]({})**".format(slot["online"],
+                                              slot["zoom"] if slot["online"] == "ZOOM" else slot["msteams"] if slot[
+                                                                                                                   "online"] == "MS Teams" else
+                                              slot["bongo"])
 
     # Check for courses in multiple locations
     if "locations" in slot:
@@ -187,7 +267,7 @@ def getTitle(day, dayDT, week):
     day = day[0].upper() + day[1:].lower()
 
     titleString = "{} {}/{}/{}".format(day, stringFormatters.leadingZero(dayDT.day),
-                                           stringFormatters.leadingZero(dayDT.month), dayDT.year)
+                                       stringFormatters.leadingZero(dayDT.month), dayDT.year)
     return titleString, week
 
 
