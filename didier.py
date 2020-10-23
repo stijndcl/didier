@@ -9,8 +9,8 @@ load_dotenv(verbose=True)
 
 # All possible prefixes
 # When_mentioned_or doesn't count for spaces so can't use that
-prefixes = ["didier ", "Didier ", "DIDIER ", "big d ", "<@!680510935164911730> ",
-            "didier", "Didier", "DIDIER", "big d", "<@!680510935164911730>"]
+prefixes = ["didier ", "Didier ", "DIDIER ", "big d ", "Big d ", "Big D ", "BIG D ", "<@!680510935164911730> ",
+            "didier", "Didier", "DIDIER", "big d", "Big d", "Big D", "BIG D", "<@!680510935164911730>"]
 
 # Configure intents (1.5.0)
 intents = discord.Intents.default()
