@@ -57,7 +57,7 @@ class Utils(commands.Cog):
             member = COC.get_member(int(memberid))
             if member is not None:
                 return member.display_name
-            return "[Persoon die de server misschien geleaved is]"
+            return "[Persoon die de server misschien geleaved is | {}]".format(memberid)
 
         mem = ctx.guild.get_member(int(memberid))
         return mem.display_name
