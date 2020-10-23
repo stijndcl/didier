@@ -3,7 +3,7 @@ from decorators import help
 import discord
 from discord.ext import commands
 from enums.help_categories import Category
-from functions import checks, config
+from functions import checks, config, timeFormatters
 from functions.database import memes, githubs, twitch, dadjoke
 import json
 import os
@@ -149,6 +149,39 @@ class ModCommands(commands.Cog):
             userid = ctx.message.mentions[0].id
         twitch.add(userid, link)
         await ctx.send("{}'s Twitch is toegevoegd aan de database.".format(self.utilsCog.getDisplayName(ctx, userid)))
+
+    @commands.command(name="WhoIs", aliases=["Info"], usage="[@User]")
+    @help.Category(Category.Mod)
+    async def whois(self, ctx, user: discord.User):
+        embed = discord.Embed(colour=discord.Colour.blue())
+
+        embed.set_author(name=user.display_name, icon_url=user.avatar_url)
+        embed.add_field(name="Discriminator", value="#{}".format(user.discriminator))
+        embed.add_field(name="Discord Id", value=user.id)
+        embed.add_field(name="Bot", value="Nee" if not user.bot else "Ja")
+
+        created_local = timeFormatters.epochToDate(user.created_at.timestamp())
+
+        embed.add_field(name="Account Aangemaakt", value="{}\n({} Geleden)".format(
+            created_local["date"], timeFormatters.diffYearBasisString(round(created_local["dateDT"].timestamp()))
+        ), inline=False)
+
+        # Check if the user is in the current guild
+        if ctx.guild is not None:
+            member_instance = ctx.guild.get_member(user.id)
+
+            embed.add_field(name="Lid van {}".format(ctx.guild.name), value="Nee" if member_instance is None else "Ja")
+
+            if member_instance is not None:
+                joined_local = timeFormatters.epochToDate(member_instance.joined_at.timestamp())
+
+                embed.add_field(name="Lid Geworden Op", value="{}\n({} Geleden)".format(
+                    joined_local["date"], timeFormatters.diffYearBasisString(round(joined_local["dateDT"].timestamp()))
+                ))
+
+                embed.add_field(name="Mention String", value=member_instance.mention, inline=False)
+
+        await ctx.send(embed=embed)
 
     # Send a DM to a user -- Can't re-use Utils cog in (un)load because the cog might not be loaded
     async def sendDm(self, userid, message: str):

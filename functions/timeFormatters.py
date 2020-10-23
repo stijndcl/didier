@@ -11,7 +11,7 @@ def epochToDate(epochTimeStamp, strFormat="%m/%d/%Y om %H:%M:%S"):
     diff = now - updateTime
     updateFormatted = str(updateTime.strftime(strFormat))
     timeAgo = str(time.strftime('%H:%M:%S', time.gmtime(diff.total_seconds())))
-    return {"date": updateFormatted, "timeAgo": timeAgo}
+    return {"date": updateFormatted, "dateDT": updateTime, "timeAgo": timeAgo}
 
 
 def dateTimeNow():
@@ -51,8 +51,8 @@ def timeIn(seconds, unit):
 # Creates a string representation based on Days/Hours/Minutes/Seconds
 def diffDayBasisString(timestamp):
     if isinstance(timestamp, int):
-        timestamp = datetime.datetime.fromtimestamp(timestamp)
-    now = datetime.datetime.fromtimestamp(time.time())
+        timestamp = epochToDate(timestamp)["dateDT"]
+    now = dateTimeNow()
     diff = dateutil.relativedelta.relativedelta(now, timestamp)
 
     timeList = []
@@ -79,8 +79,8 @@ def diffDayBasisString(timestamp):
 
 def diffYearBasisString(timestamp):
     if isinstance(timestamp, int):
-        timestamp = datetime.datetime.fromtimestamp(timestamp)
-    now = datetime.datetime.fromtimestamp(time.time())
+        timestamp = epochToDate(timestamp)["dateDT"]
+    now = dateTimeNow()
     diff = dateutil.relativedelta.relativedelta(now, timestamp)
 
     timeList = []

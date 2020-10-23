@@ -108,6 +108,7 @@
   "twitch add": "Voegt jouw eigen Twitch toe aan de lijst.\nZowel ``twitch.tv/username`` als ``username`` werken.",
   "unload": "Verwijdert [Cog].",
   "unload all": "Verwijdert alle cogs.",
+  "whois": "Toont de info van [@User]",
   "xp": "Bekijk je huidige aantal berichten en xp.",
   "yes/no": "Didier helpt je met keuzes maken."
 }
