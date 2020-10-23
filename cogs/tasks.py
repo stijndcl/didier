@@ -183,12 +183,18 @@ class Tasks(commands.Cog):
         # Don't do it multiple times a day if bot dc's, ...
         with open("files/lastTasks.json", "r") as fp:
             lastTasks = json.load(fp)
-        if self.getCurrentWeekday() < 5 and int(self.getCurrentHour()) == 7 and int(time.time()) - int(lastTasks["remind"]) > 10000:
+        if int(self.getCurrentHour()) == 0 and int(time.time()) - int(lastTasks["remind"]) > 10000:
             reminders = Reminders()
 
+            weekday = self.getCurrentWeekday()
+
             for category in reminders.categories:
+                # Checks if this reminder can be sent on weekdays
+                if (not category["weekends"]) and weekday > 4:
+                    continue
+
                 for user in category["users"]:
-                    userInstance = await self.client.fetch_user(user)
+                    userInstance = self.client.get_user(user)
 
                     # User can't be fetched for whatever reason, ignore instead of crashing
                     if userInstance is None:
