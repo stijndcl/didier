@@ -20,9 +20,12 @@ class Remind(commands.Cog):
         Command group to remind the user of a certain thing every day.
         :param ctx: Discord Context
         """
-        categories = ["Les", "Nightly"]
-        embed = discord.Embed(colour=discord.Colour.blue())
+        rows = remind.getOrAddUser(ctx.author.id)
 
+        # TODO use a loop for this when not lazy
+        categories = [remind.getIcon(rows[1]) + " Nightly", remind.getIcon(rows[2]) + " Les"]
+
+        embed = discord.Embed(colour=discord.Colour.blue())
         embed.set_author(name="Remind Categorieën")
         embed.description = "\n".join(sorted(categories))
 
