@@ -34,7 +34,7 @@ class Remind(commands.Cog):
         Command to get a daily Nightly reminder
         """
         if remind.switchReminder(ctx.author.id, "nightly"):
-            await ctx.send("Vanaf nu wordt je er dagelijks aan herinnerd om Didier Nightly te doen.")
+            await ctx.send("Vanaf nu word je er dagelijks aan herinnerd om Didier Nightly te doen.")
         else:
             await ctx.send("Je zal er niet langer aan herinnerd worden om Didier Nightly te doen.")
 
