@@ -16,7 +16,9 @@ Commands require a set list of kwargs in order to work correctly, and show up in
     Aliases should only have the first letter capitalised, and be placed in alphabetical order.
 - Usage: Optional, only required when the command takes arguments. Show how the command has to be used. Arguments should be placed between \[square brackets\], and optional arguments need an asterisk* after the brackets.
 - Hidden: Optional, should only be added when you _don't_ want the command to show up in the help page.
-- Ignore_Extra: Optional, should only be used when you want to ignore extra arguments passed into the function.
+- Ignore_Extra: Optional, should only be used when you don't want the command to be called when too many arguments are passed.
+
+    This defaults to `True`, so if you don't care about extra arguments then adding this is obsolete. Setting this to `False` makes sentences like _Didier Bank is a cool command_ not trigger the `Didier Bank` command.
 
 ##### Checks
 Further, checks can be added to commands to make sure the function only executes in certain situations. There are already a few [built-in checks](https://discordpy.readthedocs.io/en/latest/ext/commands/api.html?highlight=checks#checks) to do commonly-used  things, but you can easily create your own functions to do this.
