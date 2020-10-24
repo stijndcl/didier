@@ -41,3 +41,8 @@ def switchReminder(userid, column):
 
     return to
 
+
+# Function that returns a red or green circle depending on
+# whether or not a value is True or False
+def getIcon(val):
+    return ":green_circle:" if val else ":red_circle:"
