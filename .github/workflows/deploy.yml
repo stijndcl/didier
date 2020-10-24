@@ -1,0 +1,28 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Deploy to server
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.DEPLOY_HOST }}
+        port: ${{ secrets.DEPLOY_PORT }}
+        key: ${{ secrets.DEPLOY_PRIVATE_KEY }}
+        script: "cd didier; git pull"
+        username: pi
+    - name: Restart Didier
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.DEPLOY_HOST }}
+        port: ${{ secrets.DEPLOY_PORT }}
+        key: ${{ secrets.DEPLOY_PRIVATE_KEY }}
+        script: "sudo service didier restart"
+        username: pi
