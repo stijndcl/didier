@@ -1,7 +1,6 @@
 [
   {
     "course": "Programmeren",
-    "icon": "laptop-code",
     "slots": [
       {
         "campus": "Sterre",
@@ -32,7 +31,6 @@
   },
   {
     "course": "Databanken",
-    "icon": "database",
     "slots": [
       {
         "campus": "Sterre",
@@ -40,8 +38,8 @@
         "room": "A3",
         "time": [
           "donderdag",
-          1000,
-          1100
+          1130,
+          1245
         ]
       },
       {
@@ -50,8 +48,8 @@
         "room": "A3",
         "time": [
           "vrijdag",
-          1430,
-          1530
+          1300,
+          1415
         ]
       },
       {
@@ -96,8 +94,6 @@
   },
   {
     "course": "Computergebruik",
-    "icon": "linux",
-    "icon_type": "fab",
     "slots": [
       {
         "campus": "Sterre",
@@ -142,7 +138,6 @@
   },
   {
     "course": "RAF",
-    "icon": "brain",
     "slots": [
       {
         "campus": "Sterre",
@@ -178,12 +173,10 @@
   },
   {
     "course": "Discrete Wiskunde",
-    "icon": "square-root-alt",
+    "zoom": "https://ufora.ugent.be/d2l/ext/rp/232374/lti/framedlaunch/556e197e-e87b-4c27-be5d-53adc7a41826",
     "slots": [
       {
-        "campus": "Sterre",
-        "building": "S9",
-        "room": "A3",
+        "online": "ZOOM",
         "time": [
           "maandag",
           1000,

@@ -97,11 +97,11 @@ def getCourses(schedule, day, week):
 
                 # Add online links for those at home
                 # Check if link hasn't been added yet
-                if not any(el["course"] == course["course"] and
-                           # Avoid KeyErrors: if either of these don't have an online link yet,
-                           # add it as well
-                           ("online" not in el or "online" not in slot or el["online"] == slot["online"])
-                           for el in onlineLinks):
+                if "online" in slot and not any(el["course"] == course["course"] and
+                                                # Avoid KeyErrors: if either of these don't have an online link yet,
+                                                # add it as well
+                                                ("online" not in el or el["online"] == slot["online"])
+                                                for el in onlineLinks):
                     # Some courses have multiple links on the same day,
                     # add all of them
                     if "bongo" in slot["online"].lower():
@@ -317,16 +317,16 @@ def parseArgs(day):
             # elif: calling a weekday is automatically handled below,
             # so checking is obsolete
         else:
+            # TODO check other direction (di 1) in else
             # Both were passed
             if day[0].isdigit():
                 if 0 < int(day[0]) < years_counter + 1:
                     year = int(day[0])
-                    day = []
+                    # day = []
                 else:
                     return [False, "Dit is geen geldige jaargang."]
             # Cut the schedule from the string
             day = day[1:]
-
     day = getWeekDay(None if len(day) == 0 else day)[1]
     dayDatetime = findDate(timeFormatters.weekdayToInt(day))
 
