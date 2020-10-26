@@ -1,22 +1,86 @@
+from enums.platforms import Platforms
 from functions.timeFormatters import timeFromInt
 
 
-# A container class for classes
+# A container class for schedules
+class Schedule:
+    pass
+# TODO extra's & special classes
+
+
+# A container class for courses
 class Course:
     # Initialize a course from the dict that the JSON contains
     def __init__(self, courseInfo: dict):
+        self.courseInfo = courseInfo
         self.name = courseInfo["course"]
 
+        self.slots = []
+        self.initSlots()
 
+        self.platforms = {}
+        self.initPlatforms()
+
+    def initSlots(self):
+        """
+        Function that creates Slot instances & adds them to the list
+        """
+        for slot in self.courseInfo["slots"]:
+            self.slots.append(Slot(self, slot))
+
+    def initPlatforms(self):
+        """
+        Function that creates Platform instances & adds them into the dict
+        """
+        for platform in Platforms:
+            if platform["rep"] in self.courseInfo:
+                self.platforms[platform["rep"]] = Platform(platform["name"], self.courseInfo[platform["rep"]])
+
+    def getSlotsOnDay(self, day: str, week: int):
+        """
+        Function that returns a list of all slots of this course
+        on a given day of the week
+
+        This list then has duplicate days filtered out depending on
+        whether or not there is a special class on this day
+        """
+        slots = []
+        specials = []
+
+        for slot in self.slots:
+            # Skip slots on other days
+            if slot.day != day:
+                continue
+
+            # TODO check weeks & filter slots down
+
+            if slot.special:
+                specials.append(slot)
+            else:
+                slots.append(slot)
+
+
+
+# TODO add an is_online field to the JSON to allow toggling
+#   temporary online classes easier
 # A slot in a course
 class Slot:
-    def __init__(self, slot: dict):
+    def __init__(self, course: Course, slot: dict):
+        self.course = course
         self.day = slot["time"][0]
         self.start = timeFromInt(slot["time"][1])
         self.end = timeFromInt(slot["time"][2])
-        self.locations = self.getLocations(slot)
+        self.canceled = "canceled" in slot  # Boolean indicating whether or not this class has been canceled
+        self.special = "weeks" in slot or self.canceled  # Boolean indicating if this class is special or generic
 
-    def getLocations(self, slot: dict):
+        # TODO check if on-campus, else None
+        self.locations = self.setLocations(slot)
+        self.platform = self.course.platforms[slot["online"]]
+
+    def setLocations(self, slot: dict):
+        """
+        Function that creates a list of Location instances
+        """
         locations = []
 
         # Slot has multiple locations
@@ -29,6 +93,17 @@ class Slot:
 
         return locations
 
+    def getLocations(self):
+        """
+        Function that creates a string representation for this
+        slot's locations
+        """
+        if self.locations is None:
+            return ""
+
+    def getOnline(self):
+        pass
+
 
 # A location where a course might take place
 class Location:
@@ -37,7 +112,12 @@ class Location:
         self.building = slot["building"]
         self.room = slot["room"]
 
+    def __str__(self):
+        return " ".join([self.campus, self.building, self.room])
+
 
 # A streaming platform
 class Platform:
-    pass
+    def __init__(self, name, url):
+        self.name = name
+        self.url = url
