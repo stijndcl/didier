@@ -4,8 +4,17 @@ from functions.timeFormatters import timeFromInt
 
 # A container class for schedules
 class Schedule:
-    pass
-# TODO extra's & special classes
+    def __init__(self, schedule: dict):
+        self.courses = [Course(course) for course in schedule]
+        self.customs = []  # Courses that only the person that called the schedule has
+        self.extra = []  # Courses that need special attention (canceled, online, ...)
+
+    def addCustom(self, course):
+        """
+        Function that adds a course into the list of courses,
+        useful for adding a user's custom courses
+        """
+        self.customs.append(Course(course))
 
 
 # A container class for courses
