@@ -1,23 +1,18 @@
 import discord
 from discord.ext import commands
 from dotenv import load_dotenv
+from functions.prefixes import get_prefix
 import os
 
 
 load_dotenv(verbose=True)
 
 
-# All possible prefixes
-# When_mentioned_or doesn't count for spaces so can't use that
-prefixes = ["didier ", "Didier ", "DIDIER ", "big d ", "Big d ", "Big D ", "BIG D ", "<@!680510935164911730> ",
-            "didier", "Didier", "DIDIER", "big d", "Big d", "Big D", "BIG D", "<@!680510935164911730>"]
-
 # Configure intents (1.5.0)
 intents = discord.Intents.default()
 intents.members = True
 
-client = commands.Bot(command_prefix=prefixes, case_insensitive=True, intents=intents)
-client.prefixes = prefixes
+client = commands.Bot(command_prefix=get_prefix, case_insensitive=True, intents=intents)
 
 # Remove default help because it sucks & I made my own
 client.remove_command("help")

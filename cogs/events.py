@@ -66,24 +66,29 @@ class Events(commands.Cog):
         if not checks.freeGamesCheck(message):
             await self.failedChecksCog.freeGames(message)
 
-        # Log commands in terminal
-        if any(message.content.lower().startswith(pre) for pre in self.client.prefixes):
-            DM = message.guild is None
-            print("{} in {}: {}".format(message.author.display_name,
-                                        "DM" if DM else "{} ({})".format(message.channel.name, message.guild.name),
-                                        message.content))
-
         # Boos React to people that call him Dider
-        if "dider" in message.content.lower() and str(message.author.id) not in [constants.myId, constants.didierId]:
+        if "dider" in message.content.lower() and str(message.author.id) not in [constants.myId, constants.didierId, constants.coolerDidierId]:
             await message.add_reaction("<:boos:629603785840263179>")
 
         # Check for other easter eggs
-        eER = easterEggResponses.control(message)
+        eER = easterEggResponses.control(self.client, message)
         if eER:
             await message.channel.send(eER)
 
         # Earn XP & Message count
         stats.sentMessage(message)
+
+    @commands.Cog.listener()
+    async def on_command(self, ctx):
+        """
+        Function called whenever someone invokes a command.
+        Logs commands in your terminal.
+        :param ctx: Discord Context
+        """
+        DM = ctx.guild is None
+        print("{} in {}: {}".format(ctx.author.display_name,
+                                    "DM" if DM else "{} ({})".format(ctx.channel.name, ctx.guild.name),
+                                    ctx.message.content))
 
     @commands.Cog.listener()
     async def on_command_error(self, ctx, err):
