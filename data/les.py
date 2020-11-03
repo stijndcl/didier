@@ -61,13 +61,23 @@ class Course:
             if slot.day != day:
                 continue
 
-            # TODO check weeks & filter slots down
+            # This is a special slot that should only be added
+            # if the week corresponds
+            if slot.weeks and week not in slot.weeks:
+                continue
 
             if slot.special:
                 specials.append(slot)
             else:
                 slots.append(slot)
 
+#         Filter doubles out (special classes, ...)
+        for special in specials:
+            for slot in slots:
+                if slot.start == special.start and slot.end == special.end:
+                    slots.remove(slot)
+
+        return slots, specials
 
 
 # TODO add an is_online field to the JSON to allow toggling
@@ -79,6 +89,7 @@ class Slot:
         self.day = slot["time"][0]
         self.start = timeFromInt(slot["time"][1])
         self.end = timeFromInt(slot["time"][2])
+        self.weeks = [] if "weeks" not in slot else slot["weeks"]
         self.canceled = "canceled" in slot  # Boolean indicating whether or not this class has been canceled
         self.special = "weeks" in slot or self.canceled  # Boolean indicating if this class is special or generic
 
