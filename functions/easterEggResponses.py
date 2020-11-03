@@ -1,16 +1,15 @@
+from data import constants
 import random
 
-from data import constants
 
-
-def control(message):
+def control(bot, message):
     if str(message.author.id) == constants.didierId:
         return ""
-    elif didier(message.content):
+    elif didier(bot, message.content):
         return "Hmm?"
     elif any(term in message.content for term in ["gib dink", "gib donk"]):
         return "No."
-    elif didier(message.content.split(" ")[0]) and any(term in message.content.lower() for term in ["are you sure", "are u sure"]):
+    elif didier(bot, message.content.split(" ")[0]) and any(term in message.content.lower() for term in ["are you sure", "are u sure"]):
         return "I'm not just sure, I'm HIV Positive."
     elif any(message.content.lower().startswith(term) for term in ["is this", "isthis", "isdis", "is dis"]):
         res = random.randint(0, 100)
@@ -24,6 +23,6 @@ def control(message):
     return ""
 
 
-def didier(message):
+def didier(bot, message):
     ml = message.lower()
-    return ml == "didier" or ml == "<@!{}>".format(constants.didierId)
+    return ml in constants.prefixes or ml == "<@!{}>".format(bot.user.id)

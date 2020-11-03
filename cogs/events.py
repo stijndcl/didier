@@ -67,18 +67,19 @@ class Events(commands.Cog):
             await self.failedChecksCog.freeGames(message)
 
         # Log commands in terminal
-        if any(message.content.lower().startswith(pre) for pre in self.client.prefixes):
-            DM = message.guild is None
-            print("{} in {}: {}".format(message.author.display_name,
-                                        "DM" if DM else "{} ({})".format(message.channel.name, message.guild.name),
-                                        message.content))
+        # TODO move to on_command
+        # if any(message.content.lower().startswith(pre) for pre in self.client.prefixes):
+        #     DM = message.guild is None
+        #     print("{} in {}: {}".format(message.author.display_name,
+        #                                 "DM" if DM else "{} ({})".format(message.channel.name, message.guild.name),
+        #                                 message.content))
 
         # Boos React to people that call him Dider
         if "dider" in message.content.lower() and str(message.author.id) not in [constants.myId, constants.didierId]:
             await message.add_reaction("<:boos:629603785840263179>")
 
         # Check for other easter eggs
-        eER = easterEggResponses.control(message)
+        eER = easterEggResponses.control(self.client, message)
         if eER:
             await message.channel.send(eER)
 

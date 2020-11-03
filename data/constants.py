@@ -2,6 +2,7 @@ from enum import Enum
 
 myId = "171671190631481345"
 didierId = "680510935164911730"
+coolerDidierId = "728361496874057812"
 botIDs = [
     "155149108183695360",
     "234395307759108106",
@@ -42,6 +43,8 @@ allowedChannels = {
 creationDate = 1582243200
 
 holidayAPIKey = "af4e1ebe-465d-4b93-a828-b95df18e6424"
+
+prefixes = ["big d", "didier"]
 
 
 class Live(Enum):
