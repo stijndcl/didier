@@ -10,6 +10,12 @@ Contains the application's token to connect to Discord. You can create your own 
 
     token_goes_here
 
+### files/commands.json
+
+Contains info on every command's usage. These are dynamically added, so this is just an emtpy json file.
+
+    {}
+
 ### files/database.json
 
 Contains the credentials needed to connect to the PSQL database. This is ignored so that I don't have to leak my IP address, but also so that you can set up a local database to mess around without affecting the Live one or having to change any code.
