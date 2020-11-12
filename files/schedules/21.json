@@ -47,6 +47,11 @@
           }
         ],
         "time": ["maandag", 1430, 1700]
+      },
+      {
+        "weeks": [9],
+        "canceled": true,
+        "time": ["donderdag", 1430, 1700]
       }
     ]
   },
