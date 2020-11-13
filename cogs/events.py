@@ -102,7 +102,7 @@ class Events(commands.Cog):
             return
         # Someone just mentioned Didier without calling a real command,
         # don't care about this error
-        if isinstance(err, (commands.CommandNotFound, commands.CheckFailure, commands.TooManyArguments), ):
+        if isinstance(err, (commands.CommandNotFound, commands.CheckFailure, commands.TooManyArguments, commands.ExpectedClosingQuoteError), ):
             pass
         # Someone used a command that was on cooldown
         elif isinstance(err, commands.CommandOnCooldown):
