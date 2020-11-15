@@ -192,9 +192,9 @@ class Events(commands.Cog):
         :param react: the RawReactionEvent associated with the reaction
         :param msg: the message this react was placed on
         """
-        # Blacklist NinjaJay after spamming
-        if react.user_id in [153162010576551946]:
-            return False
+        # # Blacklist NinjaJay after spamming
+        # if react.user_id in [153162010576551946]:
+        #     return False
 
         # Don't spam DM's when something has already been reported
         # Check if the react's count is 1
