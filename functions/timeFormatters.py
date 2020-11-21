@@ -82,7 +82,6 @@ def diffYearBasisString(timestamp):
         timestamp = epochToDate(timestamp)["dateDT"]
     now = dateTimeNow()
     diff = dateutil.relativedelta.relativedelta(now, timestamp)
-
     timeList = []
 
     # Don't add obsolete info such as "0 days", ...
@@ -98,10 +97,18 @@ def diffYearBasisString(timestamp):
     if diff.days != 0:
         timeList.append("{} {}".format(diff.days, getPlural(diff.days, "days")))
 
-    timeString = ", ".join(timeList[:-1])
+    timeString = ""
+
+    if not timeList:
+        return "Minder dan een dag"
+
+    if len(timeList) > 1:
+        timeString = ", ".join(timeList[:-1])
     if len(timeString) > 0:
         timeString += " en "
+
     timeString += timeList[-1]
+
     return timeString
 
 

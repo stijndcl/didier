@@ -58,7 +58,7 @@ class Poke(commands.Cog):
     @poke.command(name="Current")
     async def current(self, ctx):
         p = poke.get()
-        pokedTimeStamp = datetime.datetime.fromtimestamp(int(p[1]))
+        pokedTimeStamp = timeFormatters.epochToDate(int(p[1]))["dateDT"]
         timeString = timeFormatters.diffDayBasisString(pokedTimeStamp)
 
         await ctx.send("Het is al **{}** aan **{}**.".format(timeString, self.utilsCog.getDisplayName(ctx, p[0])))

@@ -170,7 +170,7 @@ class ModCommands(commands.Cog):
 
         created_local = timeFormatters.epochToDate(user.created_at.timestamp())
 
-        embed.add_field(name="Account Aangemaakt", value="{}\n({} Geleden)".format(
+        embed.add_field(name="Account Aangemaakt", value="{}\n({} geleden)".format(
             created_local["date"], timeFormatters.diffYearBasisString(round(created_local["dateDT"].timestamp()))
         ), inline=False)
 
