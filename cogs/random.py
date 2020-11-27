@@ -32,13 +32,9 @@ class Random(commands.Cog):
 
     @random.command(name="Choice", usage="[Argumenten]")
     async def choice(self, ctx, *options):
-        if not options:
+        if not options or not options[0]:
             await ctx.send("Geef een geldige reeks op.")
             return
-
-        # Allows choose alias to pass in it's args too
-        if isinstance(options[0], tuple):
-            options = options[0]
 
         await ctx.send(random.choice(options))
 
@@ -58,7 +54,7 @@ class Random(commands.Cog):
             raise error
 
     @random.command(name="Name")
-    async def name(self, ctx, *args):
+    async def name(self, ctx):
         try:
             name = requests.get("https://randomuser.me/api/").json()
         except json.decoder.JSONDecodeError:
@@ -69,7 +65,7 @@ class Random(commands.Cog):
         await ctx.send("{} {} {}".format(name["title"], name["first"], name["last"]))
 
     @random.command(name="Identity", aliases=["Id"])
-    async def identity(self, ctx, *args):
+    async def identity(self, ctx):
         try:
             identity = requests.get("https://randomuser.me/api/").json()
         except json.decoder.JSONDecodeError:
@@ -105,7 +101,7 @@ class Random(commands.Cog):
         await ctx.send(" - ".join(args))
 
     @random.command(name="Colour", aliases=["Color"])
-    async def colour(self, ctx, *args):
+    async def colour(self, ctx):
         r, g, b = colours.randomRGB()
 
         embed = discord.Embed(colour=discord.Colour.from_rgb(r, g, b))
@@ -117,7 +113,7 @@ class Random(commands.Cog):
         await ctx.send(embed=embed)
 
     @random.command(name="Timestamp", aliases=["Time", "Ts"])
-    async def timestamp(self, ctx, *args):
+    async def timestamp(self, ctx):
         hour = str(random.randint(0, 23))
         hour = ("0" if len(hour) == 1 else "") + hour
         minutes = str(random.randint(0, 23))
@@ -125,13 +121,13 @@ class Random(commands.Cog):
         await ctx.send("{}:{}".format(hour, minutes))
 
     @random.command(name="Fact", aliases=["Knowledge"])
-    async def fact(self, ctx, *args):
+    async def fact(self, ctx):
         randomFact = requests.get("https://uselessfacts.jsph.pl/random.json?language=en").json()
         await ctx.send(randomFact["text"])
 
     @commands.command(name="Yes/No", aliases=["Yn"])
     @help.Category(Category.Random)
-    async def yesno(self, ctx, *args):
+    async def yesno(self, ctx):
         await ctx.send(random.choice(["Ja.", "Nee."]))
 
 
