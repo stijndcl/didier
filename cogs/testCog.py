@@ -15,6 +15,10 @@ class TestCog(commands.Cog):
     async def test(self, ctx):
         pass
 
+    @test.error
+    async def test_handler(self, ctx, error):
+        raise error
+
 
 def setup(client):
     client.add_cog(TestCog(client))
