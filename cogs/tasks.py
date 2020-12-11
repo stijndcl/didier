@@ -189,6 +189,10 @@ class Tasks(commands.Cog):
             weekday = self.getCurrentWeekday()
 
             for category in reminders.categories:
+                # Check if this reminder is temporarily disabled
+                if category["disabled"]:
+                    continue
+
                 # Checks if this reminder can be sent on weekdays
                 if (not category["weekends"]) and weekday > 4:
                     continue
