@@ -43,21 +43,40 @@ class School(commands.Cog):
     @commands.check(checks.allowedChannels)
     @help.Category(category=Category.School)
     async def les(self, ctx, *day):
-        parsed = les.parseArgs(day)
+        embed = discord.Embed(colour=discord.Colour.blue())
 
-        # Invalid arguments
-        if not parsed[0]:
-            return await ctx.send(parsed[1])
+        # These are hardcoded because they don't change & don't matter anymore in a month
+        embed.set_author(name="Examenrooster 2de Bachelor")
 
-        day, dayDatetime, semester, year = parsed[1:]
-
-        # Customize the user's schedule
-        schedule = self.customizeSchedule(ctx, year, semester)
-
-        # Create the embed
-        embed = les.createEmbed(day, dayDatetime, semester, year, schedule)
+        embed.add_field(name="Algoritmen en Datastructuren 2",
+                        value="Woensdag 06/01/2021\n13:00 - 16:00\nFlanders Expo, Hal 4D", inline=False)
+        embed.add_field(name="Functioneel Programmeren",
+                        value="Dinsdag 12/01/2021\n13:00 - 16:00\nFlanders Expo, Hal 5C", inline=False)
+        embed.add_field(name="Systeemprogrammeren",
+                        value="Maandag 18/01/2021\n08:30 - 11:30\nOnline, schriftelijk", inline=False)
+        embed.add_field(name="Communicatienetwerken",
+                        value="Vrijdag 22/01/2021\n13:00 - 16:00\nFlanders Expo Hal 4A", inline=False)
+        embed.add_field(name="Statistiek en Probabiliteit",
+                        value="Vrijdag 29/01/2021\n08:30 - 11:30\nCampus Ardoyen Locus, PC Resto Locus", inline=False)
 
         await ctx.send(embed=embed)
+
+        # Les code
+        # parsed = les.parseArgs(day)
+        #
+        # # Invalid arguments
+        # if not parsed[0]:
+        #     return await ctx.send(parsed[1])
+        #
+        # day, dayDatetime, semester, year = parsed[1:]
+        #
+        # # Customize the user's schedule
+        # schedule = self.customizeSchedule(ctx, year, semester)
+        #
+        # # Create the embed
+        # embed = les.createEmbed(day, dayDatetime, semester, year, schedule)
+        #
+        # await ctx.send(embed=embed)
 
     # Add all the user's courses
     def customizeSchedule(self, ctx, year, semester):
