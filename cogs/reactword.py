@@ -51,6 +51,25 @@ class ReactWord(commands.Cog):
             for reac in arr:
                 await message.add_reaction(reac)
 
+    @commands.command(name="Character", aliases=["Char"], usage="[Karakter]")
+    @help.Category(category=Category.Other)
+    async def char(self, ctx, char: str = None):
+        # Nothing passed
+        if char is None:
+            return await ctx.send("Controleer je argumenten")
+
+        char = char.lower()
+
+        # Not 1 char passed
+        if len(char) != 1 or char not in reactWord.allowedCharacters():
+            return await ctx.send("Dit is geen geldig karakter.")
+
+        var = reactWord.getAllVariants(char)
+
+        return await ctx.send("**Karakter**: {}\nOpties (**{}**): {}".format(
+            char, len(var), " ".join(var)
+        ))
+
 
 def setup(client):
     client.add_cog(ReactWord(client))

@@ -25,6 +25,7 @@
   "bitcoin sell": "Verkoop [Aantal] Bitcoins.",
   "buy": "Koop [Aantal] van [Item id] uit de Store.\nIndien je geen aantal opgeeft, is dit standaard 1.",
   "changelog": "Stuurt links naar de Didier Changelogs.",
+  "character": "Toont een lijst van opties van emoji's die Didier React kan gebruiken voor [Karakter], zodat je kan zien hoeveel (en welke) karakters gebruikt kunnen worden.",
   "clap": "Zet \"Tekst\" om naar :clap: \uD83C\uDDF9 :clap: \uD83C\uDDEA :clap: \uD83C\uDDF0 :clap: \uD83C\uDDF8 :clap: \uD83C\uDDF9 :clap:",
   "coinflip": "Gooi een muntje, indien je Didier Dinks inzet kan je je inzet verdubbelen (of verliezen).",
   "config": "Past constanten in het config bestand aan.",

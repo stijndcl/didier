@@ -260,3 +260,37 @@ def getUnicodeDict():
     }
 
     return unidic
+
+
+# Returns a list of all emoji's that exist for a char
+def getAllVariants(char: str):
+    variants = []
+
+    # Letter
+    reg_ind = "regional_indicator_{}".format(char)
+    if reg_ind in getUnicodeDict():
+        variants.append(reg_ind)
+
+    # Number
+    elif char in getNumbers():
+        variants.append(getNumbers()[char])
+
+    # Special Character
+    elif char in getSpecialCharacters():
+        variants.append(getSpecialCharacters()[char])
+
+    # Get all doubles
+    if char in getDoubles():
+        for letter in getDoubles()[char]:
+            variants.append(letter)
+
+    # Remove doubles that might have slipped in
+    # Use a list here to keep the order!
+    uniques = []
+
+    for var in variants:
+        rep = ":" + var + ":"
+        if rep not in uniques:
+            uniques.append(rep)
+
+    return uniques
