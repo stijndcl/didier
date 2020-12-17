@@ -277,7 +277,8 @@ def getAllVariants(char: str):
 
     # Special Character
     elif char in getSpecialCharacters():
-        variants.append(getSpecialCharacters()[char])
+        for letter in getSpecialCharacters()[char]:
+            variants.append(letter)
 
     # Get all doubles
     if char in getDoubles():
@@ -288,6 +289,7 @@ def getAllVariants(char: str):
     # Use a list here to keep the order!
     uniques = []
 
+    print(variants)
     for var in variants:
         rep = ":" + var + ":"
         if rep not in uniques:
