@@ -107,6 +107,12 @@ def gainXp(user, user_db):
     update(user, "last_message", round(time.time()))
 
 
+def getTotalMessageCount():
+    r = getAllRows()
+
+    return sum(user[11] for user in r)
+
+
 def getOrAddChannel(channelid: int):
     connection = utils.connect()
     cursor = connection.cursor()
