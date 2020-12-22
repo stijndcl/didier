@@ -7,9 +7,16 @@ class TestCog(commands.Cog):
     def __init__(self, client):
         self.client = client
 
-    # All commands in this Cog should only be accessible to me
     def cog_check(self, ctx):
-        return checks.isMe(ctx)
+        """
+        Check executed for every command in this cog.
+
+        If necessary, create your own check here. A check is just a function
+        that returns True or False, and takes ctx as an argument. A command will
+        only be executed when this check returns True, which is why that is the default
+        implementation for this function.
+        """
+        return True
 
     @commands.command()
     async def test(self, ctx):
