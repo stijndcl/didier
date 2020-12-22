@@ -5,7 +5,7 @@ import dateutil.relativedelta
 import pytz
 
 
-def epochToDate(epochTimeStamp, strFormat="%m/%d/%Y om %H:%M:%S"):
+def epochToDate(epochTimeStamp, strFormat="%d/%m/%Y om %H:%M:%S"):
     now = dateTimeNow()
     updateTime = datetime.datetime.fromtimestamp(int(epochTimeStamp), pytz.timezone("Europe/Brussels"))
     diff = now - updateTime

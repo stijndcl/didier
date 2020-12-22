@@ -165,12 +165,12 @@ class ModCommands(commands.Cog):
 
         embed.set_author(name=user.display_name, icon_url=user.avatar_url)
         embed.add_field(name="Discriminator", value="#{}".format(user.discriminator))
-        embed.add_field(name="Discord Id", value=user.id)
+        embed.add_field(name="Discord id", value=user.id)
         embed.add_field(name="Bot", value="Nee" if not user.bot else "Ja")
 
         created_local = timeFormatters.epochToDate(user.created_at.timestamp())
 
-        embed.add_field(name="Account Aangemaakt", value="{}\n({} geleden)".format(
+        embed.add_field(name="Account aangemaakt", value="{}\n({} geleden)".format(
             created_local["date"], timeFormatters.diffYearBasisString(round(created_local["dateDT"].timestamp()))
         ), inline=False)
 
@@ -178,12 +178,10 @@ class ModCommands(commands.Cog):
         if ctx.guild is not None:
             member_instance = ctx.guild.get_member(user.id)
 
-            embed.add_field(name="Lid van {}".format(ctx.guild.name), value="Nee" if member_instance is None else "Ja")
-
             if member_instance is not None:
                 joined_local = timeFormatters.epochToDate(member_instance.joined_at.timestamp())
 
-                embed.add_field(name="Lid Geworden Op", value="{}\n({} Geleden)".format(
+                embed.add_field(name="Lid geworden van {} op".format(ctx.guild.name), value="{}\n({} Geleden)".format(
                     joined_local["date"], timeFormatters.diffYearBasisString(round(joined_local["dateDT"].timestamp()))
                 ))
 
