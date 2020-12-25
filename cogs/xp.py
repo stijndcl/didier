@@ -22,9 +22,13 @@ class Xp(commands.Cog):
 
         target_stats = stats.getOrAddUser(target.id)
 
+        message_count = stats.getTotalMessageCount()
+
+        perc = round(int(target_stats[11]) * 100/message_count, 2)
+
         embed = discord.Embed(colour=discord.Colour.blue())
         embed.set_author(name=target.display_name, icon_url=target.avatar_url)
-        embed.add_field(name="Aantal Berichten", value="{}".format(int(target_stats[11])))
+        embed.add_field(name="Aantal Berichten", value="{} ({}%)".format(int(target_stats[11]), perc))
         embed.add_field(name="Level", value=str(xp.calculate_level(target_stats[12])))
         embed.add_field(name="XP", value="{:,}".format(int(target_stats[12])))
         embed.set_footer(text="*Sinds Didier 2.0 Launch")

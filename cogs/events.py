@@ -97,6 +97,10 @@ class Events(commands.Cog):
         :param ctx: Discord Context
         :param err: the error thrown
         """
+        # Zandbak Didier shouldn't spam the error logs
+        if self.client.user.id == int(constants.coolerDidierId):
+            raise err
+
         # Don't handle commands that have their own custom error handler
         if hasattr(ctx.command, 'on_error'):
             return

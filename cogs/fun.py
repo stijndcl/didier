@@ -1,3 +1,4 @@
+from data import paginatedLeaderboard
 from decorators import help
 import discord
 from discord.ext import commands
@@ -162,10 +163,9 @@ class Fun(commands.Cog):
         memeList = [": ".join([stringFormatters.titleCase(meme[1]),
                                str(meme[2])]) for meme in sorted(memeList, key=lambda x: x[1])]
 
-        # Add the fields into the embed
-        embed = discord.Embed(colour=discord.Colour.blue())
-        embed.add_field(name="Meme: aantal velden", value="\n".join(memeList), inline=False)
-        await ctx.send(embed=embed)
+        pages = paginatedLeaderboard.Pages(source=paginatedLeaderboard.Source(memeList, "Memes", discord.Colour.blue()),
+                                           clear_reactions_after=True)
+        await pages.start(ctx)
 
     @commands.command(name="Pjoke")
     @help.Category(category=Category.Fun)

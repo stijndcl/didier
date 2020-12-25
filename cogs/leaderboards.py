@@ -10,7 +10,6 @@ import math
 import requests
 
 
-
 # TODO some sort of general leaderboard because all of them are the same
 class Leaderboards(commands.Cog):
 
@@ -156,15 +155,20 @@ class Leaderboards(commands.Cog):
     async def messages(self, ctx):
         s = stats.getAllRows()
         boardTop = []
+
+        message_count = stats.getTotalMessageCount()
+
         for i, user in enumerate(sorted(s, key=lambda x: x[11], reverse=True)):
             if int(user[11]) == 0:
                 break
 
+            perc = round(int(user[11]) * 100 / message_count, 2)
+
             name = self.utilsCog.getDisplayName(ctx, user[0])
             if int(user[0]) == int(ctx.author.id):
-                boardTop.append("**{} ({:,})**".format(name, round(int(user[11]))))
+                boardTop.append("**{} ({:,} | {}%)**".format(name, round(int(user[11])), perc))
             else:
-                boardTop.append("{} ({:,})".format(name, round(int(user[11]))))
+                boardTop.append("{} ({:,} | {}%)".format(name, round(int(user[11])), perc))
         await self.startPaginated(ctx, boardTop, "Messages Leaderboard")
 
     @leaderboard.command(name="Muttn", aliases=["M", "Mutn", "Mutten"], hidden=True)

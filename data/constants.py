@@ -46,6 +46,15 @@ holidayAPIKey = "af4e1ebe-465d-4b93-a828-b95df18e6424"
 
 prefixes = ["big d", "didier"]
 
+faq_channels = {
+    727876753523081216: "ad2",
+    727876779481497600: "comnet",
+    727876797458284584: "funcprog",
+    727876819264733244: "statprob",
+    727876836587208714: "sysprog",
+    676713433567199232: "didier"
+}
+
 
 class Live(Enum):
     CallOfCode = "626699611192688641"
