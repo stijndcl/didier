@@ -1,3 +1,4 @@
+from data import constants
 from decorators import help
 import discord
 from discord.ext import commands
@@ -20,6 +21,9 @@ class Faq(commands.Cog):
         """
         Command group that controls the FAQ commands.
         When this command is invoked, it sends a list of valid categories.
+
+        After invoking in a subject's channel (without passing a category),
+        it sends the FAQ for that subject instead.
         :param ctx: Discord Context
         :param args: args passed
         """
@@ -27,6 +31,10 @@ class Faq(commands.Cog):
         # This is not the cleanest but 80 subcommands is a bit much
         if len(args) != 0 and any("@" not in arg for arg in args):
             return await self.faqCategory(ctx, args)
+
+        # Check if the command was used in a subject's channel
+        if ctx.channel.id in constants.faq_channels:
+            return await self.faqCategory(ctx, (constants.faq_channels[ctx.channel.id],))
 
         # List of all categories with the first letter capitalized
         resp = [stringFormatters.titleCase(cat[0]) for cat in faq.getCategories()]
