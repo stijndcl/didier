@@ -142,3 +142,10 @@ def weekdayToInt(day):
 
 def intToWeekday(day):
     return ["Maandag", "Dinsdag", "Woensdag", "Donderdag", "Vrijdag", "Zaterdag", "Zondag"][day]
+
+
+def fromString(timeString: str, formatString="%d/%m/%Y"):
+    """
+    Constructs a datetime object from an input string
+    """
+    return datetime.datetime.strptime(timeString, formatString)
