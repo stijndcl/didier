@@ -31,7 +31,10 @@ class Corona(commands.Cog):
             await self.sendError(ctx)
             return
 
-        await self.sendEmbed(ctx, dic)
+        # Vaccination stats
+        vaccine = self.getVaccineData(country, dic["today"]["population"], dic["yesterday"]["population"])
+
+        await self.sendEmbed(ctx, dic, vaccine)
 
     @corona.command(aliases=["lb", "leaderboards"], hidden=True)
     async def leaderboard(self, ctx):
@@ -43,7 +46,7 @@ class Corona(commands.Cog):
         """
         await self.client.get_cog("Leaderboards").callLeaderboard("corona", ctx)
 
-    async def sendEmbed(self, ctx, dic):
+    async def sendEmbed(self, ctx, dic, vaccines):
         """
         Function that sends a Corona embed from a dictionary.
         :param ctx: Discord Context
@@ -54,7 +57,7 @@ class Corona(commands.Cog):
 
         # Total
         embed.add_field(name="Totale Gevallen (Vandaag):",
-                        value="{:,} **(+{:,})** {}".format(
+                        value=self.createEmbedString(
                             dic["today"]["cases"],
                             dic["today"]["todayCases"],
                             self.trendIndicator(dic, "todayCases")
@@ -63,7 +66,7 @@ class Corona(commands.Cog):
 
         # Active
         embed.add_field(name="Actieve Gevallen (Vandaag):",
-                        value="{:,} **(+{:,})** {}".format(
+                        value=self.createEmbedString(
                             dic["today"]["activeCases"],
                             dic["today"]["activeCases"] - dic["yesterday"]["activeCases"],
                             self.activeTrendIndicator(dic)
@@ -72,7 +75,7 @@ class Corona(commands.Cog):
 
         # Deaths
         embed.add_field(name="Sterfgevallen (Vandaag):",
-                        value="{:,} **(+{:,})** {}".format(
+                        value=self.createEmbedString(
                             dic["today"]["deaths"],
                             dic["today"]["todayDeaths"],
                             self.trendIndicator(dic, "todayDeaths")
@@ -81,7 +84,7 @@ class Corona(commands.Cog):
 
         # Recovered
         embed.add_field(name="Hersteld (Vandaag):",
-                        value="{:,} **(+{:,}) {}**".format(
+                        value=self.createEmbedString(
                             dic["today"]["recovered"],
                             dic["today"]["todayRecovered"],
                             self.trendIndicator(dic, "todayRecovered")
@@ -90,14 +93,39 @@ class Corona(commands.Cog):
 
         # Test Cases
         embed.add_field(name="Aantal uitgevoerde tests:",
-                        value="{:,}".format(dic["today"]["tests"]),
+                        value=self.createEmbedString(
+                            dic["today"]["tests"],
+                            dic["today"]["todayTests"]
+                        ),
                         inline=False)
 
+        # Vaccines
+        if vaccines is not None:
+            embed.add_field(name="Aantal toegediende vaccins:",
+                            value=self.createEmbedString(
+                                vaccines["today"]["vaccines"],
+                                vaccines["today"]["todayVaccines"],
+                                self.trendIndicator(vaccines, "todayVaccines")
+                            ))
+
         # Timestamp of last update
-        timeFormatted = timeFormatters.epochToDate(int(dic["today"]["updated"])/1000)
+        timeFormatted = timeFormatters.epochToDate(int(dic["today"]["updated"]) / 1000)
         embed.set_footer(text="Laatst geüpdatet op {} ({} geleden)".format(
             timeFormatted["date"], timeFormatted["timeAgo"]))
         await ctx.send(embed=embed)
+
+    def createEmbedString(self, total, today, indicator="", isPercentage=False):
+        """
+        Function that formats a string to add covid data into the embed,
+        separate function to make code more readable
+        """
+        # + or - symbol | minus is included in the number so no need
+        symbol = "+" if today >= 0 else ""
+        perc = "%" if isPercentage else ""
+
+        return "{:,}{} **({}{:,}{})** {}".format(
+            total, perc, symbol, today, perc, indicator
+        )
 
     @commands.command(name="Trends", aliases=["Ct"], usage="[Land]*")
     @commands.check(checks.allowedChannels)
@@ -146,7 +174,7 @@ class Corona(commands.Cog):
             distribution[0], distribution[1], distribution[2]), inline=False)
 
         # Timestamp of last update
-        timeFormatted = timeFormatters.epochToDate(int(dic["today"]["updated"])/1000)
+        timeFormatted = timeFormatters.epochToDate(int(dic["today"]["updated"]) / 1000)
         embed.set_footer(text="Laatst geüpdatet op {} ({} geleden)".format(
             timeFormatted["date"], timeFormatted["timeAgo"]))
         await ctx.send(embed=embed)
@@ -184,7 +212,9 @@ class Corona(commands.Cog):
                 "recovered": today["recovered"],
                 "todayRecovered": today["todayRecovered"],
                 "tests": today["tests"],
-                "updated": today["updated"]
+                "todayTests": today["tests"] - yesterday["tests"],
+                "updated": today["updated"],
+                "population": today["population"]
             },
             "yesterday": {
                 "cases": yesterday["cases"],
@@ -195,10 +225,77 @@ class Corona(commands.Cog):
                 "recovered": yesterday["recovered"],
                 "todayRecovered": yesterday["todayRecovered"],
                 "tests": yesterday["tests"],
-                "updated": yesterday["updated"]
+                "updated": yesterday["updated"],
+                "population": yesterday["population"]
             }
         }
+
         return dic
+
+    def getVaccineData(self, country: str, todayPopulation: int, yesterdayPopulation: int):
+        """
+        Function that gets vaccination stats for a specicic country.
+        This information is later added to the embed.
+        """
+        if todayPopulation == 0:
+            todayPopulation = 1
+
+        if yesterdayPopulation == 0:
+            yesterdayPopulation = 1
+
+        # "all" has a different endpoint
+        if country == "global":
+            vaccine: dict = requests.get("https://disease.sh/v3/covid-19/vaccine/coverage?lastdays=3").json()
+        else:
+            vaccine: dict = requests.get("https://disease.sh/v3/covid-19/vaccine/coverage/countries/{}?lastdays=3"
+                                         .format(country)).json()
+
+        # Country-specific is structured differently
+        if "timeline" in vaccine:
+            vaccine = vaccine["timeline"]
+
+        # Error message returned or not enough data yet
+        if "message" in vaccine or len(vaccine.keys()) != 3:
+            return None
+
+        timeFormat = "%m/%d/%y"
+
+        def getDt(dt):
+            """
+            Function that calls fromString with an argument
+            so it can be used in map
+            """
+            return timeFormatters.fromString(dt, timeFormat)
+
+        def toString(dt):
+            """
+            Function to cast datetime back to string
+            """
+            st: str = dt.strftime(timeFormat)
+
+            # Api doesn't add leading zeroes so the keys don't match anymore ---'
+            if st.startswith("0"):
+                st = st[1:]
+
+            return st
+
+        # Order dates
+        ordered = sorted(map(getDt, vaccine.keys()))
+        # Datetime objects are only required for sorting, turn back into strings
+        ordered = list(map(toString, ordered))
+
+        info = {"today": {}, "yesterday": {}}
+
+        # Total vaccines
+        info["today"]["vaccines"] = vaccine[ordered[2]]
+        # New vaccines today
+        info["today"]["todayVaccines"] = vaccine[ordered[2]] - vaccine[ordered[1]]
+        # % of total population
+        info["today"]["perc"] = round(100 * vaccine[ordered[2]] / todayPopulation, 2)
+        info["yesterday"]["vaccines"] = vaccine[ordered[1]]
+        info["yesterday"]["todayVaccines"] = vaccine[ordered[1]] - vaccine[ordered[0]]
+
+        return info
 
     def distribution(self, dic):
         """
@@ -209,9 +306,9 @@ class Corona(commands.Cog):
         totalToday = dic["today"]["cases"] if dic["today"]["cases"] != 0 else 1
         totalYesterday = dic["yesterday"]["cases"] if dic["yesterday"]["cases"] != 0 else 1
 
-        tap = round(100 * dic["today"]["activeCases"]/totalToday, 2)  # Today Active Percentage
-        trp = round(100 * dic["today"]["recovered"]/totalToday, 2)  # Today Recovered Percentage
-        tdp = round(100 * dic["today"]["deaths"]/totalToday, 2)  # Today Deaths Percentage
+        tap = round(100 * dic["today"]["activeCases"] / totalToday, 2)  # Today Active Percentage
+        trp = round(100 * dic["today"]["recovered"] / totalToday, 2)  # Today Recovered Percentage
+        tdp = round(100 * dic["today"]["deaths"] / totalToday, 2)  # Today Deaths Percentage
         yap = round(100 * dic["yesterday"]["activeCases"] / totalYesterday, 2)  # Yesterday Active Percentage
         yrp = round(100 * dic["yesterday"]["recovered"] / totalYesterday, 2)  # Yesterday Recovered Percentage
         ydp = round(100 * dic["yesterday"]["deaths"] / totalYesterday, 2)  # Yesterday Deaths Percentage
@@ -245,7 +342,7 @@ class Corona(commands.Cog):
         yesterday = dic["yesterday"][key] if dic["yesterday"][key] != 0 else 1
 
         # Percentage
-        perc = round(100 * change/yesterday, 2)
+        perc = round(100 * change / yesterday, 2)
 
         # Sign to add to the number
         sign = "+" if change >= 0 else ""
@@ -263,7 +360,8 @@ class Corona(commands.Cog):
         :return: a triangle emoji or empty string
         """
         todayNew = dic["today"]["todayCases"] - dic["today"]["todayDeaths"] - dic["today"]["todayRecovered"]
-        yesterdayNew = dic["yesterday"]["todayCases"] - dic["yesterday"]["todayDeaths"] - dic["yesterday"]["todayRecovered"]
+        yesterdayNew = dic["yesterday"]["todayCases"] - dic["yesterday"]["todayDeaths"] - dic["yesterday"][
+            "todayRecovered"]
 
         return ":small_red_triangle:" if todayNew > yesterdayNew else \
             (":small_red_triangle_down:" if todayNew < yesterdayNew else "")
