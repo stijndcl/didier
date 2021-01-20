@@ -101,12 +101,15 @@ class Corona(commands.Cog):
 
         # Vaccines
         if vaccines is not None:
+            # embed.add_field(name="Aantal toegediende vaccins:",
+            #                 value=self.createEmbedString(
+            #                     vaccines["today"]["vaccines"],
+            #                     vaccines["today"]["todayVaccines"],
+            #                     self.trendIndicator(vaccines, "todayVaccines")
+            #                 ))
             embed.add_field(name="Aantal toegediende vaccins:",
-                            value=self.createEmbedString(
-                                vaccines["today"]["vaccines"],
-                                vaccines["today"]["todayVaccines"],
-                                self.trendIndicator(vaccines, "todayVaccines")
-                            ))
+                            value="{:,}".format(vaccines["today"]["vaccines"]),
+                            inline=False)
 
         # Timestamp of last update
         timeFormatted = timeFormatters.epochToDate(int(dic["today"]["updated"]) / 1000)
