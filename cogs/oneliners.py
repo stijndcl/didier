@@ -105,7 +105,7 @@ class Oneliners(commands.Cog):
     async def todo(self, ctx, *args):
         await ctx.send("https://trello.com/b/PdtsAJea/didier-to-do-list")
 
-    @commands.command(name="LMGTFY", aliases=["Dsfr", "Gtfm", "Google"], usage="[Query]")
+    @commands.command(name="LMGTFY", aliases=["Dsfr"], usage="[Query]")
     @help.Category(category=Category.Other)
     async def lmgtfy(self, ctx, *, query=None):
         if query:

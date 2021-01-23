@@ -84,6 +84,9 @@ class Store(commands.Cog):
                 item_tuple = item
                 break
 
+        if amount.lower() == "all":
+            amount = int(item_tuple[2])
+
         if int(item_tuple[2]) < amount:
             return await ctx.send("Je hebt niet zoveel {}s.".format(item_tuple[1]))
 
