@@ -15,18 +15,26 @@ def google_search(query):
 
     query = urlencode({"q": query})
 
-    resp = get("https://www.google.com/search?{}&num=10&hl=en".format(query), headers=headers)
-    print("got here")
+    # Get 20 results in case some of them are None
+    resp = get("https://www.google.com/search?{}&num=20&hl=en".format(query), headers=headers)
+
     if resp.status_code != 200:
         return None, resp.status_code
 
     bs = BeautifulSoup(resp.text, "html.parser")
 
     def getContent(element):
-        link = element.find('a', href=True)
-        title = element.find('h3')
-        return link, title
+        link = element.find("a", href=True)
+        title = element.find("h3")
+        if link is None or title is None:
+            return None
 
-    divs = bs.find_all('div', attrs={'class': 'g'})
-    print(divs)
+        sp = title.find("span")
+
+        if sp is None:
+            return None
+
+        return link["href"], sp.text
+    divs = bs.find_all("div", attrs={"class": "g"})
+
     return list(getContent(d) for d in divs), 200
