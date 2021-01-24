@@ -1,3 +1,5 @@
+import re
+
 from requests import get
 from urllib.parse import urlencode
 from bs4 import BeautifulSoup
@@ -49,4 +51,28 @@ def getMatchweek():
     """
     Parses the current JPL matchweek out of Sporza's site
     """
-    pass
+    resp = get("https://sporza.be/nl/categorie/voetbal/jupiler-pro-league/")
+
+    if resp.status_code != 200:
+        return None
+
+    bs = BeautifulSoup(resp.text, "html.parser")
+    matchdays = bs.find_all("section", attrs={"class": "sc-matchdays"})
+
+    if len(matchdays) < 2:
+        return None
+
+    # Table header
+    header = matchdays[1]
+
+    # Regex to find current matchday
+    r = re.compile(r"speeldag\s*\d+", flags=re.I)
+
+    match = r.search(str(header))
+
+    # Something went wrong, just ignore
+    if match is None:
+        return None
+
+    # "Speeldag DD" -> split on space & take second
+    return match[0].split(" ")[1]
