@@ -24,8 +24,12 @@ def google_search(query):
     bs = BeautifulSoup(resp.text, "html.parser")
 
     def getContent(element):
+        """
+        Function to find links & titles in the HTML of a <div> element
+        """
         link = element.find("a", href=True)
         title = element.find("h3")
+
         if link is None or title is None:
             return None
 
@@ -35,6 +39,7 @@ def google_search(query):
             return None
 
         return link["href"], sp.text
+
     divs = bs.find_all("div", attrs={"class": "g"})
 
     return list(getContent(d) for d in divs), 200

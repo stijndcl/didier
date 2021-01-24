@@ -24,10 +24,8 @@ class Google(commands.Cog):
         if results is None:
             return await ctx.send("Er ging iets fout (Response {})".format(status))
 
+        # Filter out all Nones
         elements = list(filter(lambda x: x is not None, results))
-
-        if len(elements) > 10:
-            elements = elements[:10]
 
         embed = discord.Embed(colour=discord.Colour.blue())
         embed.set_author(name="Google Search")
@@ -36,6 +34,10 @@ class Google(commands.Cog):
         if len(elements) == 0:
             embed.description = "Geen resultaten gevonden."
             return await ctx.reply(embed=embed, mention_author=False)
+
+        # Cut excess results out
+        if len(elements) > 10:
+            elements = elements[:10]
 
         links = []
 
