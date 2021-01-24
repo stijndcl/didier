@@ -43,3 +43,10 @@ def google_search(query):
     divs = bs.find_all("div", attrs={"class": "g"})
 
     return list(getContent(d) for d in divs), 200
+
+
+def getMatchweek():
+    """
+    Parses the current JPL matchweek out of Sporza's site
+    """
+    pass

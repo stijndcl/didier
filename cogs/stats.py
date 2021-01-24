@@ -102,7 +102,7 @@ class Stats(commands.Cog):
             embed.set_author(name="Channel Activity - {}".format(ctx.guild))
 
             description = ""
-            for c in sorted(res, key=lambda x: int(x[1]), reverse=True):
+            for c in sorted(res, key=lambda x: float(x[1]), reverse=True):
                 if not any(tc.id == int(c[0]) for tc in ctx.guild.text_channels):
                     continue
 

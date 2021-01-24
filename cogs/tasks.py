@@ -218,6 +218,10 @@ class Tasks(commands.Cog):
     async def beforeSendReminders(self):
         await self.client.wait_until_ready()
 
+    # TODO
+    async def updateMatchweek(self):
+        pass
+
     def getCurrentHour(self):
         return timeFormatters.dateTimeNow().hour
 
