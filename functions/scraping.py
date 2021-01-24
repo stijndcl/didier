@@ -76,3 +76,16 @@ def getMatchweek():
 
     # "Speeldag DD" -> split on space & take second
     return match[0].split(" ")[1]
+
+
+def getJPLMatches(week: int):
+    """
+    JPL matches for a given matchweek
+    """
+    current_day = get("https://api.sporza.be/web/soccer/matchdays/161733/{}".format(week))
+
+    # Something went wrong
+    if current_day.status_code != 200:
+        return None
+
+    return current_day.json()["groupedMatches"][0]["matches"]

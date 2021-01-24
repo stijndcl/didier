@@ -1,9 +1,9 @@
 from bs4 import BeautifulSoup
-import datetime
 from decorators import help
 from discord.ext import commands
 from enums.help_categories import Category
 from functions import checks, config
+from functions.football import getMatches
 import requests
 import tabulate
 
@@ -25,37 +25,13 @@ class Football(commands.Cog):
     @jpl.command(name="Matches", aliases=["M"], usage="[Week]*")
     async def matches(self, ctx, *args):
         args = list(args)
+
+        # Default is current day
         if not args:
             args = [str(config.get("jpl_day"))]
+
         if all(letter.isdigit() for letter in args[0]):
-            current_day = requests.get("https://api.sporza.be/web/soccer/matchdays/161733/{}".format(args[0])).json()
-            current_day = current_day["groupedMatches"][0]["matches"]
-
-            # Create dictionaries for every match
-            matches_formatted = {}
-            for i, match in enumerate(current_day):
-                matchDic = {"home": match["homeTeam"]["name"], "away": match["awayTeam"]["name"]}
-
-                # Add date
-                matchDate = datetime.datetime.strptime(match["startDateTime"].split("+")[0], "%Y-%m-%dT%H:%M:%S.%f")
-                matchDic["date"] = matchDate.strftime("%d/%m")
-                matchDic["day"] = self.get_weekday(matchDate.weekday())
-
-                # TODO check back when there's active games (to find the key in the dict) & add the current time if not over
-                # Add scores
-                if match["status"] == "END":  # Status != [not_yet_started] whatever it is
-                    matchDic["score"] = "{} - {}".format(match["homeScore"], match["awayScore"])
-                else:
-                    # If there's no score, show when the match starts
-                    matchDic["score"] = "{}:{}".format(
-                        ("" if len(str(matchDate.hour)) == 2 else "0") + str(matchDate.hour),  # Leading Zero
-                        ("" if len(str(matchDate.minute)) == 2 else "0") + str(matchDate.minute))  # Leading Zero
-
-                matches_formatted[i] = matchDic
-
-            # Put every formatted version of the matches in a list
-            matchList = list([self.format_match(matches_formatted[match]) for match in matches_formatted])
-            await ctx.send("```Jupiler Pro League - Speeldag {}\n\n{}```".format(args[0], tabulate.tabulate(matchList, headers=["Dag", "Datum", "Thuis", "Stand", "Uit", "Tijd"])))
+            await ctx.send(getMatches(int(args[0])))
         else:
             return await ctx.send("Dit is geen geldige speeldag.")
 
