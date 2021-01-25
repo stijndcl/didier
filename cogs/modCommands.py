@@ -130,7 +130,7 @@ class ModCommands(commands.Cog):
     # Adds a meme into the database
     @add.command(name="Meme", aliases=["Mem"], usage="[Id] [Name] [Aantal Velden]")
     async def meme(self, ctx, memeid, meme, fields):
-        await ctx.send(memes.insert(memeid, meme, fields)[1])
+        await ctx.send(memes.insert(memeid, meme, fields))
 
     # Adds a person's GitHub into the database
     @add.command(name="GitHub", aliases=["Gh", "Git"], usage="[Id] [Link]")
