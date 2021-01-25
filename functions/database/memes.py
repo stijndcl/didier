@@ -1,3 +1,5 @@
+from attr import dataclass
+
 from functions.database import utils
 
 
@@ -18,9 +20,23 @@ def getMeme(name):
     cursor = connection.cursor()
     cursor.execute("SELECT * FROM memes WHERE name like %s", ["%" + name.lower() + "%"])
     result = cursor.fetchall()
+
     if len(result) == 0:
         return None
-    return result[0]
+
+    meme = Meme(result[0][0], result[0][1], result[0][2])
+
+    return meme
+
+
+@dataclass
+class Meme:
+    """
+    Dataclass to represent a meme in order to avoid having to use [] on tuples all the time
+    """
+    meme_id: int
+    name: str
+    fields: int
 
 
 def getAllMemes():

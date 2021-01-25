@@ -91,7 +91,7 @@ class Fun(commands.Cog):
             return await ctx.send("Controleer je argumenten.")
 
         # Get the meme info that corresponds to this name
-        result = memes.getMeme(name)
+        result: memes.Meme = memes.getMeme(name)
 
         # No meme found
         if result is None:
@@ -101,15 +101,15 @@ class Fun(commands.Cog):
         fields = list(fields)
 
         # If there's only one field, the user isn't required to use quotes
-        if result[2] == 1:
+        if result.fields == 1:
             fields = [" ".join(fields)]
 
         # Apply mock to mocking spongebob memes
-        if result[1] == "mocking spongebob":
+        if result.name == "mocking spongebob":
             fields = list(map(mock.mock, fields))
 
         # X, X everywhere only takes X as an argument
-        if result[1] == "x, x everywhere":
+        if result.name == "x, x everywhere":
             fields[0] = " ".join(fields)
             fields.append(fields[0] + " everywhere")
 
@@ -127,7 +127,7 @@ class Fun(commands.Cog):
 
         if req["success"]:
             caption = {
-                "template_id": result[0],
+                "template_id": result.meme_id,
                 "username": os.getenv("IMGFLIPNAME"),
                 "password": os.getenv("IMGFLIPPASSWORD"),
                 "boxes[0][text]": boxes[0]["text"],
