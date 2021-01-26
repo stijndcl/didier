@@ -71,7 +71,7 @@ def _applyMeme(meme: Meme, fields):
     a few words to be added, or needs the input to be changed.
     This function handles all that.
 
-    Callbacks contains a function that modifies the input
+    Links certain meme id's to functions that need to be applied first.
     """
     memeDict = {
         102156234: _mockingSpongebob,
