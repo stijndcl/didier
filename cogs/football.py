@@ -1,11 +1,8 @@
-from bs4 import BeautifulSoup
 from decorators import help
 from discord.ext import commands
 from enums.help_categories import Category
 from functions import checks, config
-from functions.football import getMatches
-import requests
-import tabulate
+from functions.football import getMatches, getTable
 
 
 class Football(commands.Cog):
@@ -35,30 +32,10 @@ class Football(commands.Cog):
         else:
             return await ctx.send("Dit is geen geldige speeldag.")
 
-    # TODO check back when there's active games & add the timestamp instead of EINDE
-    def format_match(self, match):
-        return [match["day"], match["date"], match["home"], match["score"], match["away"], "Einde"]
-
-    def get_weekday(self, day: int):
-        days = ["Ma", "Di", "Wo", "Do", "Vr", "Za", "Zo"]
-        return days[day]
-
     @jpl.command(name="Table", aliases=["Ranking", "Rankings", "Ranks", "T"])
     async def table(self, ctx, *args):
-        page_html = requests.get("https://sporza.be/nl/categorie/voetbal/jupiler-pro-league/").text
-        bs_parsed = BeautifulSoup(page_html, "html.parser")
-        rows = bs_parsed.find(summary="algemeen klassement").find_all("tr")[1:]
-        rowsFormatted = []
-        for row in rows:
-            rowsFormatted.append(self.createRowList(row))
-        await ctx.send("```Jupiler Pro League Klassement\n\n{}```".format(tabulate.tabulate(rowsFormatted, headers=["#", "Ploeg", "Punten", "M", "M+", "M-", "M="])))
+        await ctx.send(getTable())
 
-    # Formats the row into an list that can be passed to Tabulate
-    def createRowList(self, row):
-        scoresArray = list([td.renderContents().decode("utf-8") for td in row.find_all("td")])[:6]
-        # Insert the team name into the list
-        scoresArray.insert(1, row.find_all("a")[0].renderContents().decode("utf-8").split("<!--")[0])
-        return scoresArray
 
 
 def setup(client):

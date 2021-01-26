@@ -1,7 +1,7 @@
 from enum import Enum
 from attr import dataclass, field
 from functions.timeFormatters import fromString
-from functions.scraping import getJPLMatches
+from functions.scraping import getJPLMatches, getJPLTable
 from functions.stringFormatters import leadingZero
 from datetime import datetime
 import tabulate
@@ -117,13 +117,13 @@ class Navigation(Enum):
 
 def getMatches(matchweek: int):
     """
-    Function that constructs the table for a given matchweek
+    Function that constructs the list of matches for a given matchweek
     """
     current_day = getJPLMatches(matchweek)
 
     # API request failed
     if current_day is None:
-        return "Er ging iets mis. Probeer het later opnieuw."
+        return "Er ging iets fout. Probeer het later opnieuw."
 
     matches = list(map(Match, current_day))
     matches = list(map(lambda x: x.getInfo(), matches))
@@ -132,3 +132,30 @@ def getMatches(matchweek: int):
     table = tabulate.tabulate(matches, headers=["Dag", "Datum", "Thuis", "Stand", "Uit", "Tijd"])
 
     return "```{}\n\n{}```".format(header, table)
+
+
+def getTable():
+    """
+    Function that constructs the current table of the JPL
+    """
+    rows = getJPLTable()
+
+    if rows is None:
+        return "Er ging iets fout. Probeer het later opnieuw."
+
+    formatted = [_formatRow(row) for row in rows]
+
+    header = "Jupiler Pro League Klassement"
+    table = tabulate.tabulate(formatted, headers=["#", "Ploeg", "Punten", "M", "M+", "M-", "M="])
+
+    return "```{}\n\n{}```".format(header, table)
+
+
+def _formatRow(row):
+    """
+    Function that formats a row into a list for Tabulate to use
+    """
+    scoresArray = list([td.renderContents().decode("utf-8") for td in row.find_all("td")])[:6]
+    # Insert the team name into the list
+    scoresArray.insert(1, row.find_all("a")[0].renderContents().decode("utf-8").split("<!--")[0])
+    return scoresArray

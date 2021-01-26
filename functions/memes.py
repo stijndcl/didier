@@ -87,10 +87,7 @@ def _applyMeme(meme: Meme, fields):
 
 
 def _mockingSpongebob(fields):
-    for i, field in enumerate(fields):
-        fields[i] = mock(field)
-
-    return fields
+    return list(map(mock, fields))
 
 
 def _xXEverywhere(fields):

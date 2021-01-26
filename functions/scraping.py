@@ -89,3 +89,17 @@ def getJPLMatches(week: int):
         return None
 
     return current_day.json()["groupedMatches"][0]["matches"]
+
+
+def getJPLTable():
+    """
+    JPL table
+    """
+    page_html = get("https://sporza.be/nl/categorie/voetbal/jupiler-pro-league/")
+
+    if page_html.status_code != 200:
+        return None
+
+    bs_parsed = BeautifulSoup(page_html.text, "html.parser")
+    rows = bs_parsed.find(summary="algemeen klassement").find_all("tr")[1:]
+    return rows
