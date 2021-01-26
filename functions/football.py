@@ -143,6 +143,7 @@ def getTable():
     if rows is None:
         return "Er ging iets fout. Probeer het later opnieuw."
 
+    # Format every row to work for Tabulate
     formatted = [_formatRow(row) for row in rows]
 
     header = "Jupiler Pro League Klassement"
@@ -156,6 +157,8 @@ def _formatRow(row):
     Function that formats a row into a list for Tabulate to use
     """
     scoresArray = list([td.renderContents().decode("utf-8") for td in row.find_all("td")])[:6]
+
     # Insert the team name into the list
     scoresArray.insert(1, row.find_all("a")[0].renderContents().decode("utf-8").split("<!--")[0])
+
     return scoresArray

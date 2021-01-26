@@ -97,6 +97,7 @@ def getJPLTable():
     """
     page_html = get("https://sporza.be/nl/categorie/voetbal/jupiler-pro-league/")
 
+    # Something went wrong
     if page_html.status_code != 200:
         return None
 
