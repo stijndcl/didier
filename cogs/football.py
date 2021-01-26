@@ -11,7 +11,7 @@ class Football(commands.Cog):
 
     # Don't allow any commands to work when locked
     def cog_check(self, ctx):
-        return checks.isMe(ctx) and not self.client.locked
+        return not self.client.locked
 
     @commands.group(name="Jpl", case_insensitive=True, invoke_without_command=True)
     @commands.check(checks.allowedChannels)
@@ -35,7 +35,6 @@ class Football(commands.Cog):
     @jpl.command(name="Table", aliases=["Ranking", "Rankings", "Ranks", "T"])
     async def table(self, ctx, *args):
         await ctx.send(getTable())
-
 
 
 def setup(client):
