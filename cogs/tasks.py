@@ -3,7 +3,9 @@ from data.remind import Reminders
 from discord.ext import commands, tasks
 from enums.numbers import Numbers
 from functions import timeFormatters
+from functions.config import config
 from functions.database import currency, poke, prison, birthdays, stats
+from functions.scraping import getMatchweek
 import json
 import random
 import requests
@@ -21,6 +23,7 @@ class Tasks(commands.Cog):
         self.checkBirthdays.start()
         self.updateMessageCounts.start()
         self.sendReminders.start()
+        self.updateMatchweek.start()
 
     @tasks.loop(hours=1.0)
     async def bankInterest(self):
@@ -216,6 +219,23 @@ class Tasks(commands.Cog):
 
     @sendReminders.before_loop
     async def beforeSendReminders(self):
+        await self.client.wait_until_ready()
+
+    @tasks.loop(hours=2.0)
+    async def updateMatchweek(self):
+        """
+        Task that checks the current JPL matchweek & changes the dict value
+        """
+        matchweek = getMatchweek()
+
+        if matchweek is None:
+            return
+
+        # Change the setting in the config
+        config("jpl_day", int(matchweek))
+
+    @updateMatchweek.before_loop
+    async def beforeUpdateMatchweek(self):
         await self.client.wait_until_ready()
 
     def getCurrentHour(self):

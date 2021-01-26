@@ -15,8 +15,8 @@ class Translate(commands.Cog):
     def cog_check(self, ctx):
         return not self.client.locked
 
-    @commands.command(name="Translate", aliases=["Tl", "Trans"], usage="[Tekst] [Van]* [Naar]*")
-    @help.Category(Category.Words)
+    # @commands.command(name="Translate", aliases=["Tl", "Trans"], usage="[Tekst] [Van]* [Naar]*")
+    # @help.Category(Category.Words)
     async def translate(self, ctx, query=None, to="nl", fr="auto"):
         if query is None:
             return await ctx.send("Controleer je argumenten.")
@@ -57,8 +57,8 @@ class Translate(commands.Cog):
 
             raise e
 
-    @commands.command(name="Detect", aliases=["Ld"], usage="[Tekst]")
-    @help.Category(Category.Words)
+    # @commands.command(name="Detect", aliases=["Ld"], usage="[Tekst]")
+    # @help.Category(Category.Words)
     async def detect(self, ctx, query=None):
         if query is None:
             return await ctx.send("Controleer je argumenten.")

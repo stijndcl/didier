@@ -3,10 +3,10 @@ from decorators import help
 import discord
 from discord.ext import commands
 from enums.help_categories import Category
-from functions import checks, mock, stringFormatters
+from functions import checks, stringFormatters
 from functions.database import memes, trump, dadjoke
+from functions.memes import generate
 import json
-import os
 import random
 import requests
 
@@ -91,63 +91,23 @@ class Fun(commands.Cog):
             return await ctx.send("Controleer je argumenten.")
 
         # Get the meme info that corresponds to this name
-        result = memes.getMeme(name)
+        result: memes.Meme = memes.getMeme(name)
 
         # No meme found
-        if not result[0]:
-            return await ctx.send(result[1])
+        if result is None:
+            return await ctx.send("Deze meme staat niet in de database.")
 
         # Convert to list to support item assignment
         fields = list(fields)
 
-        # If there's only one field, the user isn't required to use quotes
-        if result[1][2] == 1:
-            fields = [" ".join(fields)]
+        generated = generate(result, fields)
 
-        # Apply mock to mocking spongebob memes
-        if result[1][1] == "mocking spongebob":
-            fields = list(map(mock.mock, fields))
+        # If the request was successful, remove the message calling it
+        if generated["success"]:
+            await self.utilsCog.removeMessage(ctx.message)
 
-        # X, X everywhere only takes X as an argument
-        if result[1][1] == "x, x everywhere":
-            fields[0] = " ".join(fields)
-            fields.append(fields[0] + " everywhere")
-
-        # List of fields to send to the API
-        boxes = [{"text": ""}, {"text": ""}, {"text": ""}, {"text": ""}]
-
-        # Add all fields required & ignore the excess ones
-        for i in range(len(fields)):
-            if i > 3:
-                break
-            boxes[i]["text"] = fields[i]
-
-        # Check server status
-        req = requests.get('https://api.imgflip.com/get_memes').json()
-
-        if req["success"]:
-            caption = {
-                "template_id": result[1][0],
-                "username": os.getenv("IMGFLIPNAME"),
-                "password": os.getenv("IMGFLIPPASSWORD"),
-                "boxes[0][text]": boxes[0]["text"],
-                "boxes[1][text]": boxes[1]["text"],
-                "boxes[2][text]": boxes[2]["text"],
-                "boxes[3][text]": boxes[3]["text"]
-            }
-
-            # Send the POST to the API
-            memeReply = requests.post('https://api.imgflip.com/caption_image', caption).json()
-
-            if memeReply['success']:
-                await ctx.send(str(memeReply['data']['url']))
-                await self.utilsCog.removeMessage(ctx.message)
-            else:
-                await ctx.send(
-                    "Error! Controleer of je de juiste syntax hebt gebruikt. Gebruik het commando "
-                    "\"memes\" voor een lijst aan geaccepteerde meme-namen.")
-        else:
-            await ctx.send("Er is een fout opgetreden.")
+        # Send the meme's url or the error message
+        await ctx.send(generated["message"])
 
     @commands.command(name="Memes")
     @commands.check(checks.allowedChannels)
