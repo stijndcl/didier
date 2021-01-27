@@ -55,7 +55,7 @@ class Match:
         if status.lower() == "live":
             # Half time
             if Navigation.LiveMatchPhase.value in self.matchDict and \
-                    Navigation.LiveMatchPhase.value == Navigation.HalfTime.value:
+                    self.matchDict[Navigation.LiveMatchPhase.value] == Navigation.HalfTime.value:
                 return Status.HalfTime.value
 
             # Current time
