@@ -280,6 +280,9 @@ class Corona(commands.Cog):
             if st.startswith("0"):
                 st = st[1:]
 
+            if st[2] == "0":
+                st = st[:2] + st[3:]
+
             return st
 
         # Order dates
