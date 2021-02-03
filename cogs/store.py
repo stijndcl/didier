@@ -84,7 +84,7 @@ class Store(commands.Cog):
                 item_tuple = item
                 break
 
-        if amount.lower() == "all":
+        if str(amount).lower() == "all":
             amount = int(item_tuple[2])
 
         if int(item_tuple[2]) < amount:
