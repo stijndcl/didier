@@ -1,0 +1,84 @@
+[
+  {
+    "course": "Computerarchitectuur",
+    "zoom": "https://ufora.ugent.be/d2l/ext/rp/228912/lti/framedlaunch/556e197e-e87b-4c27-be5d-53adc7a41826",
+    "slots": [
+      {
+        "online": "ZOOM",
+        "time": ["maandag", 1000, 1300]
+      },
+      {
+        "online": "ZOOM",
+        "time": ["dinsdag", 830, 930]
+      },
+      {
+        "online": "ZOOM",
+        "time": ["donderdag", 1430, 1700]
+      }
+    ]
+  },
+  {
+    "course": "Multimedia",
+    "zoom": "https://ufora.ugent.be/d2l/ext/rp/236949/lti/framedlaunch/556e197e-e87b-4c27-be5d-53adc7a41826",
+    "slots": [
+      {
+        "online": "ZOOM",
+        "time": ["maandag", 1430, 1730]
+      },
+      {
+        "campus": "Sterre",
+        "building": "S9",
+        "room": "A3",
+        "time": ["woensdag", 1130, 1330]
+      }
+    ]
+  },
+  {
+    "course": "Wetenschappelijk Rekenen",
+    "zoom": "https://ufora.ugent.be/d2l/ext/rp/236404/lti/framedlaunch/556e197e-e87b-4c27-be5d-53adc7a41826",
+    "slots": [
+      {
+        "online": "ZOOM",
+        "time": ["dinsdag", 1130, 1300]
+      },
+      {
+        "online": "ZOOM",
+        "time": ["woensdag", 1500, 1800]
+      },
+      {
+        "online": "ZOOM",
+        "time": ["donderdag", 830, 1000]
+      }
+    ]
+  },
+  {
+    "course": "Software Engineering Lab 1",
+    "zoom": "https://ufora.ugent.be/d2l/ext/rp/235800/lti/framedlaunch/556e197e-e87b-4c27-be5d-53adc7a41826",
+    "slots": [
+      {
+        "online": "ZOOM",
+        "time": ["dinsdag", 1430, 1700]
+      },
+      {
+        "online": "ZOOM",
+        "time": ["vrijdag", 830, 1130]
+      }
+    ]
+  },
+  {
+    "course": "Webdevelopment",
+    "zoom": "https://ufora.ugent.be/d2l/ext/rp/223449/lti/framedlaunch/556e197e-e87b-4c27-be5d-53adc7a41826",
+    "slots": [
+      {
+        "campus": "Sterre",
+        "building": "S9",
+        "room": "A3",
+        "time": ["woensdag", 900, 1100]
+      },
+      {
+        "online": "ZOOM",
+        "time": ["donderdag", 1000, 1300]
+      }
+    ]
+  }
+]
