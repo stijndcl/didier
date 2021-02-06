@@ -4,15 +4,15 @@
     "zoom": "https://ufora.ugent.be/d2l/ext/rp/228912/lti/framedlaunch/556e197e-e87b-4c27-be5d-53adc7a41826",
     "slots": [
       {
-        "online": "Zoom",
+        "online": "ZOOM",
         "time": ["maandag", 1000, 1300]
       },
       {
-        "online": "Zoom",
+        "online": "ZOOM",
         "time": ["dinsdag", 830, 930]
       },
       {
-        "online": "Zoom",
+        "online": "ZOOM",
         "time": ["donderdag", 1430, 1700]
       }
     ]
@@ -22,7 +22,7 @@
     "zoom": "https://ufora.ugent.be/d2l/ext/rp/236949/lti/framedlaunch/556e197e-e87b-4c27-be5d-53adc7a41826",
     "slots": [
       {
-        "online": "Zoom",
+        "online": "ZOOM",
         "time": ["maandag", 1430, 1730]
       },
       {
@@ -38,15 +38,15 @@
     "zoom": "https://ufora.ugent.be/d2l/ext/rp/236404/lti/framedlaunch/556e197e-e87b-4c27-be5d-53adc7a41826",
     "slots": [
       {
-        "online": "Zoom",
+        "online": "ZOOM",
         "time": ["dinsdag", 1130, 1300]
       },
       {
-        "online": "Zoom",
+        "online": "ZOOM",
         "time": ["woensdag", 1500, 1800]
       },
       {
-        "online": "Zoom",
+        "online": "ZOOM",
         "time": ["donderdag", 830, 1000]
       }
     ]
@@ -55,11 +55,11 @@
     "course": "Software Engineering Lab 1",
     "slots": [
       {
-        "online": "Zoom",
+        "online": "ZOOM",
         "time": ["dinsdag", 1430, 1700]
       },
       {
-        "online": "Zoom",
+        "online": "ZOOM",
         "time": ["vrijdag", 830, 1130]
       }
     ]
@@ -74,7 +74,7 @@
         "time": ["woensdag", 900, 1100]
       },
       {
-        "online": "Zoom",
+        "online": "ZOOM",
         "time": ["donderdag", 1000, 1300]
       }
     ]

@@ -21,7 +21,7 @@ def createCourseString(courses):
 
 def createEmbed(day, dayDatetime, semester, year, schedule):
     # Create a date object to check the current week
-    startDate = 1600041600
+    startDate = 1612224000
     currentTime = dayDatetime.timestamp()
     week = clamp(timeFormatters.timeIn(currentTime - startDate, "weeks")[0], 1, 13)
 
@@ -47,12 +47,11 @@ def createEmbed(day, dayDatetime, semester, year, schedule):
         if extras:
             embed.add_field(name="Extra", value="\n".join(getExtras(extra) for extra in extras), inline=False)
 
-        # TODO uncomment this when covid rules slow down
         # Add online links - temporarily removed because everything is online right now
-        # if online:
-        #     uniqueLinks: dict = getUniqueLinks(online)
-        #     embed.add_field(name="Online Links", value="\n".join(
-        #         sorted(getLinks(onlineClass, links) for onlineClass, links in uniqueLinks.items())))
+        if online:
+            uniqueLinks: dict = getUniqueLinks(online)
+            embed.add_field(name="Online Links", value="\n".join(
+                sorted(getLinks(onlineClass, links) for onlineClass, links in uniqueLinks.items())))
 
         embed.set_footer(text="Semester  {} | Lesweek {}".format(semester, round(week)))
     return embed
