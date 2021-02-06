@@ -53,6 +53,7 @@
   },
   {
     "course": "Software Engineering Lab 1",
+    "zoom": "https://ufora.ugent.be/d2l/ext/rp/235800/lti/framedlaunch/556e197e-e87b-4c27-be5d-53adc7a41826",
     "slots": [
       {
         "online": "ZOOM",
@@ -66,6 +67,7 @@
   },
   {
     "course": "Webdevelopment",
+    "zoom": "https://ufora.ugent.be/d2l/ext/rp/223449/lti/framedlaunch/556e197e-e87b-4c27-be5d-53adc7a41826",
     "slots": [
       {
         "campus": "Sterre",
