@@ -114,6 +114,8 @@ class Events(commands.Cog):
         # Someone forgot an argument or passed an invalid argument
         elif isinstance(err, (commands.BadArgument, commands.MissingRequiredArgument)):
             await ctx.send("Controleer je argumenten.")
+        elif isinstance(err, commands.MessageNotFound):
+            await ctx.send("Geen bericht gevonden dat overeenkomt met het opgegeven argument.")
         else:
             # Remove the InvokeCommandError because it's useless information
             x = traceback.format_exception(type(err), err, err.__traceback__)
