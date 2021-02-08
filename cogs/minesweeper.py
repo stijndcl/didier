@@ -68,7 +68,6 @@ class Minesweeper(commands.Cog):
 
         # Join the grid into a string
         li = [" ".join(row) for row in grid]
-        print("\n".join(li))
         return "\n".join(li)
 
     # Counts the amount of bombs near a given cell
