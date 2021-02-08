@@ -18,7 +18,7 @@ class School(commands.Cog):
         return not self.client.locked
 
     @commands.command(name="Eten", aliases=["Food", "Menu"], usage="[Dag]*")
-    @commands.check(checks.allowedChannels)
+    # @commands.check(checks.allowedChannels)
     @help.Category(category=Category.School)
     async def eten(self, ctx, *day):
         day = les.getWeekDay(None if len(day) == 0 else day)[1]
@@ -40,7 +40,7 @@ class School(commands.Cog):
         await ctx.send(embed=embed)
 
     @commands.command(name="Les", aliases=["Class", "Classes", "Sched", "Schedule"], usage="[Jaargang]* [Dag]*")
-    @commands.check(checks.allowedChannels)
+    # @commands.check(checks.allowedChannels)
     @help.Category(category=Category.School)
     async def les(self, ctx, *day):
         parsed = les.parseArgs(day)

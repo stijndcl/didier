@@ -76,6 +76,14 @@
         "time": ["woensdag", 900, 1100]
       },
       {
+        "weeks": [1],
+        "canceled": true,
+        "campus": "Sterre",
+        "building": "S9",
+        "room": "A3",
+        "time": ["woensdag", 900, 1100]
+      },
+      {
         "online": "ZOOM",
         "time": ["donderdag", 1000, 1300]
       }
