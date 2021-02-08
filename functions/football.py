@@ -147,7 +147,7 @@ def getTable():
     formatted = [_formatRow(row) for row in rows]
 
     header = "Jupiler Pro League Klassement"
-    table = tabulate.tabulate(formatted, headers=["#", "Ploeg", "Punten", "M", "M+", "M-", "M="])
+    table = tabulate.tabulate(formatted, headers=["#", "Ploeg", "Punten", "M", "M+", "M-", "M=", "D+", "D-", "D+/-"])
 
     return "```{}\n\n{}```".format(header, table)
 
@@ -156,7 +156,7 @@ def _formatRow(row):
     """
     Function that formats a row into a list for Tabulate to use
     """
-    scoresArray = list([td.renderContents().decode("utf-8") for td in row.find_all("td")])[:6]
+    scoresArray = list([td.renderContents().decode("utf-8") for td in row.find_all("td")])[:9]
 
     # Insert the team name into the list
     scoresArray.insert(1, row.find_all("a")[0].renderContents().decode("utf-8").split("<!--")[0])
