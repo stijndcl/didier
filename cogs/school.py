@@ -84,6 +84,18 @@ class School(commands.Cog):
                                 schedule.append(val)
         return schedule
 
+    @commands.command(name="Pin", usage="[Message]")
+    @help.Category(category=Category.School)
+    async def pin(self, ctx, message: discord.Message):
+        # In case people abuse, check if they're blacklisted
+        blacklist = []
+
+        if ctx.author.id in blacklist:
+            return
+
+        await ctx.message.add_reaction("✅")
+        await message.pin(reason="Didier Pin door {}".format(ctx.author.display_name))
+
 
 def setup(client):
     client.add_cog(School(client))

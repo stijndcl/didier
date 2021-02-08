@@ -96,9 +96,8 @@ class Oneliners(commands.Cog):
 
     @commands.command(name="Changelog", aliases=["Cl", "Change", "Changes"])
     @help.Category(category=Category.Didier)
-    async def changelog(self, ctx, *args):
-        await ctx.send("V2.0: <https://docs.google.com/document/d/1oa-9oc9yFnZ0X5sLJTWfdahtaL0vF8acLl-xMXA3a40/edit#>\n"
-                       "V2.1: https://docs.google.com/document/d/1ezdJBTnKWoog4q9yJrgwfF4iGOn-PZMoBZgSNVYPtqg/edit#")
+    async def changelog(self, ctx):
+        await ctx.send("v2.3.0: https://github.com/stijndcl/didier/releases/tag/2.3.0")
 
     @commands.command(name="Todo", aliases=["List", "Td"])
     @help.Category(category=Category.Didier)

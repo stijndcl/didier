@@ -3,6 +3,10 @@ def check(content, earlier=[]):
     if len(content) < 1:
         return False, ["Controleer je argumenten."]
 
+    # More than 20 reacts queried
+    if len("".join(content)) + len(earlier) > 20:
+        return False, ["Er kunnen maximaal 20 emoji's op een message geplaatst worden."]
+
     # This command should work case insensitive
     for i, word in enumerate(content):
         content[i] = word.lower()

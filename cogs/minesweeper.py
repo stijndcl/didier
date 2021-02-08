@@ -30,7 +30,7 @@ class Minesweeper(commands.Cog):
         dimensions = {
             "e": [5, 5, 4],
             "m": [10, 10, 20],
-            "h": [13, 13, 35]
+            "h": [13, 8, 35]
         }
 
         numbers = {
