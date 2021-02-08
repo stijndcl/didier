@@ -111,11 +111,13 @@ class Events(commands.Cog):
         # Someone used a command that was on cooldown
         elif isinstance(err, commands.CommandOnCooldown):
             await ctx.send("Je kan dit commando niet (meer) spammen.", delete_after=10)
+        elif isinstance(err, commands.MessageNotFound):
+            await ctx.send("Geen message gevonden die overeenkomt met het opgegeven argument.")
+        elif isinstance(err, (commands.ChannelNotFound, commands.ChannelNotReadable)):
+            await ctx.send("Geen channel gevonden dat overeenkomt met het opgegeven argument.")
         # Someone forgot an argument or passed an invalid argument
         elif isinstance(err, (commands.BadArgument, commands.MissingRequiredArgument)):
             await ctx.send("Controleer je argumenten.")
-        elif isinstance(err, commands.MessageNotFound):
-            await ctx.send("Geen bericht gevonden dat overeenkomt met het opgegeven argument.")
         else:
             # Remove the InvokeCommandError because it's useless information
             x = traceback.format_exception(type(err), err, err.__traceback__)

@@ -19,25 +19,16 @@ class ReactWord(commands.Cog):
     @help.Category(category=Category.Other)
     async def react(self, ctx, *words):
         words = list(words)
+        message = ctx.message
         target = False
-        channel = ctx.channel
 
-        # Check if the URL or the Id was passed
-        if str(words[-1]).count("/") > 3:
-            spl = str(words[-1]).split("/")
-            channel = self.client.get_channel(int(spl[-2]))
-            if channel is None:
-                return await ctx.send("Ik kan geen kanaal zien met dit id.")
-            words[-1] = spl[-1]
-
-        # Get the message object if an Id was passed, otherwise react to the message itself
-        try:
-            message = await channel.fetch_message(words[-1])
-            if message is None:
-                return await ctx.send("Ik kan geen bericht zien met dit id.")
+        # Message id or URL passed as final argument
+        if (len(words[-1]) == 18 and all(i.isdigit() for i in words[-1])) or "discord.com/channels/" in words[-1]:
             target = True
-        except discord.HTTPException:
-            message = ctx.message
+            message = await commands.MessageConverter().convert(ctx, words[-1])
+
+            # Cut id or URL
+            words = words[:-1]
 
         # Reactions that were added before this command was executed
         previousReactions = ([x.emoji for x in message.reactions]) if len(message.reactions) != 0 else []
