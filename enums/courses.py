@@ -20,6 +20,11 @@ class Ba2(Enum):
     FuncProg = {"year": 2, "semester": 1, "id": 727879279622225920, "name": "Functioneel Programmeren"}
     StatProb = {"year": 2, "semester": 1, "id": 727879946458103880, "name": "Statistiek en Probabiliteit"}
     SysProg = {"year": 2, "semester": 1, "id": 727880036644028517, "name": "Systeemprogrammeren"}
+    CompArch = {"year": 2, "semester": 2, "id": 807565108355137566, "name": "Computerarchitectuur"}
+    Multimedia = {"year": 2, "semester": 2, "id": 807565458496028683, "name": "Multimedia"}
+    SEL1 = {"year": 2, "semester": 2, "id": 807565600086818817, "name": "Software Engineering Lab 1"}
+    WebDev = {"year": 2, "semester": 2, "id": 807565717234778132, "name": "Webdevelopment"}
+    WetRek = {"year": 2, "semester": 2, "id": 807562607707947058, "name": "Wetenschappelijk Rekenen"}
 
 
 years = [Ba1, Ba2]
