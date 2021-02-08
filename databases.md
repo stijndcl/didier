@@ -123,6 +123,13 @@ Used in stats.py - Stats commands. Tracks the user's personal stats to award ach
     12 xp: bigint, default 0                            | The amount of message xp the user has gained
     13 last_message: bigint, default 0                  | The timestamp of the user's last message that awarded xp
 
+### pin
+
+Used in school.py - Pin command. Keeps track of which messages have been requested for a pin.
+
+    0 messageid: bigint, unique, primary key            | The id of the message being tracked
+    1 reactions: integer, default 0                     | The amount of votes for this message
+
 ### poke
 
 Used in poke.py - Poke commands. Keeps track of the currently poked person.
