@@ -4,7 +4,7 @@ def check(content, earlier=[]):
         return False, ["Controleer je argumenten."]
 
     # More than 20 reacts queried
-    if len(" ".join(content)) + len(earlier) > 20:
+    if len("".join(content)) + len(earlier) > 20:
         return False, ["Er kunnen maximaal 20 emoji's op een message geplaatst worden."]
 
     # This command should work case insensitive
