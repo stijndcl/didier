@@ -37,7 +37,8 @@ allowedChannels = {
     "bot-commandsCOCGI": 714170653124722738,
     "generalZandbak": 728361031008780422,
     "freegamesZandbak": 728545397127118898,
-    "spelenZandbak": 769248992957038612
+    "spelenZandbak": 769248992957038612,
+    "warzone": 691933718880714843
 }
 
 creationDate = 1582243200
