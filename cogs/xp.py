@@ -15,8 +15,8 @@ class Xp(commands.Cog):
     @commands.check(checks.allowedChannels)
     @help.Category(Category.Other)
     async def xp(self, ctx, user: discord.Member = None):
-        if user is not None and str(ctx.author.id) != constants.myId:
-            return await ctx.send("Je hebt geen toegang tot dit commando.")
+        # if user is not None and str(ctx.author.id) != constants.myId:
+        #     return await ctx.send("Je hebt geen toegang tot dit commando.")
 
         target = user if user is not None else ctx.author
 
