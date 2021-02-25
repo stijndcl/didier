@@ -86,6 +86,10 @@ class Define(commands.Cog):
         """
         text = text.replace("[", "")
         text = text.replace("]", "")
+
+        if not text:
+            return "N/A"
+
         return text if len(text) < 1024 else text[:1021] + "..."
 
     def ratio(self, dic):
