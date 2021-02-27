@@ -48,8 +48,8 @@ class Oneliners(commands.Cog):
     @commands.command(name="Reverse", aliases=["Rev"], usage="[Tekst]")
     @commands.check(checks.allowedChannels)
     @help.Category(category=Category.Other)
-    async def reverse(self, ctx, *args):
-        await ctx.send(" ".join(args)[::-1])
+    async def reverse(self, ctx, *, args):
+        await ctx.send(args[::-1])
 
     @commands.command(name="Government", aliases=["Gov", "Regering"])
     @commands.check(checks.allowedChannels)
