@@ -54,13 +54,14 @@
   {
     "course": "Software Engineering Lab 1",
     "zoom": "https://ufora.ugent.be/d2l/ext/rp/235800/lti/framedlaunch/556e197e-e87b-4c27-be5d-53adc7a41826",
+    "msteams": "https://teams.microsoft.com/l/team/19%3a4dfd5b2fb1ae4aa9b72706aa3a0d6867%40thread.tacv2/conversations?groupId=256d5c58-5d53-43f5-9436-497b0c852c75&tenantId=d7811cde-ecef-496c-8f91-a1786241b99c",
     "slots": [
       {
         "online": "ZOOM",
         "time": ["dinsdag", 1430, 1700]
       },
       {
-        "online": "ZOOM",
+        "online": "MS Teams",
         "time": ["vrijdag", 830, 1130]
       }
     ]
