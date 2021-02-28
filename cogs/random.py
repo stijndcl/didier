@@ -23,7 +23,7 @@ class Random(commands.Cog):
 
     @commands.command(name="Shuffle", usage="[Argumenten]")
     async def _shuffle(self, ctx, *options):
-        await self.shuffle(ctx, options)
+        await self.shuffle(ctx, *options)
 
     @commands.group(name="Random", aliases=["R", "Rand", "RNG"], case_insensitive=True, invoke_without_command=True)
     @help.Category(category=Category.Random, unpack=True)
@@ -33,8 +33,7 @@ class Random(commands.Cog):
     @random.command(name="Choice", usage="[Argumenten]")
     async def choice(self, ctx, *options):
         if not options or not options[0]:
-            await ctx.send("Geef een geldige reeks op.")
-            return
+            return await ctx.send("Geef een geldige reeks op.")
 
         await ctx.send(random.choice(options))
 
@@ -69,8 +68,7 @@ class Random(commands.Cog):
         try:
             identity = requests.get("https://randomuser.me/api/").json()
         except json.decoder.JSONDecodeError:
-            await ctx.send("Er ging iets mis. Probeer het opnieuw.")
-            return
+            return await ctx.send("Er ging iets mis. Probeer het opnieuw.")
 
         identity = identity["results"][0]
         name = identity["name"]
@@ -87,12 +85,7 @@ class Random(commands.Cog):
     @random.command(name="Shuffle", aliases=["Order"], usage="[Argumenten]")
     async def shuffle(self, ctx, *args):
         if not args:
-            await ctx.send("Geef een geldige reeks op.")
-            return
-
-        # Allows shuffle alias to pass in it's args too
-        if isinstance(args[0], tuple):
-            args = args[0]
+            return await ctx.send("Geef een geldige reeks op.")
 
         args = list(args)
 
