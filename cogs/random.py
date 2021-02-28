@@ -19,7 +19,7 @@ class Random(commands.Cog):
     # Creates an alias
     @commands.command(name="Choice", aliases=["Choose"], usage="[Argumenten]")
     async def choose(self, ctx, *options):
-        await self.choice(ctx, options)
+        await self.choice(ctx, *options)
 
     @commands.command(name="Shuffle", usage="[Argumenten]")
     async def _shuffle(self, ctx, *options):
