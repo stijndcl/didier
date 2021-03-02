@@ -54,7 +54,7 @@
     "msteams": "https://teams.microsoft.com/l/team/19%3a4dfd5b2fb1ae4aa9b72706aa3a0d6867%40thread.tacv2/conversations?groupId=256d5c58-5d53-43f5-9436-497b0c852c75&tenantId=d7811cde-ecef-496c-8f91-a1786241b99c",
     "slots": [
       {
-        "online": "ZOOM",
+        "online": "MS Teams",
         "time": ["dinsdag", 1430, 1700]
       },
       {
