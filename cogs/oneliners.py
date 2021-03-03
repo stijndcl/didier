@@ -6,6 +6,7 @@ from discord.ext import commands
 from enums.help_categories import Category
 from functions import checks, clap, mock, sunrise, timeFormatters
 import pytz
+from requests import get
 import time
 import urllib.parse
 
@@ -101,7 +102,7 @@ class Oneliners(commands.Cog):
 
     @commands.command(name="Todo", aliases=["List", "Td"])
     @help.Category(category=Category.Didier)
-    async def todo(self, ctx, *args):
+    async def todo(self, ctx):
         await ctx.send("https://trello.com/b/PdtsAJea/didier-to-do-list")
 
     @commands.command(name="LMGTFY", aliases=["Dsfr"], usage="[Query]")
@@ -130,7 +131,7 @@ class Oneliners(commands.Cog):
         await ctx.send("Shut, it already is.")
 
     @commands.command()
-    async def sc(self, ctx, *args):
+    async def sc(self, ctx):
         await ctx.send("http://take-a-screenshot.org/")
 
     @commands.command(aliases=["os", "sauce", "src"])
@@ -144,8 +145,18 @@ class Oneliners(commands.Cog):
         await ctx.send(":sunny:: **{}**\n:crescent_moon:: **{}**".format(s.sunrise(), s.sunset()))
 
     @commands.command(name="Tias", aliases=["TryIt"])
-    async def tias(self, ctx, *args):
+    async def tias(self, ctx):
         await ctx.send("***Try it and see***")
+
+    @commands.command(name="Inspire")
+    @help.Category(Category.Other)
+    async def inspire(self, ctx):
+        image = get("http://inspirobot.me/api?generate=true")
+
+        if image.status_code == 200:
+            await ctx.send(image.text)
+        else:
+            await ctx.send("Uh oh API down.")
 
 
 def setup(client):

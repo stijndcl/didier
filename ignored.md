@@ -103,3 +103,22 @@ Contains the stats to track for gambling games. Weren't made as a PSQL table bec
 Contains Didier's status message for when he logs in. Keep in mind that his activity is set to `Playing `. This was first used in Didier V1 to show whether or not he was in sandbox mode.
 
     with your Didier Dinks.
+    
+### files/ufora_notifications.json
+
+Stores ID's of all received Ufora notifications.
+
+```json
+{
+  "Algoritmen en Datastructuren 2": [],
+  "Communicatienetwerken": [],
+  "Computerarchitectuur": [],
+  "Functioneel Programmeren": [],
+  "Multimedia": [],
+  "Software Engineering Lab 1": [],
+  "Statistiek en Probabiliteit": [],
+  "Systeemprogrammeren": [],
+  "Webdevelopment": [],
+  "Wetenschappelijk Rekenen": []
+}
+```

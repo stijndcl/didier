@@ -8,6 +8,7 @@ import pytz
 import requests
 
 
+# Temporarily disabled because of API (setup @ bottom)
 class Launch(commands.Cog):
     def __init__(self, client):
         self.client = client
@@ -51,4 +52,5 @@ class Launch(commands.Cog):
 
 
 def setup(client):
-    client.add_cog(Launch(client))
+    pass
+    # client.add_cog(Launch(client))

@@ -6,6 +6,7 @@ from functions import timeFormatters
 from functions.config import config
 from functions.database import currency, poke, prison, birthdays, stats
 from functions.scraping import getMatchweek
+from functions import ufora_notifications
 import json
 import random
 import requests
@@ -24,6 +25,7 @@ class Tasks(commands.Cog):
         self.updateMessageCounts.start()
         self.sendReminders.start()
         self.updateMatchweek.start()
+        self.uforaAnnouncements.start()
 
     @tasks.loop(hours=1.0)
     async def bankInterest(self):
@@ -236,6 +238,24 @@ class Tasks(commands.Cog):
 
     @updateMatchweek.before_loop
     async def beforeUpdateMatchweek(self):
+        await self.client.wait_until_ready()
+
+    @tasks.loop(minutes=30.0)
+    async def uforaAnnouncements(self):
+        """
+        Task that checks for new Ufora announcements every few minutes
+        """
+        # Get new notifications
+        announcements = ufora_notifications.run()
+
+        if announcements:
+            announcements_channel = self.client.get_channel(816724500136591380)
+
+            for an in announcements:
+                await announcements_channel.send(embed=an.to_embed())
+
+    @uforaAnnouncements.before_loop
+    async def beforeUforaAnnouncements(self):
         await self.client.wait_until_ready()
 
     def getCurrentHour(self):
