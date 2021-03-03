@@ -40,7 +40,7 @@ class UforaNotification:
         desc = self._clean_content(self._content["summary"])
 
         if len(desc) > 500:
-            return desc[:500]
+            return desc[:497] + "..."
 
         return desc
 
