@@ -33,7 +33,7 @@ class UforaNotification:
         if self._notif_id is None or self._course_id is None:
             return self._content["link"]
 
-        return "https://ufora.ugent.be/d2l/le/news/{0}/{1}/view?ou={0}".format(self._notif_id, self._course_id)
+        return "https://ufora.ugent.be/d2l/le/news/{0}/{1}/view?ou={0}".format(self._course_id, self._notif_id)
 
     def _find_ids(self, url: str):
         match = re.search(r"[0-9]+-[0-9]+$", url)
@@ -54,6 +54,7 @@ class UforaNotification:
         return desc
 
     def _clean_content(self, text: str):
+        # Dict with HTML & markdown tags to replace
         html_table = {
             # CHARACTERS:
             "&amp;": '&',
