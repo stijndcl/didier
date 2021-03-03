@@ -249,8 +249,7 @@ class Tasks(commands.Cog):
         announcements = ufora_notifications.run()
 
         if announcements:
-            # TODO change to COC Bot testing if it works
-            announcements_channel = self.client.get_channel(int(constants.ZandbakSpeeltuin))
+            announcements_channel = self.client.get_channel(816724500136591380)
 
             for an in announcements:
                 await announcements_channel.send(embed=an.to_embed())
