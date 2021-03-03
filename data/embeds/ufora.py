@@ -1,15 +1,16 @@
 from datetime import datetime, timedelta
 from discord import Embed, Colour
+from functions.stringFormatters import leadingZero as lz
 from functions.timeFormatters import intToWeekday
 import pytz
 import re
 
 
 class UforaNotification:
-    def __init__(self, content: dict, course):
+    def __init__(self, content: dict, course, notif_id, course_id):
         self._content: dict = content
         self._course = course
-        self._notif_id, self._course_id = self._find_ids(self._content["id"])
+        self._notif_id, self._course_id = notif_id, course_id
         self._view_url = self._create_url()
         self._title = self._clean_content(self._content["title"])
         self._description = self._get_description()
@@ -34,16 +35,6 @@ class UforaNotification:
             return self._content["link"]
 
         return "https://ufora.ugent.be/d2l/le/news/{0}/{1}/view?ou={0}".format(self._course_id, self._notif_id)
-
-    def _find_ids(self, url: str):
-        match = re.search(r"[0-9]+-[0-9]+$", url)
-
-        if not match:
-            return None, None
-
-        spl = match[0].split("-")
-
-        return spl[0], spl[1]
 
     def _get_description(self):
         desc = self._clean_content(self._content["summary"])
@@ -76,7 +67,10 @@ class UforaNotification:
             "<ins>": "__",
             "</ins>": "__",
             # Represent paragraphs with newlines
-            "</p>": "\n"
+            "</p>": "\n",
+            "<br>": "\n",
+            "<br/>": "\n",
+            "<br />": "\n"
         }
 
         # Unescape HTML
@@ -96,6 +90,6 @@ class UforaNotification:
 
         return "{} {}/{}/{} om {}:{}:{}".format(
             intToWeekday(dt.weekday()),
-            dt.day, dt.month, dt.year,
-            dt.hour, dt.minute, dt.second
+            lz(dt.day), lz(dt.month), lz(dt.year),
+            lz(dt.hour), lz(dt.minute), lz(dt.second)
         )

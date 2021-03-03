@@ -1,3 +1,5 @@
+import re
+
 import feedparser
 from data.embeds import UforaNotification
 import json
@@ -37,14 +39,14 @@ def run():
         feed = feedparser.parse(url)
 
         # Filter out old notifications
-        feed = list(filter(lambda f: f["id"] not in notifications[course], feed.entries))
+        feed = list(filter(lambda f: _parse_ids(f["id"])[0] not in notifications[course], feed.entries))
 
         if feed:
             for item in feed:
-                notification = UforaNotification(item, course)
-                new_notifications.append(notification)
+                notif_id, course_id = _parse_ids(item["id"])
+                new_notifications.append(UforaNotification(item, course, notif_id, course_id))
 
-                notifications[course].append(notification.get_id())
+                notifications[course].append(notif_id)
 
     # Update list of notifications
     if new_notifications:
@@ -52,3 +54,14 @@ def run():
             json.dump(notifications, fp)
 
     return new_notifications
+
+
+def _parse_ids(url: str):
+    match = re.search(r"[0-9]+-[0-9]+$", url)
+
+    if not match:
+        return None, None
+
+    spl = match[0].split("-")
+
+    return spl[0], spl[1]
