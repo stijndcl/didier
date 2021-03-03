@@ -41,9 +41,10 @@ def run():
 
         if feed:
             for item in feed:
-                notifications[course].append(item["id"])
+                notification = UforaNotification(item, course)
+                new_notifications.append(notification)
 
-                new_notifications.append(UforaNotification(item, course))
+                notifications[course].append(notification.get_id())
 
     # Update list of notifications
     if new_notifications:

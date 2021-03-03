@@ -26,6 +26,9 @@ class UforaNotification:
 
         return embed
 
+    def get_id(self):
+        return int(self._notif_id) if self._notif_id is not None else self._content["id"]
+
     def _create_url(self):
         if self._notif_id is None or self._course_id is None:
             return self._content["link"]
@@ -52,11 +55,27 @@ class UforaNotification:
 
     def _clean_content(self, text: str):
         html_table = {
+            # CHARACTERS:
             "&amp;": '&',
             "&quot;": '"',
             "apos;": "'",
             "&gt;": ">",
-            "&lt;": "<"
+            "&lt;": "<",
+            # MARKDOWN SUPPORT:
+            "<b>": "**",
+            "</b>": "**",
+            "<strong>": "**",
+            "</strong>": "**",
+            "<i>": "*",
+            "</i>": "*",
+            "<em>": "*",
+            "</em>": "*",
+            "<del>": "~~",
+            "</del>": "~~",
+            "<ins>": "__",
+            "</ins>": "__",
+            # Represent paragraphs with newlines
+            "</p>": "\n"
         }
 
         # Unescape HTML
