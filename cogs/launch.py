@@ -51,5 +51,6 @@ class Launch(commands.Cog):
             datetime.fromtimestamp(int(d) + 7200, pytz.timezone("Europe/Brussels")).strftime('%B %d %Y om %H:%M:%S'))
 
 
-# def setup(client):
-#     client.add_cog(Launch(client))
+def setup(client):
+    pass
+    # client.add_cog(Launch(client))
