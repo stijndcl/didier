@@ -8,6 +8,7 @@ import pytz
 import requests
 
 
+# Temporarily disabled because of API (setup @ bottom)
 class Launch(commands.Cog):
     def __init__(self, client):
         self.client = client
@@ -50,5 +51,5 @@ class Launch(commands.Cog):
             datetime.fromtimestamp(int(d) + 7200, pytz.timezone("Europe/Brussels")).strftime('%B %d %Y om %H:%M:%S'))
 
 
-def setup(client):
-    client.add_cog(Launch(client))
+# def setup(client):
+#     client.add_cog(Launch(client))
