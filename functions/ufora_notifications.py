@@ -1,9 +1,6 @@
 import feedparser
-from data.constants import BotTesting
-
-
-# TODO when it works, move to announcements channel
-notifications_channel = BotTesting
+from data.embeds import UforaNotification
+import json
 
 
 course_urls = {
@@ -18,3 +15,39 @@ course_urls = {
     "Webdevelopment": "https://ufora.ugent.be/d2l/le/news/rss/223449/course?token=aehhv6utkf46t8cc102e0&ou=223449",
     "Wetenschappelijk Rekenen": "https://ufora.ugent.be/d2l/le/news/rss/236404/course?token=aehhv6utkf46t8cc102e0&ou=236404"
 }
+
+
+def run():
+    """
+    Check for new notifications
+    """
+    # List of new notifications
+    new_notifications = []
+
+    # List of old notifications
+    with open("files/ufora_notifications.json", "r") as fp:
+        notifications = json.load(fp)
+
+    for course, url in course_urls.items():
+        # Automatically append new/missing courses
+        if course not in notifications:
+            notifications[course] = []
+
+        # Get the updated feed
+        feed = feedparser.parse(url)
+
+        # Filter out old notifications
+        feed = list(filter(lambda f: f["id"] not in notifications[course], feed.entries))
+
+        if feed:
+            for item in feed:
+                notifications[course].append(item["id"])
+
+                new_notifications.append(UforaNotification(item, course))
+
+    # Update list of notifications
+    if new_notifications:
+        with open("files/ufora_notifications.json", "w") as fp:
+            json.dump(notifications, fp)
+
+    return new_notifications
