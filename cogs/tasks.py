@@ -240,7 +240,7 @@ class Tasks(commands.Cog):
     async def beforeUpdateMatchweek(self):
         await self.client.wait_until_ready()
 
-    @tasks.loop(minutes=30.0)
+    @tasks.loop(minutes=10.0)
     async def uforaAnnouncements(self):
         """
         Task that checks for new Ufora announcements every few minutes

@@ -2,6 +2,7 @@ from datetime import datetime, timedelta
 from discord import Embed, Colour
 from functions.stringFormatters import leadingZero as lz
 from functions.timeFormatters import intToWeekday
+from html import unescape
 import pytz
 import re
 
@@ -78,7 +79,7 @@ class UforaNotification:
             text = text.replace(key, value)
 
         # Remove HTML tags
-        return re.sub(r"<[^>]*>", "", text)
+        return unescape(re.sub(r"<[^>]*>", "", text))
 
     def _get_published(self):
         time_string = "%a, %d %b %Y %H:%M:%S %Z"
