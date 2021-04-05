@@ -23,7 +23,14 @@ def createEmbed(day, dayDatetime, semester, year, schedule):
     # Create a date object to check the current week
     startDate = 1612224000
     currentTime = dayDatetime.timestamp()
+
     week = clamp(timeFormatters.timeIn(currentTime - startDate, "weeks")[0], 1, 13)
+
+    # Compensate for easter holidays
+    # Sorry but I don't have time to make a clean solution for this rn
+    # this will have to do
+    if currentTime > 1617377400:
+        week -= 2
 
     title, week = getTitle(day, dayDatetime, week)
 
