@@ -1,3 +1,5 @@
+import random
+
 from data import constants
 from decorators import help
 import discord
@@ -43,21 +45,25 @@ class School(commands.Cog):
     # @commands.check(checks.allowedChannels)
     @help.Category(category=Category.School)
     async def les(self, ctx, *day):
-        parsed = les.parseArgs(day)
+        deadlines = ["SEL", "Webdevelopment", "Computerarchitectuur", "Wetenschappelijk Rekenen"]
 
-        # Invalid arguments
-        if not parsed[0]:
-            return await ctx.send(parsed[1])
-
-        day, dayDatetime, semester, year = parsed[1:]
-
-        # Customize the user's schedule
-        schedule = self.customizeSchedule(ctx, year, semester)
-
-        # Create the embed
-        embed = les.createEmbed(day, dayDatetime, semester, year, schedule)
-
-        await ctx.send(embed=embed)
+        await ctx.send("'T is vakantie. Sort of. Werk een beetje aan uw project voor {}.".format(random.choice(deadlines)))
+        #
+        # parsed = les.parseArgs(day)
+        #
+        # # Invalid arguments
+        # if not parsed[0]:
+        #     return await ctx.send(parsed[1])
+        #
+        # day, dayDatetime, semester, year = parsed[1:]
+        #
+        # # Customize the user's schedule
+        # schedule = self.customizeSchedule(ctx, year, semester)
+        #
+        # # Create the embed
+        # embed = les.createEmbed(day, dayDatetime, semester, year, schedule)
+        #
+        # await ctx.send(embed=embed)
 
     # Add all the user's courses
     def customizeSchedule(self, ctx, year, semester):
