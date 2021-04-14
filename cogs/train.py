@@ -89,7 +89,7 @@ class Train(commands.Cog):
         return "".join(arr)
 
     async def sendEmbed(self, ctx, embed):
-        if checks.allowedChannels(ctx):
+        if await checks.allowedChannels(ctx):
             await ctx.send(embed=embed)
         else:
             await ctx.author.send(embed=embed)
