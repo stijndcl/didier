@@ -35,12 +35,7 @@ def google_search(query):
         if link is None or title is None:
             return None
 
-        sp = title.find("span")
-
-        if sp is None:
-            return None
-
-        return link["href"], sp.text
+        return link["href"], title.text
 
     divs = bs.find_all("div", attrs={"class": "g"})
 
