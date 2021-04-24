@@ -73,13 +73,13 @@ class Corona(commands.Cog):
 
         embed = discord.Embed(colour=discord.Colour.red(), title="Vaccinatiecijfers")
 
-        embed.add_field(name="Eerste Dosis", value="{:,} ({} %)".format(first_dose, first_dose_perc))
+        embed.add_field(name="Eerste Dosis", value="{:,} ({}%)".format(first_dose, first_dose_perc))
         embed.add_field(name="Eerste Dosis (Vandaag)",
-                        value="{:,} ({} %)".format(new_info["today"]["first_dose"], first_today_perc))
+                        value="{:,} ({}%)".format(new_info["today"]["first_dose"], first_today_perc))
         embed.add_field(name="Eerste Dosis (Verschil)", value=first_trend)
-        embed.add_field(name="Tweede Dosis", value="{:,} ({} %)".format(second_dose, second_dose_perc))
+        embed.add_field(name="Tweede Dosis", value="{:,} ({}%)".format(second_dose, second_dose_perc))
         embed.add_field(name="Tweede Dosis (Vandaag)",
-                        value="{:,} ({} %)".format(new_info["today"]["second_dose"], second_today_perc))
+                        value="{:,} ({}%)".format(new_info["today"]["second_dose"], second_today_perc))
         embed.add_field(name="Tweede Dosis (Verschil)", value=second_trend)
 
         # Only add updated timestamp if the request succeeded
