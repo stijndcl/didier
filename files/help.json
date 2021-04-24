@@ -30,6 +30,7 @@
   "coinflip": "Gooi een muntje, indien je Didier Dinks inzet kan je je inzet verdubbelen (of verliezen).",
   "config": "Past constanten in het config bestand aan.",
   "corona": "Coronatracker voor [Land].\nIndien je geen land opgeeft is dit standaard België.\nCorona Global voor wereldwijde cijfers.",
+  "corona vaccinations": "Vaccinatiecijfers voor België.",
   "dadjoke": "Didier vertelt een dad joke.",
   "define": "Geeft de definitie van [Woord] zoals het in de Urban Dictionary staat.\nZoektermen met spaties moeten **niet** tussen aanhalingstekens staan.",
   "detect": "Didier probeert de taal van [Tekst] te detecteren.",

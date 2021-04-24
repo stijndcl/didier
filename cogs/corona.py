@@ -36,6 +36,106 @@ class Corona(commands.Cog):
 
         await self.sendEmbed(ctx, dic, vaccine)
 
+    @corona.command(name="Vaccinations", aliases=["V", "Vacc", "Vax", "Vaxx"])
+    async def vaccinations(self, ctx):
+        population = 11632326
+
+        res = requests.get("https://covid-vaccinatie.be/api/v1/administered.json")
+        updated = requests.get("https://covid-vaccinatie.be/api/v1/last-updated.json")
+
+        if res.status_code != 200:
+            return
+
+        res = res.json()
+        administered = res["result"]["administered"]
+
+        first_dose = 0
+        second_dose = 0
+
+        # Get dose counts
+        for entry in administered:
+            first_dose += entry["first_dose"]
+            second_dose += entry["second_dose"]
+
+        new_info = self.get_new_vaccinations(administered)
+
+        # % of population that has received their vaccine
+        first_dose_perc = round(first_dose * 100 / population, 2)
+        second_dose_perc = round(second_dose * 100 / population, 2)
+
+        # % of population that has received their vaccine TODAY
+        first_today_perc = round(new_info["today"]["first_dose"] * 100 / population, 2)
+        second_today_perc = round(new_info["today"]["second_dose"] * 100 / population, 2)
+
+        # Difference compared to the day before
+        first_trend = self.trend(new_info, "first_dose")
+        second_trend = self.trend(new_info, "second_dose")
+
+        embed = discord.Embed(colour=discord.Colour.red(), title="Vaccinatiecijfers")
+
+        embed.add_field(name="Eerste Dosis", value="{:,} ({} %)".format(first_dose, first_dose_perc))
+        embed.add_field(name="Eerste Dosis (Vandaag)",
+                        value="{:,} ({} %)".format(new_info["today"]["first_dose"], first_today_perc))
+        embed.add_field(name="Eerste Dosis (Verschil)", value=first_trend)
+        embed.add_field(name="Tweede Dosis", value="{:,} ({} %)".format(second_dose, second_dose_perc))
+        embed.add_field(name="Tweede Dosis (Vandaag)",
+                        value="{:,} ({} %)".format(new_info["today"]["second_dose"], second_today_perc))
+        embed.add_field(name="Tweede Dosis (Verschil)", value=second_trend)
+
+        # Only add updated timestamp if the request succeeded
+        # this isn't really a big deal so the command doesn't fail
+        # if it didn't
+        if updated.status_code == 200:
+            embed.set_footer(text="Laatste update: {}".format(updated.json()["result"]["last_updated"]["updated"]))
+
+        return await ctx.send(embed=embed)
+
+    def get_new_vaccinations(self, data):
+        """
+        Finds the amount of new doses administered today & the day before
+        """
+        reversed_data = list(reversed(data))
+
+        # Find the most recent date that was added
+        # (not necessarily today)
+        latest_date = reversed_data[0]["date"]
+        date_before = ""
+
+        info = {
+            "today": {
+                "first_dose": 0,
+                "second_dose": 0
+            },
+            "yesterday": {
+                "first_dose": 0,
+                "second_dose": 0
+            }
+        }
+
+        # Find first date doses
+        for entry in reversed_data:
+            if entry["date"] == latest_date:
+                info["today"]["first_dose"] += entry["first_dose"]
+                info["today"]["second_dose"] += entry["second_dose"]
+            else:
+                # Find the date before the most recent one
+                # to calculate differences
+                date_before = entry["date"]
+                break
+
+        # Find second date doses
+        for entry in reversed_data:
+            # Info on first date was added above
+            if entry["date"] == latest_date:
+                continue
+            elif entry["date"] == date_before:
+                info["yesterday"]["first_dose"] += entry["first_dose"]
+                info["yesterday"]["second_dose"] += entry["second_dose"]
+            else:
+                break
+
+        return info
+
     @corona.command(aliases=["lb", "leaderboards"], hidden=True)
     async def leaderboard(self, ctx):
         """
