@@ -10,12 +10,14 @@ import json
 
 def createCourseString(courses):
     courseString = ""
+
     for course in sorted(courses, key=lambda item: item["slot"]["time"][1]):
         # Add a ":" to the hour + add a leading "0" if needed
         start = timeFormatters.timeFromInt(course["slot"]["time"][1])
         end = timeFormatters.timeFromInt(course["slot"]["time"][2])
         courseString += "{} - {}: {} {}\n".format(start, end,
                                                   str(course["course"]), getLocation(course["slot"]))
+
     return courseString
 
 
@@ -41,27 +43,38 @@ def createEmbed(day, dayDatetime, semester, year, schedule):
     embed = discord.Embed(colour=discord.Colour.blue(), title=title)
     embed.set_author(name="Lessenrooster voor {}{} Bachelor".format(year, "ste" if year == 1 else "de"))
 
+    # The only if statement we'd wish to be True
     if len(courses) == 0:
         embed.add_field(name="Geen Les", value="Geen Les", inline=False)
-    else:
-        courseString = createCourseString(courses)
-        # TODO uncomment this when covid rules slow down
-        # courseString += "\nGroep {} heeft vandaag online les.".format(1 if week % 2 == 0 else 2)
-        embed.description = courseString
 
-        if prev:
-            embed.add_field(name="Vakken uit vorige jaren", value=createCourseString(prev), inline=False)
+        return embed
 
-        if extras:
-            embed.add_field(name="Extra", value="\n".join(getExtras(extra) for extra in extras), inline=False)
+    courseString = createCourseString(courses)
+    # TODO uncomment this when covid rules slow down
+    # courseString += "\nGroep {} heeft vandaag online les.".format(1 if week % 2 == 0 else 2)
+    embed.description = courseString
 
-        # Add online links - temporarily removed because everything is online right now
-        if online:
-            uniqueLinks: dict = getUniqueLinks(online)
-            embed.add_field(name="Online Links", value="\n".join(
-                sorted(getLinks(onlineClass, links) for onlineClass, links in uniqueLinks.items())))
+    if prev:
+        embed.add_field(name="Vakken uit vorige jaren", value=createCourseString(prev), inline=False)
 
-        embed.set_footer(text="Semester  {} | Lesweek {}".format(semester, round(week)))
+    if extras:
+        embed.add_field(name="Extra", value="\n".join(getExtras(extra) for extra in extras), inline=False)
+
+    # Add online links - temporarily removed because everything is online right now
+    if online:
+        uniqueLinks: dict = getUniqueLinks(online)
+        embed.add_field(
+            name="Online Links",
+            value="\n".join(
+                sorted(
+                    getLinks(onlineClass, links)
+                    for onlineClass, links in uniqueLinks.items()
+                )
+            )
+        )
+
+    embed.set_footer(text="Semester  {} | Lesweek {}".format(semester, round(week)))
+
     return embed
 
 
@@ -74,6 +87,7 @@ def findDate(targetWeekday):
     now = timeFormatters.dateTimeNow()
     while now.weekday() != targetWeekday:
         now = now + datetime.timedelta(days=1)
+
     return now
 
 
@@ -144,13 +158,17 @@ def getCourses(schedule, day, week):
                 if week in slot["weeks"]:
                     if "custom" not in course:
                         courses.append(classDic)
+
                     extras.append(classDic)
+
             elif "weeks" in slot and "online" in slot and "group" not in slot:
                 # This class is only online for this week
                 if week in slot["weeks"]:
                     if "custom" not in course:
                         courses.append(classDic)
+                        
                     extras.append(classDic)
+
             else:
                 # Nothing special happening, just add it to the list of courses
                 # in case this is a course for everyone in this year
@@ -195,11 +213,13 @@ def getExtras(extra):
             extra["slot"]["group"], extra["course"], location,
             start, end
         )
+
     elif "online" in extra["slot"]:
         return "**{}** gaat vandaag uitzonderlijk **online** door {} van **{} tot {}**.".format(
             extra["course"], location[7:],
             start, end
         )
+
     else:
         return "**{}** vindt vandaag uitzonderlijk plaats **{}** van **{} tot {}**.".format(
             extra["course"], location,
@@ -232,11 +252,15 @@ def getLinks(onlineClass, links):
     Function that returns a formatted string giving a hyperlink
     to every online link for this class today.
     """
-    return "{}: {}".format(onlineClass,
-                           " | ".join(
-                               ["**[{}]({})**".format(platform, url) for platform, url in
-                                links.items()])
-                           )
+    return "{}: {}".format(
+        onlineClass,
+        " | ".join(
+            [
+                f"**[{platform}]({url})**"
+                for platform, url in links.items()
+            ]
+        )
+    )
 
 
 def getLocation(slot):
@@ -302,12 +326,15 @@ def getWeekDay(day=None):
     if day is not None:
         if day[0] == "morgen":
             dayNumber += 1
+
         elif day[0] == "overmorgen":
             dayNumber += 2
+
         else:
             for i in range(5):
                 if weekDays[i].startswith(day):
                     dayNumber = i
+
     # Weekends should be skipped
     dayNumber = dayNumber % 7
     if dayNumber > 4:
@@ -321,32 +348,31 @@ def parseArgs(day):
     semester = int(config.get("semester"))
     year = int(config.get("year"))
     years_counter = int(config.get("years"))
+
     # Check if a schedule or a day was called
-    if len(day) == 0:
-        day = []
-    else:
-        # Only either of them was passed
-        if len(day) == 1:
-            # Called a schedule
-            if day[0].isdigit():
-                if 0 < int(day[0]) < years_counter + 1:
-                    year = int(day[0])
-                    day = []
-                else:
-                    return [False, "Dit is geen geldige jaargang."]
-            # elif: calling a weekday is automatically handled below,
-            # so checking is obsolete
-        else:
-            # TODO check other direction (di 1) in else
-            # Both were passed
-            if day[0].isdigit():
-                if 0 < int(day[0]) < years_counter + 1:
-                    year = int(day[0])
-                    # day = []
-                else:
-                    return [False, "Dit is geen geldige jaargang."]
-            # Cut the schedule from the string
-            day = day[1:]
+    if len(day) == 1:
+        # Called a schedule
+        if day[0].isdigit():
+            if not (0 < int(day[0]) < years_counter + 1):
+                return [False, "Dit is geen geldige jaargang."]
+
+            year = int(day[0])
+            day = []
+
+        # elif: calling a weekday is automatically handled below,
+        # so checking is obsolete
+    elif len(day) > 1:
+        # TODO check other direction (di 1) in else
+        # Both were passed
+        if day[0].isdigit():
+            if not (0 < int(day[0]) < years_counter + 1):
+                return [False, "Dit is geen geldige jaargang."]
+
+            year = int(day[0])
+
+        # Cut the schedule from the string
+        day = day[1:]
+
     day = getWeekDay(None if len(day) == 0 else day)[1]
     dayDatetime = findDate(timeFormatters.weekdayToInt(day))
 
