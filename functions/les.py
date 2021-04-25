@@ -93,67 +93,69 @@ def getCourses(schedule, day, week):
 
     for course in schedule:
         for slot in course["slots"]:
-            if day in slot["time"]:
-                # Basic dict containing the course name & the class' time slot
-                classDic = {"course": course["course"], "slot": slot}
+            if day not in slot["time"]:
+                continue
 
-                # Class was canceled
-                if "canceled" in slot and "weeks" in slot and week in slot["weeks"]:
-                    extras.append(classDic)
-                    continue
+            # Basic dict containing the course name & the class' time slot
+            classDic = {"course": course["course"], "slot": slot}
 
-                # Add online links for those at home
-                # Check if link hasn't been added yet
-                if "online" in slot and not any(el["course"] == course["course"] and
-                                                # Avoid KeyErrors: if either of these don't have an online link yet,
-                                                # add it as well
-                                                ("online" not in el or el["online"] == slot["online"])
-                                                for el in onlineLinks):
-                    # Some courses have multiple links on the same day,
-                    # add all of them
-                    if "bongo" in slot["online"].lower():
-                        onlineDic = {"course": course["course"], "online": "Bongo Virtual Classroom",
-                                     "link": course["bongo"]}
-                        onlineLinks.append(onlineDic)
+            # Class was canceled
+            if "canceled" in slot and "weeks" in slot and week in slot["weeks"]:
+                extras.append(classDic)
+                continue
 
-                    if "zoom" in slot["online"].lower():
-                        onlineDic = {"course": course["course"], "online": "ZOOM", "link": course["zoom"]}
-                        onlineLinks.append(onlineDic)
+            # Add online links for those at home
+            # Check if link hasn't been added yet
+            if "online" in slot and not any(el["course"] == course["course"] and
+                                            # Avoid KeyErrors: if either of these don't have an online link yet,
+                                            # add it as well
+                                            ("online" not in el or el["online"] == slot["online"])
+                                            for el in onlineLinks):
+                # Some courses have multiple links on the same day,
+                # add all of them
+                if "bongo" in slot["online"].lower():
+                    onlineDic = {"course": course["course"], "online": "Bongo Virtual Classroom",
+                                 "link": course["bongo"]}
+                    onlineLinks.append(onlineDic)
 
-                    if "teams" in slot["online"].lower():
-                        onlineDic = {"course": course["course"], "online": "MS Teams", "link": course["msteams"]}
-                        onlineLinks.append(onlineDic)
+                if "zoom" in slot["online"].lower():
+                    onlineDic = {"course": course["course"], "online": "ZOOM", "link": course["zoom"]}
+                    onlineLinks.append(onlineDic)
 
-                # Add this class' bongo, msteams & zoom links
-                if "bongo" in course:
-                    classDic["slot"]["bongo"] = course["bongo"]
+                if "teams" in slot["online"].lower():
+                    onlineDic = {"course": course["course"], "online": "MS Teams", "link": course["msteams"]}
+                    onlineLinks.append(onlineDic)
 
-                if "msteams" in course:
-                    classDic["slot"]["msteams"] = course["msteams"]
+            # Add this class' bongo, msteams & zoom links
+            if "bongo" in course:
+                classDic["slot"]["bongo"] = course["bongo"]
 
-                if "zoom" in course:
-                    classDic["slot"]["zoom"] = course["zoom"]
+            if "msteams" in course:
+                classDic["slot"]["msteams"] = course["msteams"]
 
-                if "custom" in course:
-                    prev.append(classDic)
+            if "zoom" in course:
+                classDic["slot"]["zoom"] = course["zoom"]
 
-                # Check for special classes
-                if "weeks" in slot and "online" not in slot:
-                    if week in slot["weeks"]:
-                        if "custom" not in course:
-                            courses.append(classDic)
-                        extras.append(classDic)
-                elif "weeks" in slot and "online" in slot and "group" not in slot:
-                    # This class is only online for this week
-                    if week in slot["weeks"]:
-                        if "custom" not in course:
-                            courses.append(classDic)
-                        extras.append(classDic)
-                else:
-                    # Nothing special happening, just add it to the list of courses
-                    # in case this is a course for everyone in this year
+            if "custom" in course:
+                prev.append(classDic)
+
+            # Check for special classes
+            if "weeks" in slot and "online" not in slot:
+                if week in slot["weeks"]:
                     if "custom" not in course:
                         courses.append(classDic)
+                    extras.append(classDic)
+            elif "weeks" in slot and "online" in slot and "group" not in slot:
+                # This class is only online for this week
+                if week in slot["weeks"]:
+                    if "custom" not in course:
+                        courses.append(classDic)
+                    extras.append(classDic)
+            else:
+                # Nothing special happening, just add it to the list of courses
+                # in case this is a course for everyone in this year
+                if "custom" not in course:
+                    courses.append(classDic)
 
     # Filter out normal courses that are replaced with special courses
     for extra in extras:
@@ -245,18 +247,30 @@ def getLocation(slot):
     if "canceled" in slot:
         return None
 
-    # TODO fix this because it's ugly
     if "online" in slot:
-        return "online @ **[{}]({})**".format(slot["online"],
-                                              slot["zoom"] if slot["online"] == "ZOOM" else slot["msteams"] if slot[
-                                                                                                                   "online"] == "MS Teams" else
-                                              slot["bongo"])
+        # NOTE maybe this should be moved to a more general config area instead
+        platforms = {
+            "ZOOM": slot["zoom"],
+            "MS Teams": slot["msteams"],
+        }
+
+        return "online @ **[{}]({})**".format(
+            slot["online"],
+            platforms.get(slot["online"], slot["bongo"]
+        )
 
     # Check for courses in multiple locations
     if "locations" in slot:
         # Language - 'en' for the last one
-        return ", ".join(getLocation(location) for location in slot["locations"][:-1]) \
-               + " en " + getLocation(slot["locations"][-1])
+        return sum(
+            ", ".join(
+                getLocation(location)
+                for location in slot["locations"][:-1]
+            ),
+            " en ",
+            getLocation(slot["locations"][-1])
+        )
+
     return "in {} {} {}".format(slot["campus"], slot["building"], slot["room"])
 
 
@@ -273,9 +287,8 @@ def getTitle(day, dayDT, week):
     #     week += 1
 
     day = day[0].upper() + day[1:].lower()
+    titleString = f"{day} {dayDT.day:02}/{dayDT.month:02}/{dayDT.year}"
 
-    titleString = "{} {}/{}/{}".format(day, stringFormatters.leadingZero(dayDT.day),
-                                       stringFormatters.leadingZero(dayDT.month), dayDT.year)
     return titleString, week
 
 
