@@ -6,10 +6,6 @@
     "slots": [
       {
         "online": "MS Teams",
-        "time": ["maandag", 1000, 1300]
-      },
-      {
-        "online": "MS Teams",
         "time": ["donderdag", 1430, 1700]
       }
     ]
