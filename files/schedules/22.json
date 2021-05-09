@@ -4,14 +4,6 @@
     "zoom": "https://ufora.ugent.be/d2l/ext/rp/228912/lti/framedlaunch/556e197e-e87b-4c27-be5d-53adc7a41826",
     "msteams": "https://teams.microsoft.com/l/team/19%3ad7295f0bc4634a61b461504d4a7134b3%40thread.tacv2/conversations?groupId=8755cb96-1ef5-4ea3-b806-eeebf8a85ae8&tenantId=d7811cde-ecef-496c-8f91-a1786241b99c",
     "slots": [
-      {
-        "online": "MS Teams",
-        "time": ["maandag", 1000, 1300]
-      },
-      {
-        "online": "MS Teams",
-        "time": ["donderdag", 1430, 1700]
-      }
     ]
   },
   {
