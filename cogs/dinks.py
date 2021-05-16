@@ -288,7 +288,7 @@ class Dinks(commands.Cog):
             await ctx.send(checks.isValidAmount(ctx, amount[0])[1])
         else:
             user = currency.getOrAddUser(ctx.author.id)
-            if amount[0] == "all":
+            if str(amount[0]).lower() == "all":
                 amount[0] = user[1]
 
             amount[0] = float(amount[0])

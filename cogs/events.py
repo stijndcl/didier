@@ -116,7 +116,7 @@ class Events(commands.Cog):
         elif isinstance(err, (commands.ChannelNotFound, commands.ChannelNotReadable)):
             await ctx.send("Geen channel gevonden dat overeenkomt met het opgegeven argument.")
         # Someone forgot an argument or passed an invalid argument
-        elif isinstance(err, (commands.BadArgument, commands.MissingRequiredArgument)):
+        elif isinstance(err, (commands.BadArgument, commands.MissingRequiredArgument, commands.UnexpectedQuoteError)):
             await ctx.send("Controleer je argumenten.")
         else:
             # Remove the InvokeCommandError because it's useless information

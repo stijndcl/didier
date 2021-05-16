@@ -70,7 +70,7 @@ class Bitcoin(commands.Cog):
         if not resp[0]:
             return await ctx.send(resp[1])
 
-        if amount == "all":
+        if str(amount).lower() == "all":
             amount = resp[1]
 
         # Calculate the amount of Bitcoins the user can buy with [amount] of Didier Dinks
@@ -93,7 +93,7 @@ class Bitcoin(commands.Cog):
         :param ctx: Discord Context
         :param amount: the amount of Bitcoins the user wants to sell
         """
-        if amount == "all":
+        if str(amount).lower() == "all":
             amount = float(currency.getOrAddUser(ctx.author.id)[8])
 
         try:

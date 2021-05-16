@@ -55,13 +55,13 @@ def isValidAmount(ctx, amount):
     if not amount:
         return [False, "Geef een geldig bedrag op."]
     dinks = float(currency.dinks(ctx.author.id))
-    if amount == "all":
+    if str(amount).lower() == "all":
         if dinks > 0:
             return [True, dinks]
         else:
             return [False, "Je hebt niet genoeg Didier Dinks om dit te doen."]
     # Check if it's a number <= 0 or text != all
-    if (all(char.isalpha() for char in str(amount)) and amount != "all") or \
+    if (all(char.isalpha() for char in str(amount)) and str(amount).lower() != "all") or \
             (all(char.isdigit() for char in str(abs(int(amount)))) and int(amount) <= 0):
         return [False, "Geef een geldig bedrag op."]
     if int(amount) > dinks:
