@@ -54,7 +54,7 @@ Used to store aliases for custom commands.
 
     0 id: integer, auto-increment, unique, primary key  | The id of the alias
     2 command: integer                                  | The id of the command this alias is for
-    3 alias: text                                       | The name of the alias
+    3 alias: text, unique                               | The name of the alias
 
 ### dad_jokes
 
