@@ -3,7 +3,7 @@ import datetime
 import discord
 from discord.ext import commands
 from functions import checks, easterEggResponses
-from functions.database import stats, muttn
+from functions.database import stats, muttn, custom_commands
 import pytz
 import time
 import traceback
@@ -74,6 +74,11 @@ class Events(commands.Cog):
         eER = easterEggResponses.control(self.client, message)
         if eER:
             await message.channel.send(eER)
+
+        # Check for custom commands
+        custom = custom_commands.is_custom_command(message.content)
+        if custom:
+            await message.channel.send(custom.response)
 
         # Earn XP & Message count
         stats.sentMessage(message)
