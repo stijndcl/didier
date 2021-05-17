@@ -10,6 +10,3 @@ class CustomCommand:
     name: str = None
     response: str = None
     alias_used: str = None
-
-    def __nonzero__(self):
-        return self.id is not None

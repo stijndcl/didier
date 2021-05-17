@@ -76,8 +76,9 @@ class Events(commands.Cog):
             await message.channel.send(eER)
 
         # Check for custom commands
-        custom = custom_commands.is_custom_command(message.content)
-        if custom:
+        custom = custom_commands.is_custom_command(message)
+
+        if custom.id is not None:
             await message.channel.send(custom.response)
 
         # Earn XP & Message count

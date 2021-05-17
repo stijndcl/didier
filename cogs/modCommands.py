@@ -8,6 +8,8 @@ from functions.database import memes, githubs, twitch, dadjoke
 import json
 import os
 
+from functions.database.custom_commands import is_name_free, add_command, add_alias
+
 
 class ModCommands(commands.Cog):
 
@@ -106,12 +108,34 @@ class ModCommands(commands.Cog):
             return await ctx.send("Ik kan geen bericht zien met dit Id.")
         await message.add_reaction(emoji)
 
-    # Adds stuff into their databases
     @commands.group(name="Add", usage="[Category] [Args]", case_insensitive=True, invoke_without_command=False)
     @commands.check(checks.isMe)
     @help.Category(category=Category.Mod)
     async def add(self, ctx):
+        """
+        Commands group that adds database entries
+        """
         pass
+
+    @add.command(name="Custom", usage="[Name] [Response]")
+    async def custom(self, ctx, name, *, resp):
+        err_msg = add_command(name, resp)
+
+        # Something went wrong
+        if err_msg:
+            return await ctx.send(err_msg)
+        else:
+            await ctx.message.add_reaction("✅")
+
+    @add.command(name="Alias", usage="[Name] [Alias]")
+    async def add_alias(self, ctx, command, alias):
+        err_msg = add_alias(command, alias)
+
+        # Something went wrong
+        if err_msg:
+            return await ctx.send(err_msg)
+        else:
+            await ctx.message.add_reaction("✅")
 
     @add.command(name="Dadjoke", aliases=["Dj", "Dad"], usage="[Joke]")
     async def dadjoke(self, ctx, *, joke):
