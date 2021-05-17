@@ -2,6 +2,8 @@
   "8ball": "Magic 8-Ball Didier beantwoordt ja/nee vragen.",
   "add": "Voegt [Args] toe aan [Categorie].",
   "add 8-ball": "Voegt een 8-Ball response toe aan de database.",
+  "add alias": "Voegt een alias voor custom commands toe aan de database.",
+  "add custom": "Voegt custom commands toe aan de database.",
   "add dadjoke": "Voegt een Dadjoke toe aan de database.",
   "add github": "Voegt iemand's GitHub link toe aan de database.",
   "add meme": "Voegt een meme toe aan de database.",

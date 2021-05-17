@@ -40,6 +40,22 @@ Used in all Currency commands (Dinks, Bank, Bitcoin, Gambling, ...)
     9 nightly: integer, default 0                       | The timestamp when the user last claimed their Nightly
     10 nightly_streak: integer, default 0               | The user's current Nightly Streak
 
+### custom_commands
+
+Used to store custom commands that replace Dyno.
+
+    0 id: integer, auto-increment, unique, primary key  | The id of the command
+    1 name: text, unique                                | The name of the command
+    2 response: text                                    | The response sent when the command is used
+
+### custom_command_aliases
+
+Used to store aliases for custom commands.
+
+    0 id: integer, auto-increment, unique, primary key  | The id of the alias
+    2 command: integer                                  | The id of the command this alias is for
+    3 alias: text, unique                               | The name of the alias
+
 ### dad_jokes
 
 Used in fun.py - Dadjoke command.
