@@ -176,12 +176,7 @@ class ModCommands(commands.Cog):
 
     @commands.command(name="WhoIs", aliases=["Info", "Whodis"], usage="[@User]")
     @help.Category(Category.Mod)
-    async def whois(self, ctx, user):
-        if ctx.message.mentions:
-            user = ctx.message.mentions[0].id
-
-        user = await self.client.fetch_user(int(user))
-
+    async def whois(self, ctx, user: discord.User = None):
         if user is None:
             return
 
