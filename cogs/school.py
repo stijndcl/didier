@@ -96,8 +96,11 @@ class School(commands.Cog):
         if ctx.author.id in blacklist:
             return
 
-        await ctx.message.add_reaction("✅")
+        if message.is_system():
+            return await ctx.send("Dus jij wil system messages pinnen?\nMag niet.")
+
         await message.pin(reason="Didier Pin door {}".format(ctx.author.display_name))
+        await ctx.message.add_reaction("✅")
 
 
 def setup(client):

@@ -22,6 +22,10 @@ class HelpCommand(commands.MinimalHelpCommand):
         if ctx.bot.locked:
             return
 
+        # If mention prefix was used, don't count it as a target
+        if ctx.message.content.startswith("<@"):
+            ctx.message.mentions = ctx.message.mentions[1:]
+
         if len(ctx.message.mentions) > 5:
             return await ctx.send("Je kan Help maar naar maximaal 5 mensen doorsturen.")
 
@@ -39,6 +43,10 @@ class HelpCommand(commands.MinimalHelpCommand):
         # Cut the mentions out & split based on subcommand
         spl = command.split(" ")
         spl = spl[:len(spl) - len(self.ctx.message.mentions)]
+
+        # A person was mentioned without passing an argument
+        if not spl:
+            return await self.send_bot_help(self.get_bot_mapping())
 
         # Turn dic to lowercase to allow proper name searching
         all_commands = dict((k.lower(), v) for k, v in bot.all_commands.items())
@@ -115,6 +123,10 @@ class HelpCommand(commands.MinimalHelpCommand):
         embed.add_field(name=await self.get_command_signature(command),
                         value=await self.add_aliases_formatting(sorted(command.aliases)) + helpDescription)
         for person in await self.get_destination():
+            # Can't send to bots
+            if person.bot:
+                continue
+
             await person.send(embed=embed)
 
     async def send_group_help(self, group):
@@ -139,6 +151,10 @@ class HelpCommand(commands.MinimalHelpCommand):
                                   helpFile[self.get_name(subcommand).lower()], inline=False)
 
         for person in await self.get_destination():
+            # Can't send to bots
+            if person.bot:
+                continue
+
             await person.send(embed=embed)
 
     # Allow mentioning people to send it to them instead
