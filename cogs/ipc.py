@@ -14,11 +14,12 @@ class IPC(commands.Cog):
         return True
 
     @ipc.server.route()
-    async def get_bot_latency(self):
+    async def get_bot_latency(self, data):
         """
         Get Didier's latency
         """
-        return str(round(self.client.latency * 1000))
+
+        return self.client.latency * 1000
 
 
 def setup(client):
