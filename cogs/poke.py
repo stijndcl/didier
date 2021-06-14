@@ -87,7 +87,7 @@ class Poke(commands.Cog):
         if ctx.message.mentions[0].id == ctx.author.id:
             await ctx.send("Je kan jezelf niet tikken, {}.".format(ctx.author.display_name))
             return False
-        if str(ctx.message.mentions[0].id) == constants.didierId:
+        if ctx.message.mentions[0].id == self.client.user.id:
             await ctx.send("Je kan me niet tikken, {}.".format(ctx.author.display_name))
             return False
         if str(ctx.message.mentions[0].id) in constants.botIDs:
