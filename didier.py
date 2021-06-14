@@ -5,8 +5,6 @@ from functions.prefixes import get_prefix
 import os
 
 
-# TODO pass option (bool) that launches IPC
-#   so there's no server running if it's not required
 class Didier(commands.Bot):
     """
     Main Bot class for Didier
