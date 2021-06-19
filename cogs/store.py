@@ -1,5 +1,5 @@
 from converters.numbers import Abbreviated
-from data import storePages
+from data.menus import storePages
 from decorators import help
 import discord
 from discord.ext import commands

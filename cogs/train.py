@@ -1,5 +1,4 @@
-from data import paginatedLeaderboard
-import datetime
+from data.menus import paginatedLeaderboard
 from decorators import help
 import discord
 from discord.ext import commands, menus
