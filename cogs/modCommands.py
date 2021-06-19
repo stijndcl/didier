@@ -5,10 +5,9 @@ from discord.ext import commands
 from enums.help_categories import Category
 from functions import checks, config, timeFormatters
 from functions.database import memes, githubs, twitch, dadjoke
+from functions.database.custom_commands import add_command, add_alias
 import json
 import os
-
-from functions.database.custom_commands import is_name_free, add_command, add_alias
 
 
 class ModCommands(commands.Cog):

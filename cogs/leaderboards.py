@@ -1,4 +1,4 @@
-from data import paginatedLeaderboard
+from data.menus import paginatedLeaderboard
 from decorators import help
 import discord
 from discord.ext import commands

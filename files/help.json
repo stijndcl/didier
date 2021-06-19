@@ -33,6 +33,7 @@
   "config": "Past constanten in het config bestand aan.",
   "corona": "Coronatracker voor [Land].\nIndien je geen land opgeeft is dit standaard België.\nCorona Global voor wereldwijde cijfers.",
   "corona vaccinations": "Vaccinatiecijfers voor België.",
+  "custom": "Geeft een lijst van custom commands. Didier > Dyno confirmed once more.",
   "dadjoke": "Didier vertelt een dad joke.",
   "define": "Geeft de definitie van [Woord] zoals het in de Urban Dictionary staat.\nZoektermen met spaties moeten **niet** tussen aanhalingstekens staan.",
   "detect": "Didier probeert de taal van [Tekst] te detecteren.",
