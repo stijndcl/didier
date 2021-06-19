@@ -10,4 +10,4 @@ requests-unixsocket==0.1.5
 tabulate==0.8.7
 yarl==1.4.2
 feedparser==6.0.2
-googletrans==3.0.0
+googletrans==4.0.0rc1

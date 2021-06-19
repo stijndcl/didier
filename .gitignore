@@ -8,3 +8,4 @@ files/ufora_notifications.json
 .idea/
 __pycache__
 .env
+/venv/
