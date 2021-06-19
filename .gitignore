@@ -1,13 +1,9 @@
-files/status.txt
-files/readyMessage.txt
-files/client.txt
 files/lastTasks.json
 files/c4.json
 files/hangman.json
 files/stats.json
 files/lost.json
 files/locked.json
-files/database.json
 files/ufora_notifications.json
 .idea/
 __pycache__
