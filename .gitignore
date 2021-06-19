@@ -9,7 +9,6 @@ files/lost.json
 files/locked.json
 files/database.json
 files/ufora_notifications.json
-files/commands.json
 .idea/
 __pycache__
 .env
