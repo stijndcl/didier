@@ -1,7 +1,6 @@
-import json
-
 from discord.ext import ipc
 from functions.database import custom_commands
+import json
 from quart import Quart, jsonify, request
 from quart_cors import cors
 from time import time
