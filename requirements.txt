@@ -1,6 +1,8 @@
 python-dotenv==0.14.0
 beautifulsoup4==4.9.1
-discord.py==1.7.0
+discord.py==1.7.3
+git+https://github.com/Rapptz/discord-ext-menus@master
+discord-ext-ipc==2.0.0
 psycopg2==2.8.5
 psycopg2-binary==2.8.5
 python-dateutil==2.6.1
@@ -10,4 +12,6 @@ requests-unixsocket==0.1.5
 tabulate==0.8.7
 yarl==1.4.2
 feedparser==6.0.2
-googletrans==3.0.0
+googletrans==4.0.0rc1
+quart==0.6.15
+Quart-CORS==0.1.3

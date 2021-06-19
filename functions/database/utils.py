@@ -1,6 +1,5 @@
 import psycopg2
-import json
-import os
+from settings import DB_HOST, DB_NAME, DB_USERNAME, DB_PASSWORD
 
 
 connection = None
@@ -17,15 +16,11 @@ def connect():
 def create_connection():
     global connection
 
-    dir_path = os.path.dirname(os.path.realpath(__file__))
-    with open(os.path.join(dir_path, "../../files/database.json"), "r") as fp:
-        db = json.load(fp)
-
     connection = psycopg2.connect(
-        host=db["host"],
-        database=db["database"],
-        user=db["username"],
-        password=db["password"]
+        host=DB_HOST,
+        database=DB_NAME,
+        user=DB_USERNAME,
+        password=DB_PASSWORD
     )
 
 

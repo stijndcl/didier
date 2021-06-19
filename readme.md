@@ -51,13 +51,16 @@ When creating a new Didier command, you can add it to a `Category` by adding a d
 
 ```python
 from decorators import help
+from discord.ext import commands
 from enums.help_categories import Category
+from functions import checks
 
 @commands.command(name="Command Name", aliases=["Cn"])
 @commands.check(checks.allowedChannels)
 @help.Category(Category.Currency)
 async def command_name(self, ctx):
     # Command code
+    await ctx.send("Command response")
 ```
 
 This allows commands across multiple Cogs to be classified under the same category in the help page.

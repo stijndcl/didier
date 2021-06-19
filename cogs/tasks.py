@@ -246,7 +246,7 @@ class Tasks(commands.Cog):
         Task that checks for new Ufora announcements every few minutes
         """
         # Don't run this when testing
-        if self.client.user.id == int(constants.coolerDidierId):
+        if self.client.user.id != int(constants.didierId):
             return
 
         # Get new notifications

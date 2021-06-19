@@ -15,8 +15,8 @@ class Translate(commands.Cog):
     def cog_check(self, ctx):
         return not self.client.locked
 
-    # @commands.command(name="Translate", aliases=["Tl", "Trans"], usage="[Tekst] [Van]* [Naar]*")
-    # @help.Category(Category.Words)
+    @commands.command(name="Translate", aliases=["Tl", "Trans"], usage="[Tekst] [Van]* [Naar]*")
+    @help.Category(Category.Words)
     async def translate(self, ctx, query=None, to="nl", fr="auto"):
         if query is None:
             return await ctx.send("Controleer je argumenten.")
@@ -39,9 +39,11 @@ class Translate(commands.Cog):
             embed.set_author(name="Didier Translate")
 
             if fr == "auto":
-                language = translation.extra_data["original-language"]
+                language = translation.src
                 embed.add_field(name="Gedetecteerde taal", value=tc(LANGUAGES[language]))
-                embed.add_field(name="Zekerheid", value="{}%".format(translation.extra_data["confidence"] * 100))
+
+                if translation.extra_data["confidence"] is not None:
+                    embed.add_field(name="Zekerheid", value="{}%".format(translation.extra_data["confidence"] * 100))
 
             embed.add_field(name="Origineel ({})".format(translation.src.upper()), value=query, inline=False)
             embed.add_field(name="Vertaling ({})".format(to.upper()), value=translation.text)

@@ -5,6 +5,7 @@ from discord.ext import commands
 from functions import checks, easterEggResponses
 from functions.database import stats, muttn, custom_commands, commands as command_stats
 import pytz
+from settings import READY_MESSAGE, SANDBOX, STATUS_MESSAGE
 import time
 import traceback
 
@@ -30,20 +31,13 @@ class Events(commands.Cog):
         """
         Function called when the bot is ready & done leading.
         """
-        # Change status
-        with open("files/status.txt", "r") as statusFile:
-            status = statusFile.readline()
+        # Set status
+        await self.client.change_presence(status=discord.Status.online, activity=discord.Game(STATUS_MESSAGE))
 
-        await self.client.change_presence(status=discord.Status.online, activity=discord.Game(str(status)))
-
-        # Print a message in the terminal to show that he's ready
-        with open("files/readyMessage.txt", "r") as readyFile:
-            readyMessage = readyFile.readline()
-
-        print(readyMessage)
+        print(READY_MESSAGE)
 
         # Add constants to the client as a botvar
-        self.client.constants = constants.Live if "zandbak" not in readyMessage else constants.Zandbak
+        self.client.constants = constants.Live if SANDBOX else constants.Zandbak
 
     @commands.Cog.listener()
     async def on_message(self, message):
