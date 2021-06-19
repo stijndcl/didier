@@ -24,6 +24,13 @@ Used in stats.py - Stats.Channels & the daily task that updates the message coun
     0 channel_id: bigint, unique, primary key           | The channel id of this channel
     1 message_count: numeric                            | The amount of messages sent in this channel
 
+### command_stats
+
+Used in commands.py, tracks counters of how many commands are invoked per day.
+
+    0 day: date, unique, primary key                    | The date that is being tracked
+    1 amount: integer                                   | The total amount of commands that were invoked on this day
+
 ### currencytable
 
 Used in all Currency commands (Dinks, Bank, Bitcoin, Gambling, ...)
