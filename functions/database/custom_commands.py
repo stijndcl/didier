@@ -127,3 +127,55 @@ def add_alias(command: str, alias: str):
 
     cursor.execute("INSERT INTO custom_command_aliases(command, alias) VALUES(%s, %s)", (command_id, alias,))
     connection.commit()
+
+
+def get_all():
+    """
+    Return a list of all registered custom commands
+    """
+    connection = utils.connect()
+    cursor = connection.cursor()
+
+    cursor.execute("SELECT * FROM custom_commands")
+    commands = cursor.fetchall()
+    ret = []
+
+    # Create a list of all entries
+    for command in commands:
+        dic = {"id": command[0], "name": command[1], "response": command[2]}
+
+        # Find and add aliases
+        cursor.execute("SELECT id, alias FROM custom_command_aliases WHERE command = %s", (command[0],))
+        aliases = cursor.fetchall()
+
+        if aliases:
+            dic["aliases"] = list(map(lambda x: {"id": x[0], "alias": x[1]}, aliases))
+
+        ret.append(dic)
+
+    return ret
+
+
+def get_by_id(command_id: int):
+    """
+    Return a command that matches a given id
+    """
+    connection = utils.connect()
+    cursor = connection.cursor()
+
+    cursor.execute("SELECT * FROM custom_commands WHERE id = %s", (command_id,))
+    command = cursor.fetchone()
+
+    # Nothing found
+    if not command:
+        return None
+
+    dic = {"id": command[0], "name": command[1], "response": command[2]}
+
+    cursor.execute("SELECT id, alias FROM custom_command_aliases WHERE command = %s", (command_id,))
+    aliases = cursor.fetchall()
+
+    if aliases:
+        dic["aliases"] = list(map(lambda x: {"id": x[0], "alias": x[1]}, aliases))
+
+    return dic

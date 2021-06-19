@@ -1,6 +1,7 @@
 import json
 
 from discord.ext import ipc
+from functions.database import custom_commands
 from quart import Quart, jsonify, request
 from quart_cors import cors
 from time import time
@@ -40,6 +41,42 @@ async def send_dm():
     )
 
     return jsonify({"response": dm})
+
+
+@app.route("/custom", methods=["GET"])
+async def get_all_custom_commands():
+    """
+    Return a list of all custom commands in the bot
+    """
+    commands = custom_commands.get_all()
+
+    return jsonify(commands)
+
+
+@app.route("/custom/<command_id>")
+async def get_custom_command(command_id):
+    try:
+        command_id = int(command_id)
+    except ValueError:
+        # Id is not an int
+        return unprocessable_entity("Parameter id was not a valid integer.")
+
+    command = custom_commands.get_by_id(command_id)
+
+    if command is None:
+        return page_not_found("")
+
+    return jsonify(command)
+
+
+@app.errorhandler(404)
+def page_not_found(e):
+    return jsonify({"error": "No resource could be found matching the given URL."}), 404
+
+
+@app.errorhandler(422)
+def unprocessable_entity(e):
+    return jsonify({"error": e}), 422
 
 
 if __name__ == "__main__":
