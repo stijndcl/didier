@@ -1,5 +1,6 @@
 from discord.ext import commands, ipc
 from settings import HOST_IPC
+from startup.init_files import check_all
 import os
 
 
@@ -22,7 +23,11 @@ class Didier(commands.Bot):
         # Remove default help command
         self.remove_command("help")
 
+        # Load all extensions
         self.init_extensions()
+
+        # Check missing files
+        check_all()
 
     def init_extensions(self):
         # Load initial extensions
