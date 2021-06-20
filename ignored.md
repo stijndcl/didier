@@ -4,6 +4,26 @@ A list of all ignored files with copy-pastable templates. Useful for when you wa
 
 These are usually files which would be overkill to make a PSQL table for. Other possibilities are files that are never edited, but should be different on every machine.
 
+### .env
+
+```.env
+SANDBOX=true
+
+URBANDICTIONARY=""
+IMGFLIPNAME=""
+IMGFLIPPASSWORD=""
+
+DBUSERNAME=""
+DBPASSWORD=""
+DBHOST=""
+DBNAME=""
+
+TOKEN=""
+HOSTIPC=false
+READYMESSAGE=""
+STATUSMESSAGE=""
+```
+
 ### files/hangman.json
 
 Contains info on the current Hangman game.
