@@ -66,7 +66,7 @@ async def command_name(self, ctx):
 This allows commands across multiple Cogs to be classified under the same category in the help page.
 
 ### Python Version
-Didier uses `Python 3.6.9`. Seeing as updating Python on a Raspberry Pi is a _huge pain_, this will not change. As a result, you are expected to write code that is compatible with this version. When initially creating the PyCharm project, set `3.6.9` as your project interpreter.
+Didier uses `Python 3.9.5`, the most recent one as of the writing of this sentence. The reasoning behind this is that I hope it'll last for a while so I don't have to update it all the time.
 
 ### Ignored Files
 `ignored.md` contains a list of all ignored files, and what they look like. This way, you can recreate these files locally to test commands that use them. API keys should be stored in `environment variables`. To do so, create a file called `.env` in the root of this repository (which has already been added to `.gitignore`) and make sure the names match.
