@@ -1,4 +1,5 @@
 from data import constants
+from data.snipe import Snipe, Action
 import datetime
 import discord
 from discord.ext import commands
@@ -6,14 +7,15 @@ from functions import checks, easterEggResponses
 from functions.database import stats, muttn, custom_commands, commands as command_stats
 import pytz
 from settings import READY_MESSAGE, SANDBOX, STATUS_MESSAGE
+from startup.didier import Didier
 import time
 import traceback
 
 
 class Events(commands.Cog):
 
-    def __init__(self, client):
-        self.client = client
+    def __init__(self, client: Didier):
+        self.client: Didier = client
         self.utilsCog = self.client.get_cog("Utils")
         self.failedChecksCog = self.client.get_cog("FailedChecks")
         self.lastFeatureRequest = 0
@@ -263,7 +265,7 @@ class Events(commands.Cog):
             await msg.add_reaction("✅")
 
     @commands.Cog.listener()
-    async def on_message_edit(self, before, after):
+    async def on_message_edit(self, before: discord.Message, after: discord.Message):
         """
         Function called when a message is edited,
         so people can't edit messages in FreeGames to cheat the system.
@@ -272,7 +274,17 @@ class Events(commands.Cog):
         """
         # Run the message through the checks again
         if not checks.freeGamesCheck(after):
-            await self.failedChecksCog.freeGames(after)
+            return await self.failedChecksCog.freeGames(after)
+
+        if before.guild is not None and not before.author.bot:
+            self.client.snipe[before.channel.id] = Snipe(before.author.id, before.channel.id, before.guild.id, Action.Edit,
+                                                         before.content, after.content)
+
+    @commands.Cog.listener()
+    async def on_message_delete(self, message: discord.Message):
+        if message.guild is not None and not message.author.bot:
+            self.client.snipe[message.channel.id] = Snipe(message.author.id, message.channel.id, message.guild.id,
+                                                          Action.Remove, message.content)
 
     async def sendErrorEmbed(self, ctx, error: Exception, trace):
         """
