@@ -1,13 +1,19 @@
+from data.snipe import Snipe
 from discord.ext import commands, ipc
+import os
 from settings import HOST_IPC
 from startup.init_files import check_all
-import os
+from typing import Dict
 
 
 class Didier(commands.Bot):
     """
     Main Bot class for Didier
     """
+
+    # Dict to store the most recent Snipe info per channel
+    snipe: Dict[int, Snipe] = {}
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
