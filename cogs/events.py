@@ -1,5 +1,5 @@
 from data import constants
-from data.snipe import Snipe, Action
+from data.snipe import Snipe, Action, should_snipe
 import datetime
 import discord
 from discord.ext import commands
@@ -276,13 +276,13 @@ class Events(commands.Cog):
         if not checks.freeGamesCheck(after):
             return await self.failedChecksCog.freeGames(after)
 
-        if before.guild is not None and not before.author.bot:
+        if should_snipe(before):
             self.client.snipe[before.channel.id] = Snipe(before.author.id, before.channel.id, before.guild.id, Action.Edit,
                                                          before.content, after.content)
 
     @commands.Cog.listener()
     async def on_message_delete(self, message: discord.Message):
-        if message.guild is not None and not message.author.bot:
+        if should_snipe(message):
             self.client.snipe[message.channel.id] = Snipe(message.author.id, message.channel.id, message.guild.id,
                                                           Action.Remove, message.content)
 
