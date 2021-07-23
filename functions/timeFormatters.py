@@ -1,7 +1,11 @@
 import datetime
+from typing import List
+
 import dateutil.relativedelta
 import pytz
 import time
+
+from functions import stringFormatters
 
 
 def epochToDate(epochTimeStamp, strFormat="%d/%m/%Y om %H:%M:%S"):
@@ -147,8 +151,16 @@ def intToWeekday(day):
     return ["Maandag", "Dinsdag", "Woensdag", "Donderdag", "Vrijdag", "Zaterdag", "Zondag"][day]
 
 
-def fromString(timeString: str, formatString="%d/%m/%Y"):
+def fromString(timeString: str, formatString="%d/%m/%Y", tzinfo=pytz.timezone("Europe/Brussels")):
     """
     Constructs a datetime object from an input string
     """
-    return datetime.datetime.strptime(timeString, formatString)
+    return datetime.datetime.strptime(timeString, formatString).replace(tzinfo=tzinfo)
+
+
+def fromArray(data: List[int]) -> datetime:
+    day = stringFormatters.leadingZero(str(data[0]))
+    month = stringFormatters.leadingZero(str(data[1]))
+    year = str(data[2])
+
+    return fromString(f"{day}/{month}/{year}")
