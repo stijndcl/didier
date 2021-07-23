@@ -134,8 +134,12 @@ def getPlural(amount, unit):
     return dic[unit.lower()]["s" if amount == 1 else "p"]
 
 
-def weekdayToInt(day):
+def weekdayToInt(day) -> int:
     days = {"maandag": 0, "dinsdag": 1, "woensdag": 2, "donderdag": 3, "vrijdag": 4, "zaterdag": 5, "zondag": 6}
+
+    if day.lower() not in days:
+        return -1
+
     return days[day.lower()]
 
 
