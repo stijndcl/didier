@@ -24,6 +24,7 @@ def find_target_date(arg: Optional[str]) -> datetime:
     elif arg.lower() == "overmorgen":  # Day after tomorrow's schedule
         day += timedelta(days=2)
 
+    # TODO show a different embed when "(over)morgen" is requested & it lands on a weekend
     # Don't land on a weekend
     day = skip_weekends(day)
 

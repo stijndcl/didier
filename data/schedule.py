@@ -1,9 +1,10 @@
+import dacite
 from dacite import from_dict
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
-from enums.platforms import Platforms
+from enums.platform import Platform, get_platform
 from functions.config import get
-from functions.timeFormatters import fromArray, forward_to_weekday
+from functions.timeFormatters import fromArray, forward_to_weekday, intToWeekday
 import json
 from typing import Dict, Optional, List
 
@@ -30,9 +31,7 @@ class Holiday:
 
 @dataclass
 class Course:
-    day: str
-    week: int
-    course_dict: Dict
+    name: str
 
 
 @dataclass
@@ -51,8 +50,37 @@ class Timeslot:
     is_special: bool = False
     location: Optional[Location] = None
     online_link: Optional[str] = None
-    online_platform: Optional[Platforms] = None
+    online_platform: Optional[Platform] = None
 
+    @staticmethod
+    def from_slot_dict(slot_dict: Dict, course_dict: Dict, current_week: int):
+        """
+        Construct a Timeslot from a dict of data
+        """
+        if "weeks" in slot_dict and str(current_week) in slot_dict["weeks"]:
+            return Timeslot.special_from_dict(slot_dict, course_dict, str(current_week))
+
+        course = Course(course_dict["course"])
+        start_time = slot_dict["time"]["start"]
+        end_time = slot_dict["time"]["end"]
+
+        # Location can be none if a class is online-only
+        location = dacite.from_dict(Location, slot_dict["location"]) if "location" in slot_dict else None
+
+        # Find platform & link if this class is online
+        online_platform: Platform = get_platform(slot_dict.get("online", None))
+        online_link = course_dict["online_links"][Platform.value["rep"]] if online_platform is not None else None
+
+        return Timeslot(course=course, start_time=start_time, end_time=end_time, canceled=False, is_special=False,
+                        location=location, online_platform=online_platform, online_link=online_link)
+
+    @staticmethod
+    def special_from_dict(slot_dict: Dict, course_dict: Dict, current_week: str):
+        """
+        Create a SPECIAL Timeslot from a dict and data
+        """
+        course = Course(course_dict["course"])
+        # TODO
 
 @dataclass
 class Schedule:
@@ -78,18 +106,21 @@ class Schedule:
 
         self.check_holidays()
 
-        # Store the target weekday (in case it exists) so we can ask for the next
-        # friday after the holiday, for example
-        target_weekday = -1 if not self.targetted_weekday else self.day.weekday()
+        # TODO show a custom embed when no class instead of fast-forwarding
+        # # Store the target weekday (in case it exists) so we can ask for the next
+        # # friday after the holiday, for example
+        # target_weekday = -1 if not self.targetted_weekday else self.day.weekday()
+        #
+        # # Show schedule for after holidays
+        # if self.current_holiday is not None:
+        #     # Set day to day after holiday
+        #     self.day = self.current_holiday.end_date_parsed + timedelta(days=1)
+        #
+        # # Find the next [DAY] after the holidays
+        # if target_weekday != -1:
+        #     self.day = forward_to_weekday(self.day, target_weekday)
 
-        # Show schedule for after holidays
-        if self.current_holiday is not None:
-            # Set day to day after holiday
-            self.day = self.current_holiday.end_date_parsed + timedelta(days=1)
-
-        # Find the next [DAY] after the holidays
-        if target_weekday != -1:
-            self.day = forward_to_weekday(self.day, target_weekday)
+        self._weekday_str = intToWeekday(self.day.weekday())
 
         print(self.day)
 
@@ -114,8 +145,8 @@ class Schedule:
         """
         Load the schedule from the JSON file
         """
-        semester = get("semester")
-        year = get("year")
+        semester = get_platform("semester")
+        year = get_platform("year")
 
         with open(f"files/schedules/{year}{semester}.json", "r") as fp:
             return json.load(fp)
@@ -133,14 +164,29 @@ class Schedule:
         # Add +1 at the end because week 1 would be 0 as it's not over yet
         return (diff.days // 7) + self.holiday_offset + 1
 
-    def find_slot_for_course(self, course_dict: Dict) -> List[Timeslot]:
+    def find_slots_for_course(self, course_dict: Dict, current_week: int) -> List[Timeslot]:
         """
         Create time timeslots for a course
         """
-        pass
+        slots_today = []
+
+        # First create a list of all slots of today
+        for slot in course_dict["slots"]:
+            # This slot is for a different day
+            if slot["time"]["day"] != self._weekday_str.lower():
+                continue
+
+            slots_today.append(slot)
+
+        # Create Timeslots
+        slots_today = list(map(lambda x: Timeslot.from_slot_dict(x, course_dict, current_week), slots_today))
+
+        return slots_today
 
     def create_schedule(self):
         """
         Create the schedule for the current week
         """
         week: int = self.get_week()
+        slots: List[List[Timeslot]] = [self.find_slots_for_course(course, week) for course in self.schedule_dict["schedule"]]
+        slots_flattened = [item for sublist in slots for item in sublist]
