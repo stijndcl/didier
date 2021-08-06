@@ -1,12 +1,12 @@
 import random
 
-from data import constants
+from data import constants, schedule
 from decorators import help
 import discord
 from discord.ext import commands
 from enums.courses import years
 from enums.help_categories import Category
-from functions import checks, eten, les
+from functions import checks, eten, les, les_rework
 import json
 
 
@@ -44,7 +44,9 @@ class School(commands.Cog):
     @commands.command(name="Les", aliases=["Class", "Classes", "Sched", "Schedule"], usage="[Jaargang]* [Dag]*")
     # @commands.check(checks.allowedChannels)
     @help.Category(category=Category.School)
-    async def les(self, ctx, *day):
+    async def les(self, ctx, day=None):
+        date = les_rework.find_target_date(day)
+        s = schedule.Schedule(date, day is not None)
         return
         # parsed = les.parseArgs(day)
         #

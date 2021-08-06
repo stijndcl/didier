@@ -1,32 +1,31 @@
-import json
 from dacite import from_dict
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from enums.platforms import Platforms
 from functions.config import get
+from functions.timeFormatters import fromArray, forward_to_weekday
+import json
 from typing import Dict, Optional, List
-
-from functions.timeFormatters import fromArray
 
 
 @dataclass
 class Holiday:
-    start_list: List[int]
-    end_list: List[int]
-    start_date: datetime = field(init=False)
-    end_date: datetime = field(init=False)
+    start_date: List[int]
+    end_date: List[int]
+    start_date_parsed: datetime = field(init=False)
+    end_date_parsed: datetime = field(init=False)
     duration: timedelta = field(init=False)
 
     def __post_init__(self):
-        self.start_date = fromArray(self.start_list)
-        self.end_date = fromArray(self.end_list)
-        self.duration = self.end_date - self.start_date
+        self.start_date_parsed = fromArray(self.start_date)
+        self.end_date_parsed = fromArray(self.end_date)
+        self.duration = self.end_date_parsed - self.start_date_parsed
 
     def has_passed(self, current_day: datetime) -> bool:
         """
         Check if a holiday has passed already
         """
-        return current_day > self.end_date
+        return current_day > self.end_date_parsed
 
 
 @dataclass
@@ -58,12 +57,14 @@ class Timeslot:
 @dataclass
 class Schedule:
     day: datetime
+    targetted_weekday: bool = False
     schedule_dict: Dict = field(init=False)
-    start_date: datetime
-    end_date: datetime
+    start_date: datetime = field(init=False)
+    end_date: datetime = field(init=False)
     semester_over: bool = False
     holiday_offset: int = 0
     current_holiday: Optional[Holiday] = None
+    _weekday_str: str = field(init=False)
 
     def __post_init__(self):
         self.schedule_dict: Dict = self.load_schedule_file()
@@ -77,9 +78,20 @@ class Schedule:
 
         self.check_holidays()
 
+        # Store the target weekday (in case it exists) so we can ask for the next
+        # friday after the holiday, for example
+        target_weekday = -1 if not self.targetted_weekday else self.day.weekday()
+
         # Show schedule for after holidays
         if self.current_holiday is not None:
-            self.day = self.current_holiday.end_date + timedelta(days=1)
+            # Set day to day after holiday
+            self.day = self.current_holiday.end_date_parsed + timedelta(days=1)
+
+        # Find the next [DAY] after the holidays
+        if target_weekday != -1:
+            self.day = forward_to_weekday(self.day, target_weekday)
+
+        print(self.day)
 
     def check_holidays(self):
         """
@@ -89,13 +101,13 @@ class Schedule:
             holiday: Holiday = from_dict(Holiday, hol_entry)
 
             # Hasn't happened yet, don't care
-            if holiday.start_date > self.day:
+            if holiday.start_date_parsed > self.day:
                 continue
 
             # In the past: add the offset
             if holiday.has_passed(self.day):
-                self.holiday_offset += (self.day - holiday.end_date) // 7
-            elif holiday.start_date <= self.day <= holiday.end_date:
+                self.holiday_offset += (self.day - holiday.end_date_parsed) // 7
+            elif holiday.start_date_parsed <= self.day <= holiday.end_date_parsed:
                 self.current_holiday = holiday
 
     def load_schedule_file(self) -> Dict:
@@ -105,7 +117,7 @@ class Schedule:
         semester = get("semester")
         year = get("year")
 
-        with open(f"files/{year}{semester}.json", "r") as fp:
+        with open(f"files/schedules/{year}{semester}.json", "r") as fp:
             return json.load(fp)
 
     def get_week(self) -> int:
@@ -120,6 +132,12 @@ class Schedule:
 
         # Add +1 at the end because week 1 would be 0 as it's not over yet
         return (diff.days // 7) + self.holiday_offset + 1
+
+    def find_slot_for_course(self, course_dict: Dict) -> List[Timeslot]:
+        """
+        Create time timeslots for a course
+        """
+        pass
 
     def create_schedule(self):
         """
