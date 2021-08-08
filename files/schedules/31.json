@@ -36,7 +36,7 @@
           }
         },
         {
-          "online": "ZOOM",
+          "online": "zoom",
           "time": {
             "day": "vrijdag",
             "start": 1300,
@@ -52,7 +52,7 @@
       },
       "slots": [
         {
-          "online": "ZOOM",
+          "online": "zoom",
           "time": {
             "day": "dinsdag",
             "start": 1130,
@@ -60,7 +60,7 @@
           }
         },
         {
-          "online": "ZOOM",
+          "online": "zoom",
           "time": {
             "day": "woensdag",
             "start": 1500,
@@ -68,7 +68,7 @@
           }
         },
         {
-          "online": "ZOOM",
+          "online": "zoom",
           "time": {
             "day": "donderdag",
             "start": 830,
@@ -85,7 +85,7 @@
       },
       "slots": [
         {
-          "online": "MS Teams",
+          "online": "msteams",
           "time": {
             "day": "dinsdag",
             "start": 1430,
@@ -93,7 +93,7 @@
           }
         },
         {
-          "online": "MS Teams",
+          "online": "msteams",
           "time": {
             "day": "vrijdag",
             "start": 830,
@@ -126,7 +126,7 @@
           }
         },
         {
-          "online": "ZOOM",
+          "online": "zoom",
           "time": {
             "day": "donderdag",
             "start": 1000,

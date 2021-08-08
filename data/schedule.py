@@ -57,8 +57,18 @@ class Timeslot:
         """
         Construct a Timeslot from a dict of data
         """
+        special = False
+
         if "weeks" in slot_dict and str(current_week) in slot_dict["weeks"]:
-            return Timeslot.special_from_dict(slot_dict, course_dict, str(current_week))
+            # If at least one thing was changed, this slot requires extra attention
+            special = True
+            # Overwrite the normal data with the customized entries
+            slot_dict.update(slot_dict["weeks"][str(current_week)])
+
+            # Only happens online, not on-campus
+            online_only = slot_dict["weeks"][str(current_week)].get("online_only", False)
+            if online_only:
+                slot_dict.pop("location")
 
         course = Course(course_dict["course"])
         start_time = slot_dict["time"]["start"]
@@ -71,16 +81,9 @@ class Timeslot:
         online_platform: Platform = get_platform(slot_dict.get("online", None))
         online_link = course_dict["online_links"][Platform.value["rep"]] if online_platform is not None else None
 
-        return Timeslot(course=course, start_time=start_time, end_time=end_time, canceled=False, is_special=False,
-                        location=location, online_platform=online_platform, online_link=online_link)
+        return Timeslot(course=course, start_time=start_time, end_time=end_time, canceled="canceled" in slot_dict,
+                        is_special=special, location=location, online_platform=online_platform, online_link=online_link)
 
-    @staticmethod
-    def special_from_dict(slot_dict: Dict, course_dict: Dict, current_week: str):
-        """
-        Create a SPECIAL Timeslot from a dict and data
-        """
-        course = Course(course_dict["course"])
-        # TODO
 
 @dataclass
 class Schedule:
@@ -145,8 +148,8 @@ class Schedule:
         """
         Load the schedule from the JSON file
         """
-        semester = get_platform("semester")
-        year = get_platform("year")
+        semester = get("semester")
+        year = get("year")
 
         with open(f"files/schedules/{year}{semester}.json", "r") as fp:
             return json.load(fp)
