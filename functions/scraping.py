@@ -54,11 +54,11 @@ def getMatchweek():
     bs = BeautifulSoup(resp.text, "html.parser")
     matchdays = bs.find_all("section", attrs={"class": "sc-matchdays"})
 
-    if len(matchdays) < 2:
+    if len(matchdays) == 0:
         return None
 
     # Table header
-    header = matchdays[1]
+    header = matchdays[0]
 
     # Regex to find current matchday
     r = re.compile(r"speeldag\s*\d+", flags=re.I)
