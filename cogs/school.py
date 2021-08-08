@@ -4,7 +4,8 @@ import discord
 from discord.ext import commands
 from enums.help_categories import Category
 from functions import config, eten, les
-from functions.timeFormatters import intToWeekday
+from functions.stringFormatters import capitalize
+from functions.timeFormatters import intToWeekday, skip_weekends
 
 
 class School(commands.Cog):
@@ -21,6 +22,7 @@ class School(commands.Cog):
     @help.Category(category=Category.School)
     async def eten(self, ctx, *day):
         day_dt = les.find_target_date(day if day else None)
+        day_dt = skip_weekends(day_dt)
         day = intToWeekday(day_dt.weekday())
 
         # Create embed
@@ -44,6 +46,13 @@ class School(commands.Cog):
     @help.Category(category=Category.School)
     async def les(self, ctx, day=None):
         date = les.find_target_date(day)
+
+        # Person explicitly requested a weekend-day
+        if day is not None and day.lower() in ("morgen", "overmorgen") and date.weekday() > 4:
+            return await ctx.send(f"{capitalize(day)} is het weekend.")
+
+        date = skip_weekends(date)
+
         s = schedule.Schedule(date, int(config.get("year")), int(config.get("semester")), day is not None)
         return await ctx.send(embed=s.create_schedule().to_embed())
 
