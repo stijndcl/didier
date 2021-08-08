@@ -1,0 +1,139 @@
+{
+  "semester_start": [1, 7, 2021],
+  "semester_end": [1, 8, 2021],
+  "holidays": [
+    {
+      "start_date": [2, 7, 2021, 23, 59, 59],
+      "end_date": [10, 8, 2021, 23, 59, 59]
+    }
+  ],
+  "schedule": [
+    {
+      "course": "Computerarchitectuur",
+      "online_links": {
+        "zoom": "https://ufora.ugent.be/d2l/ext/rp/228912/lti/framedlaunch/556e197e-e87b-4c27-be5d-53adc7a41826",
+        "msteams": "https://teams.microsoft.com/l/team/19%3ad7295f0bc4634a61b461504d4a7134b3%40thread.tacv2/conversations?groupId=8755cb96-1ef5-4ea3-b806-eeebf8a85ae8&tenantId=d7811cde-ecef-496c-8f91-a1786241b99c"
+      },
+      "slots": [
+      ]
+    },
+    {
+      "course": "Multimedia",
+      "online_links": {
+        "zoom": "https://ugent-be.zoom.us/j/94248831947?pwd=ZCt4UnBLSzViZnFEQmkzWE5SYnF2QT09"
+      },
+      "slots": [
+        {
+          "location": {
+            "campus": "Sterre",
+            "building": "S9",
+            "room": "A3"
+          },
+          "time": {
+            "day": "woensdag",
+            "start": 1130,
+            "end": 1330
+          }
+        },
+        {
+          "online": "zoom",
+          "time": {
+            "day": "vrijdag",
+            "start": 1300,
+            "end": 1530
+          }
+        }
+      ]
+    },
+    {
+      "course": "Wetenschappelijk Rekenen",
+      "online_links": {
+        "zoom": "https://ufora.ugent.be/d2l/ext/rp/236404/lti/framedlaunch/556e197e-e87b-4c27-be5d-53adc7a41826"
+      },
+      "slots": [
+        {
+          "online": "zoom",
+          "time": {
+            "day": "dinsdag",
+            "start": 1130,
+            "end": 1300
+          }
+        },
+        {
+          "online": "zoom",
+          "time": {
+            "day": "woensdag",
+            "start": 1500,
+            "end": 1800
+          }
+        },
+        {
+          "online": "zoom",
+          "time": {
+            "day": "donderdag",
+            "start": 830,
+            "end": 1000
+          }
+        }
+      ]
+    },
+    {
+      "course": "Software Engineering Lab 1",
+      "online_links": {
+        "zoom": "https://ufora.ugent.be/d2l/ext/rp/235800/lti/framedlaunch/556e197e-e87b-4c27-be5d-53adc7a41826",
+        "msteams": "https://teams.microsoft.com/l/team/19%3a4dfd5b2fb1ae4aa9b72706aa3a0d6867%40thread.tacv2/conversations?groupId=256d5c58-5d53-43f5-9436-497b0c852c75&tenantId=d7811cde-ecef-496c-8f91-a1786241b99c"
+      },
+      "slots": [
+        {
+          "online": "msteams",
+          "time": {
+            "day": "dinsdag",
+            "start": 1430,
+            "end": 1700
+          }
+        },
+        {
+          "online": "msteams",
+          "time": {
+            "day": "vrijdag",
+            "start": 830,
+            "end": 1130
+          }
+        }
+      ]
+    },
+    {
+      "course": "Webdevelopment",
+      "online_links": {
+        "zoom": "https://ugent-be.zoom.us/j/93166767783?pwd=MWdvb1BnNnlPSnAyNk52QmRzdjcwdz09"
+      },
+      "slots": [
+        {
+          "weeks": {
+            "6": {
+              "canceled": true
+            }
+          },
+          "location": {
+            "campus": "Sterre",
+            "building": "S9",
+            "room": "A3"
+          },
+          "time": {
+            "day": "woensdag",
+            "start": 900,
+            "end": 1100
+          }
+        },
+        {
+          "online": "zoom",
+          "time": {
+            "day": "donderdag",
+            "start": 1000,
+            "end": 1300
+          }
+        }
+      ]
+    }
+  ]
+}

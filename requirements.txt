@@ -15,3 +15,6 @@ feedparser==6.0.2
 googletrans==4.0.0rc1
 quart==0.15.1
 Quart-CORS==0.5.0
+attrs~=21.2.0
+dacite~=1.6.0
+pytest==6.2.4

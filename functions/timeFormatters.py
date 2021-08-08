@@ -1,7 +1,11 @@
 import datetime
+from typing import List
+
 import dateutil.relativedelta
 import pytz
 import time
+
+from functions import stringFormatters
 
 
 def epochToDate(epochTimeStamp, strFormat="%d/%m/%Y om %H:%M:%S"):
@@ -134,17 +138,66 @@ def getPlural(amount, unit):
     return dic[unit.lower()]["s" if amount == 1 else "p"]
 
 
-def weekdayToInt(day):
+def weekdayToInt(day: str) -> int:
     days = {"maandag": 0, "dinsdag": 1, "woensdag": 2, "donderdag": 3, "vrijdag": 4, "zaterdag": 5, "zondag": 6}
-    return days[day.lower()]
+
+    # Allow abbreviations
+    for d, i in days.items():
+        if d.startswith(day):
+            return i
+
+    return -1
 
 
 def intToWeekday(day):
     return ["Maandag", "Dinsdag", "Woensdag", "Donderdag", "Vrijdag", "Zaterdag", "Zondag"][day]
 
 
-def fromString(timeString: str, formatString="%d/%m/%Y"):
+def fromString(timeString: str, formatString="%d/%m/%Y", tzinfo=pytz.timezone("Europe/Brussels")):
     """
     Constructs a datetime object from an input string
     """
-    return datetime.datetime.strptime(timeString, formatString)
+    return datetime.datetime.strptime(timeString, formatString).replace(tzinfo=tzinfo)
+
+
+def fromArray(data: List[int]) -> datetime:
+    day = stringFormatters.leadingZero(str(data[0]))
+    month = stringFormatters.leadingZero(str(data[1]))
+    year = str(data[2])
+
+    if len(data) == 6:
+        hour = stringFormatters.leadingZero(str(data[3]))
+        minute = stringFormatters.leadingZero(str(data[4]))
+        second = stringFormatters.leadingZero(str(data[5]))
+
+        return fromString(f"{day}/{month}/{year} {hour}:{minute}:{second}", formatString="%d/%m/%Y %H:%M:%S")
+
+    return fromString(f"{day}/{month}/{year}")
+
+
+def skip_weekends(day: datetime) -> datetime:
+    """
+    Increment the current date if it's not a weekday
+    """
+    weekday = day.weekday()
+
+    # Friday is weekday 4
+    if weekday > 4:
+        return day + datetime.timedelta(days=(7 - weekday))
+
+    return day
+
+
+def forward_to_weekday(day: datetime, weekday: int) -> datetime:
+    """
+    Increment a date until the weekday is the same as the one provided
+    Finds the "next" [weekday]
+    """
+    current = day.weekday()
+
+    # This avoids negative numbers below, and shows
+    # next week in case the days are the same
+    if weekday <= current:
+        weekday += 7
+
+    return day + datetime.timedelta(days=(weekday - current))

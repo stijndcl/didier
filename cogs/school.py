@@ -1,13 +1,11 @@
-import random
-
-from data import constants
+from data import schedule
 from decorators import help
 import discord
 from discord.ext import commands
-from enums.courses import years
 from enums.help_categories import Category
-from functions import checks, eten, les
-import json
+from functions import config, eten, les
+from functions.stringFormatters import capitalize
+from functions.timeFormatters import intToWeekday, skip_weekends
 
 
 class School(commands.Cog):
@@ -23,7 +21,9 @@ class School(commands.Cog):
     # @commands.check(checks.allowedChannels)
     @help.Category(category=Category.School)
     async def eten(self, ctx, *day):
-        day = les.getWeekDay(None if len(day) == 0 else day)[1]
+        day_dt = les.find_target_date(day if day else None)
+        day_dt = skip_weekends(day_dt)
+        day = intToWeekday(day_dt.weekday())
 
         # Create embed
         menu = eten.etenScript(day)
@@ -44,48 +44,21 @@ class School(commands.Cog):
     @commands.command(name="Les", aliases=["Class", "Classes", "Sched", "Schedule"], usage="[Jaargang]* [Dag]*")
     # @commands.check(checks.allowedChannels)
     @help.Category(category=Category.School)
-    async def les(self, ctx, *day):
-        return
-        # parsed = les.parseArgs(day)
-        #
-        # # Invalid arguments
-        # if not parsed[0]:
-        #     return await ctx.send(parsed[1])
-        #
-        # day, dayDatetime, semester, year = parsed[1:]
-        #
-        # # Customize the user's schedule
-        # schedule = self.customizeSchedule(ctx, year, semester)
-        #
-        # # Create the embed
-        # embed = les.createEmbed(day, dayDatetime, semester, year, schedule)
-        #
-        # await ctx.send(embed=embed)
+    async def les(self, ctx, day=None):
+        date = les.find_target_date(day)
 
-    # Add all the user's courses
-    def customizeSchedule(self, ctx, year, semester):
-        schedule = les.getSchedule(semester, year)
+        # Person explicitly requested a weekend-day
+        if day is not None and day.lower() in ("morgen", "overmorgen") and date.weekday() > 4:
+            return await ctx.send(f"{capitalize(day)} is het weekend.")
 
-        COC = self.client.get_guild(int(constants.CallOfCode))
+        date = skip_weekends(date)
 
-        if COC is None:
-            return schedule
+        s = schedule.Schedule(date, int(config.get("year")), int(config.get("semester")), day is not None)
 
-        member = COC.get_member(ctx.author.id)
+        if s.semester_over:
+            return await ctx.send("Het semester is afgelopen.")
 
-        for role in member.roles:
-            for univYear in years:
-                for course in univYear:
-                    if course.value["year"] < year and course.value["id"] == role.id and course.value["semester"] == semester:
-                        with open("files/schedules/{}{}.json".format(course.value["year"], course.value["semester"]),
-                                  "r") as fp:
-                            sched2 = json.load(fp)
-
-                        for val in sched2:
-                            if val["course"] == course.value["name"]:
-                                val["custom"] = course.value["year"]
-                                schedule.append(val)
-        return schedule
+        return await ctx.send(embed=s.create_schedule().to_embed())
 
     @commands.command(name="Pin", usage="[Message]")
     @help.Category(category=Category.School)
