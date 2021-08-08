@@ -6,7 +6,7 @@ import discord
 from discord.ext import commands
 from enums.courses import years
 from enums.help_categories import Category
-from functions import checks, eten, les, les_rework
+from functions import checks, config, eten, les, les_rework
 import json
 
 
@@ -46,8 +46,8 @@ class School(commands.Cog):
     @help.Category(category=Category.School)
     async def les(self, ctx, day=None):
         date = les_rework.find_target_date(day)
-        s = schedule.Schedule(date, day is not None)
-        return
+        s = schedule.Schedule(date, int(config.get("year")), int(config.get("semester")), day is not None)
+        return await ctx.send(embed=s.create_schedule().to_embed())
         # parsed = les.parseArgs(day)
         #
         # # Invalid arguments

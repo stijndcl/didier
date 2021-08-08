@@ -165,6 +165,13 @@ def fromArray(data: List[int]) -> datetime:
     month = stringFormatters.leadingZero(str(data[1]))
     year = str(data[2])
 
+    if len(data) == 6:
+        hour = stringFormatters.leadingZero(str(data[3]))
+        minute = stringFormatters.leadingZero(str(data[4]))
+        second = stringFormatters.leadingZero(str(data[5]))
+
+        return fromString(f"{day}/{month}/{year} {hour}:{minute}:{second}", formatString="%d/%m/%Y %H:%M:%S")
+
     return fromString(f"{day}/{month}/{year}")
 
 

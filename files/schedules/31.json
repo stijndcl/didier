@@ -3,8 +3,8 @@
   "semester_end": [16, 8, 2021],
   "holidays": [
     {
-      "start_date": [2, 7, 2021],
-      "end_date": [10, 8, 2021]
+      "start_date": [2, 7, 2021, 23, 59, 59],
+      "end_date": [10, 8, 2021, 23, 59, 59]
     }
   ],
   "schedule": [
@@ -110,7 +110,7 @@
       "slots": [
         {
           "weeks": {
-            "1": {
+            "6": {
               "canceled": true
             }
           },

@@ -8,8 +8,10 @@ class Platform(Enum):
     Name: The name of the platform
     Rep: A shorter, lowercased & space-less version
     """
-    Bongo = {"name": "Bongo Virtual Classroom", "rep": "bongo"}
+    BongoVC = {"name": "Bongo Virtual Classroom", "rep": "bongo"}
+    GatherTown = {"name": "Gather Town", "rep": "gather"}
     MSTeams = {"name": "MS Teams", "rep": "msteams"}
+    OpenCast = {"name": "OpenCast", "rep": "opencast"}
     Ufora = {"name": "Ufora", "rep": "ufora"}
     Zoom = {"name": "Zoom", "rep": "zoom"}
 
