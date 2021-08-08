@@ -1,7 +1,6 @@
 from bs4 import BeautifulSoup
 import re
 from requests import get
-from urllib.parse import urlencode
 
 
 def getMatchweek():
