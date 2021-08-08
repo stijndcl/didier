@@ -1,9 +1,8 @@
 from abc import ABC, abstractmethod
-import dacite
-from discord import Colour, Embed
 from dacite import from_dict
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
+from discord import Colour, Embed
 from enums.platform import Platform, get_platform
 from functions.timeFormatters import fromArray, intToWeekday, timeFromInt
 import json
@@ -109,7 +108,7 @@ class Timeslot:
         end_time = slot_dict["time"]["end"]
 
         # Location can be none if a class is online-only
-        location = dacite.from_dict(Location, slot_dict["location"]) if "location" in slot_dict else None
+        location = from_dict(Location, slot_dict["location"]) if "location" in slot_dict else None
 
         # Find platform & link if this class is online
         online_platform: Platform = get_platform(slot_dict.get("online", None))
