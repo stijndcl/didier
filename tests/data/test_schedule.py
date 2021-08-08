@@ -1,7 +1,6 @@
-import pytz
-
 from data import schedule
 from datetime import datetime
+import pytz
 import unittest
 
 
@@ -17,11 +16,3 @@ class TestSchedule(unittest.TestCase):
         self.assertFalse(holiday.has_passed(before))
         self.assertFalse(holiday.has_passed(during))
         self.assertTrue(holiday.has_passed(after))
-
-    def test_course_str(self):
-        course = schedule.Course("Test")
-        self.assertEqual(str(course), "Test")
-
-    def test_location_str(self):
-        location = schedule.Location("C", "B", "R")
-        self.assertEqual(str(location), "C B R")
