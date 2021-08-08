@@ -145,14 +145,13 @@ class Schedule:
         self.end_date = fromArray(self.schedule_dict["semester_end"])
 
         # Semester is over
-        if self.end_date <= self.day:
+        if self.end_date < self.day:
             self.semester_over = True
             return
 
         self.check_holidays()
         self.week = self.get_week()
 
-        # TODO show a custom embed when no class instead of fast-forwarding
         # # Store the target weekday (in case it exists) so we can ask for the next
         # # friday after the holiday, for example
         # target_weekday = -1 if not self.targeted_weekday else self.day.weekday()
@@ -181,7 +180,8 @@ class Schedule:
 
             # In the past: add the offset
             if holiday.has_passed(self.day):
-                self.holiday_offset += (self.day - holiday.end_date_parsed).days // 7
+                # Add 1 because Monday-Sunday is only 6 days, but should be counted as a week
+                self.holiday_offset += (holiday.duration.days + 1) // 7
             elif holiday.start_date_parsed <= self.day <= holiday.end_date_parsed:
                 self.current_holiday = holiday
 
@@ -203,7 +203,9 @@ class Schedule:
             return 1
 
         # Add +1 at the end because week 1 would be 0 as it's not over yet
-        return (diff.days // 7) + self.holiday_offset + 1
+        # Every week would be one behind
+        # Also subtract all passed holidays
+        return (diff.days // 7) - self.holiday_offset + 1
 
     def find_slots_for_course(self, course_dict: Dict) -> List[Timeslot]:
         """
