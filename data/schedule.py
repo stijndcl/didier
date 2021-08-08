@@ -113,7 +113,13 @@ class Timeslot:
 
         # Find platform & link if this class is online
         online_platform: Platform = get_platform(slot_dict.get("online", None))
-        online_link = course_dict["online_links"][online_platform.value["rep"]] if online_platform is not None else None
+
+        # Custom online link for this day if it exists, else the general link for this platform
+        online_link = \
+            slot_dict["online_link"] if "online_link" in slot_dict else \
+            course_dict["online_links"][online_platform.value["rep"]] \
+            if online_platform is not None \
+            else None
 
         return Timeslot(course=course, start_time=start_time, end_time=end_time, canceled="canceled" in slot_dict,
                         is_special=special, location=location, online_platform=online_platform, online_link=online_link)
