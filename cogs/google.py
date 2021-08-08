@@ -2,7 +2,7 @@ import discord
 from discord.ext import commands
 from decorators import help
 from enums.help_categories import Category
-from functions.scraping import google_search
+from functions.scrapers.google import google_search
 
 
 class Google(commands.Cog):

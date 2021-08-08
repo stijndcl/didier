@@ -5,7 +5,7 @@ from enums.numbers import Numbers
 from functions import timeFormatters
 from functions.config import config
 from functions.database import currency, poke, prison, birthdays, stats
-from functions.scraping import getMatchweek
+from functions.scrapers.sporza import getMatchweek
 from functions import ufora_notifications
 import json
 import random
@@ -228,6 +228,10 @@ class Tasks(commands.Cog):
         """
         Task that checks the current JPL matchweek & changes the dict value
         """
+        # Don't run this when testing
+        if self.client.user.id != int(constants.didierId):
+            return
+
         matchweek = getMatchweek()
 
         if matchweek is None:

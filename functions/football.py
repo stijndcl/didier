@@ -1,7 +1,7 @@
 from enum import Enum
 from attr import dataclass, field
 from functions.timeFormatters import fromString
-from functions.scraping import getJPLMatches, getJPLTable
+from functions.scrapers.sporza import getJPLMatches, getJPLTable
 from functions.stringFormatters import leadingZero
 from datetime import datetime
 import tabulate
