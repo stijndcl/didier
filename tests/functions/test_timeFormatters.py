@@ -9,7 +9,7 @@ class TestTimeFormatters(unittest.TestCase):
         self.assertEqual("0123", timeFormatters.leadingZero("0123"))
 
     def test_delimiter(self):
-        self.assertEqual("0123", timeFormatters.delimiter("0123"))
+        self.assertEqual("01:23", timeFormatters.delimiter("0123"))
         self.assertEqual("01.23", timeFormatters.delimiter("0123", delim="."))
 
     def test_timeFromInt(self):
