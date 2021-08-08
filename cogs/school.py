@@ -1,12 +1,11 @@
-import random
-
 from data import constants, schedule
 from decorators import help
 import discord
 from discord.ext import commands
 from enums.courses import years
 from enums.help_categories import Category
-from functions import checks, config, eten, les, les_rework
+from functions import checks, config, eten, les
+from functions.timeFormatters import intToWeekday
 import json
 
 
@@ -23,7 +22,8 @@ class School(commands.Cog):
     # @commands.check(checks.allowedChannels)
     @help.Category(category=Category.School)
     async def eten(self, ctx, *day):
-        day = les.getWeekDay(None if len(day) == 0 else day)[1]
+        day_dt = les.find_target_date(day if day else None)
+        day = intToWeekday(day_dt.weekday())
 
         # Create embed
         menu = eten.etenScript(day)
@@ -45,49 +45,9 @@ class School(commands.Cog):
     # @commands.check(checks.allowedChannels)
     @help.Category(category=Category.School)
     async def les(self, ctx, day=None):
-        date = les_rework.find_target_date(day)
+        date = les.find_target_date(day)
         s = schedule.Schedule(date, int(config.get("year")), int(config.get("semester")), day is not None)
         return await ctx.send(embed=s.create_schedule().to_embed())
-        # parsed = les.parseArgs(day)
-        #
-        # # Invalid arguments
-        # if not parsed[0]:
-        #     return await ctx.send(parsed[1])
-        #
-        # day, dayDatetime, semester, year = parsed[1:]
-        #
-        # # Customize the user's schedule
-        # schedule = self.customizeSchedule(ctx, year, semester)
-        #
-        # # Create the embed
-        # embed = les.createEmbed(day, dayDatetime, semester, year, schedule)
-        #
-        # await ctx.send(embed=embed)
-
-    # Add all the user's courses
-    def customizeSchedule(self, ctx, year, semester):
-        schedule = les.getSchedule(semester, year)
-
-        COC = self.client.get_guild(int(constants.CallOfCode))
-
-        if COC is None:
-            return schedule
-
-        member = COC.get_member(ctx.author.id)
-
-        for role in member.roles:
-            for univYear in years:
-                for course in univYear:
-                    if course.value["year"] < year and course.value["id"] == role.id and course.value["semester"] == semester:
-                        with open("files/schedules/{}{}.json".format(course.value["year"], course.value["semester"]),
-                                  "r") as fp:
-                            sched2 = json.load(fp)
-
-                        for val in sched2:
-                            if val["course"] == course.value["name"]:
-                                val["custom"] = course.value["year"]
-                                schedule.append(val)
-        return schedule
 
     @commands.command(name="Pin", usage="[Message]")
     @help.Category(category=Category.School)

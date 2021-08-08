@@ -26,7 +26,7 @@ def etenScript(weekDag):
 
     # Fetch from API
     try:
-        menu = requests.get("https://zeus.ugent.be/hydra/api/2.0/resto/menu/nl/{}/{}/{}.json".format(d.year, d.month, d.day)).json()
+        menu = requests.get("https://zeus.ugent.be/hydra/api/2.0/resto/menu/nl-sterre/{}/{}/{}.json".format(d.year, d.month, d.day)).json()
         # Print menu
 
         for s in menu["meals"]:
