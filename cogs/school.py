@@ -54,6 +54,10 @@ class School(commands.Cog):
         date = skip_weekends(date)
 
         s = schedule.Schedule(date, int(config.get("year")), int(config.get("semester")), day is not None)
+
+        if s.semester_over:
+            return await ctx.send("Het semester is afgelopen.")
+
         return await ctx.send(embed=s.create_schedule().to_embed())
 
     @commands.command(name="Pin", usage="[Message]")
