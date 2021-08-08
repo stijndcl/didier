@@ -1,4 +1,5 @@
-from functions import les
+from data import schedule
+from functions import les, config
 from functions.database import remind
 
 
@@ -17,8 +18,6 @@ class Reminders:
         self.categories = [self.nightly, self.les]
 
     def lesEmbed(self):
-        day, dayDatetime, semester, year = les.parseArgs([])[1:]
-
-        schedule = les.getSchedule(semester, year)
-
-        return les.createEmbed(day, dayDatetime, semester, year, schedule)
+        dt = les.find_target_date()
+        s = schedule.Schedule(dt, int(config.get("year")), int(config.get("semester")))
+        return s.create_schedule().to_embed()
