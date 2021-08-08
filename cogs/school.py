@@ -1,12 +1,10 @@
-from data import constants, schedule
+from data import schedule
 from decorators import help
 import discord
 from discord.ext import commands
-from enums.courses import years
 from enums.help_categories import Category
-from functions import checks, config, eten, les
+from functions import config, eten, les
 from functions.timeFormatters import intToWeekday
-import json
 
 
 class School(commands.Cog):
