@@ -13,7 +13,7 @@ class Reminders:
 
         self._les = [int(user[0]) for user in rows if user[2]]
         self._lesMessages = ["Lessenrooster voor vandaag:"]
-        self.les = {"users": self._les, "messages": self._lesMessages, "embed": self.lesEmbed(), "weekends": False, "disabled": True}
+        self.les = {"users": self._les, "messages": self._lesMessages, "embed": self.lesEmbed, "weekends": False, "disabled": True}
 
         self.categories = [self.nightly, self.les]
 

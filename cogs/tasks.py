@@ -202,6 +202,12 @@ class Tasks(commands.Cog):
                 if (not category["weekends"]) and weekday > 4:
                     continue
 
+                # Create embed once because this can be heavy
+                if "embed" in category:
+                    embed = category["embed"]()
+                else:
+                    embed = None
+
                 for user in category["users"]:
                     userInstance = self.client.get_user(user)
 
@@ -213,7 +219,7 @@ class Tasks(commands.Cog):
                     if "embed" not in category:
                         await userInstance.send(random.choice(category["messages"]))
                     else:
-                        await userInstance.send(random.choice(category["messages"]), embed=category["embed"])
+                        await userInstance.send(random.choice(category["messages"]), embed=embed)
 
             with open("files/lastTasks.json", "w") as fp:
                 lastTasks["remind"] = round(time.time())
