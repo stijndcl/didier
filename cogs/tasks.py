@@ -5,7 +5,7 @@ from enums.numbers import Numbers
 from functions import timeFormatters
 from functions.config import config
 from functions.database import currency, poke, prison, birthdays, stats
-from functions.scraping import getMatchweek
+from functions.scrapers.sporza import getMatchweek
 from functions import ufora_notifications
 import json
 import random
@@ -202,6 +202,12 @@ class Tasks(commands.Cog):
                 if (not category["weekends"]) and weekday > 4:
                     continue
 
+                # Create embed once because this can be heavy
+                if "embed" in category:
+                    embed = category["embed"]()
+                else:
+                    embed = None
+
                 for user in category["users"]:
                     userInstance = self.client.get_user(user)
 
@@ -213,7 +219,7 @@ class Tasks(commands.Cog):
                     if "embed" not in category:
                         await userInstance.send(random.choice(category["messages"]))
                     else:
-                        await userInstance.send(random.choice(category["messages"]), embed=category["embed"])
+                        await userInstance.send(random.choice(category["messages"]), embed=embed)
 
             with open("files/lastTasks.json", "w") as fp:
                 lastTasks["remind"] = round(time.time())
@@ -228,6 +234,10 @@ class Tasks(commands.Cog):
         """
         Task that checks the current JPL matchweek & changes the dict value
         """
+        # Don't run this when testing
+        if self.client.user.id != int(constants.didierId):
+            return
+
         matchweek = getMatchweek()
 
         if matchweek is None:

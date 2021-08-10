@@ -3,7 +3,7 @@ from functions.timeFormatters import dateTimeNow, weekdayToInt, forward_to_weekd
 from typing import Optional
 
 
-def find_target_date(arg: Optional[str]) -> datetime:
+def find_target_date(arg: Optional[str] = None) -> datetime:
     """
     Find the requested date out of the user's arguments
     """
