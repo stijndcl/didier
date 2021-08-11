@@ -1,17 +1,17 @@
-from datetime import datetime, timedelta
+from datetime import datetime
 from discord import Embed, Colour
 from functions.stringFormatters import leadingZero as lz
 from functions.timeFormatters import intToWeekday
-from html import unescape
+from markdownify import markdownify as md
 import pytz
-import re
 
 
 class UforaNotification:
     def __init__(self, content: dict, course, notif_id, course_id):
         self._content: dict = content
         self._course = course
-        self._notif_id, self._course_id = notif_id, course_id
+        self._notif_id = notif_id
+        self._course_id = course_id
         self._view_url = self._create_url()
         self._title = self._clean_content(self._content["title"])
         self._description = self._get_description()
@@ -40,54 +40,24 @@ class UforaNotification:
     def _get_description(self):
         desc = self._clean_content(self._content["summary"])
 
-        if len(desc) > 500:
-            return desc[:497] + "..."
+        if len(desc) > 4096:
+            return desc[:4093] + "..."
 
         return desc
 
     def _clean_content(self, text: str):
-        # Dict with HTML & markdown tags to replace
-        html_table = {
-            # CHARACTERS:
-            "&amp;": '&',
-            "&quot;": '"',
-            "apos;": "'",
-            "&gt;": ">",
-            "&lt;": "<",
-            # MARKDOWN SUPPORT:
-            "<b>": "**",
-            "</b>": "**",
-            "<strong>": "**",
-            "</strong>": "**",
-            "<i>": "*",
-            "</i>": "*",
-            "<em>": "*",
-            "</em>": "*",
-            "<del>": "~~",
-            "</del>": "~~",
-            "<ins>": "__",
-            "</ins>": "__",
-            # Represent paragraphs with newlines
-            "</p>": "\n",
-            "<br>": "\n",
-            "<br/>": "\n",
-            "<br />": "\n"
-        }
-
-        # Unescape HTML
-        for key, value in html_table.items():
-            text = text.replace(key, value)
-
-        # Remove HTML tags
-        return unescape(re.sub(r"<[^>]*>", "", text))
+        return md(text)
 
     def _get_published(self):
-        time_string = "%a, %d %b %Y %H:%M:%S %Z"
-        dt = datetime.strptime(self._content["published"], time_string)\
+        # Datetime is unable to parse the timezone because it's useless
+        # We will hereby cut it out and pray the timezone will always be UTC+0
+        published = self._content["published"].rsplit(" ", 1)[0]
+        time_string = "%a, %d %b %Y %H:%M:%S"
+        dt = datetime.strptime(published, time_string)\
             .astimezone(pytz.timezone("Europe/Brussels"))
 
-        # Apply timezone offset
-        dt = dt + timedelta(hours=dt.utcoffset().seconds//3600)
+        # Apply timezone offset in a hacky way
+        dt = dt + dt.utcoffset()
 
         return "{} {}/{}/{} om {}:{}:{}".format(
             intToWeekday(dt.weekday()),
