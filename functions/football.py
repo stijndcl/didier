@@ -1,3 +1,5 @@
+from typing import Optional
+
 from attr import dataclass, field
 from datetime import datetime
 from enum import Enum
@@ -12,6 +14,7 @@ import tabulate
 class Status(Enum):
     AfterToday = "--:--"
     NotStarted = "--:--"
+    Postponed = "--:--"
     Over = "Einde"
     HalfTime = "Rust"
 
@@ -26,7 +29,7 @@ class Match:
     homeScore: int = 0
     away: str = field(init=False)
     awayScore: int = 0
-    start: datetime = field(init=False)
+    start: Optional[datetime] = field(init=False)
     date: str = field(init=False)
     weekDay: str = field(init=False)
     status: Status = field(init=False)
@@ -44,9 +47,13 @@ class Match:
             self.homeScore = self.matchDict[Navigation.HomeScore.value]
             self.awayScore = self.matchDict[Navigation.AwayScore.value]
 
-        self.start = fromString(self.matchDict["startDateTime"], formatString="%Y-%m-%dT%H:%M:%S.%f%z")
-        self.date = self.start.strftime("%d/%m")
-        self.weekDay = self._getWeekday()
+        if "startDateTime" in self.matchDict:
+            self.start = fromString(self.matchDict["startDateTime"], formatString="%Y-%m-%dT%H:%M:%S.%f%z")
+        else:
+            self.start = None
+
+        self.date = self.start.strftime("%d/%m") if self.start is not None else "Uitgesteld"
+        self.weekDay = self._getWeekday() if self.start is not None else "??"
 
     def _getStatus(self, status: str):
         """
@@ -67,6 +74,7 @@ class Match:
         statusses: dict = {
             "after_today": Status.AfterToday.value,
             "not_started": Status.NotStarted.value,
+            "postponed": Status.Postponed.value,
             "end": Status.Over.value
         }
 
@@ -90,6 +98,9 @@ class Match:
         """
         Returns a string representing the scoreboard
         """
+        if self.start is None:
+            return "??"
+
         # No score to show yet, show time when the match starts
         if not self._hasStarted():
             return "{}:{}".format(leadingZero(str(self.start.hour)), leadingZero(str(self.start.minute)))
@@ -97,7 +108,7 @@ class Match:
         return "{} - {}".format(self.homeScore, self.awayScore)
 
     def _hasStarted(self):
-        return self.status not in [Status.AfterToday.value, Status.NotStarted.value]
+        return self.status not in [Status.AfterToday.value, Status.NotStarted.value, Status.Postponed.value]
 
 
 class Navigation(Enum):
