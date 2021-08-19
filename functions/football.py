@@ -1,9 +1,11 @@
-from enum import Enum
 from attr import dataclass, field
+from datetime import datetime
+from enum import Enum
 from functions.timeFormatters import fromString
 from functions.scrapers.sporza import getJPLMatches, getJPLTable
 from functions.stringFormatters import leadingZero
-from datetime import datetime
+import re
+from requests import get
 import tabulate
 
 
@@ -162,3 +164,14 @@ def _formatRow(row):
     scoresArray.insert(1, row.find_all("a")[0].renderContents().decode("utf-8").split("<!--")[0])
 
     return scoresArray
+
+
+def get_jpl_code() -> int:
+    editions = get("https://api.sporza.be/web/soccer/competitions/48").json()["editions"]
+    newest_edition = editions[0]["_links"]["self"]["href"]
+    phase = get(newest_edition).json()["phases"][0]
+    phase_url = phase["_links"]["self"]["href"]
+    r = re.compile(r"\d+$")
+    match = re.search(r, phase_url)
+
+    return int(match[0])

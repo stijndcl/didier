@@ -1,4 +1,5 @@
 from bs4 import BeautifulSoup
+from functions import config
 import re
 from requests import get
 
@@ -38,7 +39,8 @@ def getJPLMatches(week: int):
     """
     JPL matches for a given matchweek
     """
-    current_day = get("https://api.sporza.be/web/soccer/matchdays/161733/{}".format(week))
+    jpl = config.get("jpl")
+    current_day = get(f"https://api.sporza.be/web/soccer/phases/{jpl}/matchdays/{week}")
 
     # Something went wrong
     if current_day.status_code != 200:
