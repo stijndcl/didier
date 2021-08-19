@@ -2,7 +2,7 @@ from decorators import help
 from discord.ext import commands
 from enums.help_categories import Category
 from functions import checks, config
-from functions.football import getMatches, getTable
+from functions.football import getMatches, getTable, get_jpl_code
 
 
 class Football(commands.Cog):
@@ -35,6 +35,13 @@ class Football(commands.Cog):
     @jpl.command(name="Table", aliases=["Ranking", "Rankings", "Ranks", "T"])
     async def table(self, ctx, *args):
         await ctx.send(getTable())
+
+    @commands.check(checks.isMe)
+    @jpl.command(name="Update")
+    async def update(self, ctx):
+        code = get_jpl_code()
+        config.config("jpl", code)
+        await ctx.message.add_reaction("✅")
 
 
 def setup(client):
