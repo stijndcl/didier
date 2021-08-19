@@ -26,7 +26,11 @@ def etenScript(weekDag):
 
     # Fetch from API
     try:
-        menu = requests.get("https://zeus.ugent.be/hydra/api/2.0/resto/menu/nl-sterre/{}/{}/{}.json".format(d.year, d.month, d.day)).json()
+        menu = requests.get(f"https://zeus.ugent.be/hydra/api/2.0/resto/menu/nl-sterre/{d.year}/{d.month}/{d.day}.json").json()
+
+        if not menu["meals"]:
+            raise Exception()
+
         # Print menu
 
         for s in menu["meals"]:
@@ -49,4 +53,4 @@ def etenScript(weekDag):
         menuSoep += "Restaurant gesloten"
         menuGroenten += "Restaurant gesloten"
         menuHoofdgerechten += "Restaurant gesloten"
-    return (menuSoep, menuHoofdgerechten, menuGroenten)
+    return menuSoep, menuHoofdgerechten, menuGroenten

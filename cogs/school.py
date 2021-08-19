@@ -29,6 +29,7 @@ class School(commands.Cog):
         menu = eten.etenScript(day)
         embed = discord.Embed(colour=discord.Colour.blue())
         embed.set_author(name="Menu voor {}".format(day))
+
         if "gesloten" in menu[0].lower():
             embed.description = "Restaurant gesloten"
         else:
