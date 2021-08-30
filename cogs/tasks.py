@@ -35,7 +35,7 @@ class Tasks(commands.Cog):
         # Don't do it multiple times a day if bot dc's, ...
         with open("files/lastTasks.json", "r") as fp:
             lastTasks = json.load(fp)
-        if int(self.getCurrentHour()) == 0 and int(time.time()) - int(lastTasks["interest"]) > 10000:
+        if int(self.getCurrentHour()) == 4 and int(time.time()) - int(lastTasks["interest"]) > 10000:
             users = currency.getAllRows()
             bitcoinPrice = self.getCurrentBitcoinPrice()
             for user in users:
@@ -188,7 +188,7 @@ class Tasks(commands.Cog):
         # Don't do it multiple times a day if bot dc's, ...
         with open("files/lastTasks.json", "r") as fp:
             lastTasks = json.load(fp)
-        if int(self.getCurrentHour()) == 7 and int(time.time()) - int(lastTasks["remind"]) > 10000:
+        if int(self.getCurrentHour()) == 4 and int(time.time()) - int(lastTasks["remind"]) > 10000:
             reminders = Reminders()
 
             weekday = self.getCurrentWeekday()
