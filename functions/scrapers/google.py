@@ -1,9 +1,18 @@
+from typing import Optional, List
+
 from bs4 import BeautifulSoup
+from dataclasses import dataclass
 from requests import get
 from urllib.parse import urlencode
 
 
-def google_search(query):
+@dataclass
+class SearchResult:
+    status_code: int
+    results: List[str]
+
+
+def google_search(query) -> SearchResult:
     """
     Function to get Google search results
     """
@@ -17,7 +26,7 @@ def google_search(query):
     resp = get("https://www.google.com/search?{}&num=20&hl=en".format(query), headers=headers)
 
     if resp.status_code != 200:
-        return None, resp.status_code
+        return SearchResult(resp.status_code, [])
 
     bs = BeautifulSoup(resp.text, "html.parser")
 
@@ -28,11 +37,21 @@ def google_search(query):
         link = element.find("a", href=True)
         title = element.find("h3")
 
-        if link is None or title is None:
+        if link is None or not link["href"].startswith(("http://", "https://",)) or title is None:
             return None
 
         return link["href"], title.text
 
     divs = bs.find_all("div", attrs={"class": "g"})
 
-    return list(getContent(d) for d in divs), 200
+    results = list(getContent(d) for d in divs)
+
+    # Filter out Nones
+    results = list(filter(lambda x: x is not None, results))
+
+    # Map to urls
+    links = []
+    for (link, title) in results:
+        links.append(f"[{title}]({link})")
+
+    return SearchResult(200, links[:10])
