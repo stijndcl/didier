@@ -62,7 +62,7 @@ class School(commands.Cog):
         return await ctx.send(embed=s.create_schedule().to_embed())
 
     @commands.command(name="Pin", usage="[Message]")
-    @help.Category(category=Category.School)
+    @help.Category(category=Category.Other)
     async def pin(self, ctx, message: discord.Message):
         # In case people abuse, check if they're blacklisted
         blacklist = []

@@ -1,5 +1,6 @@
 from data.snipe import Snipe
 from discord.ext import commands, ipc
+from dislash import InteractionClient
 import os
 from settings import HOST_IPC
 from startup.init_files import check_all
@@ -10,6 +11,8 @@ class Didier(commands.Bot):
     """
     Main Bot class for Didier
     """
+    # Reference to interactions client
+    interactions: InteractionClient
 
     # Dict to store the most recent Snipe info per channel
     snipe: Dict[int, Snipe] = {}
@@ -28,6 +31,9 @@ class Didier(commands.Bot):
 
         # Remove default help command
         self.remove_command("help")
+
+        # Create interactions client
+        self.interactions = InteractionClient(self, test_guilds=[728361030404538488, 880175869841277008])
 
         # Load all extensions
         self.init_extensions()
