@@ -2,7 +2,7 @@ from decorators import help
 from discord.ext import commands
 from enums.help_categories import Category
 from functions import checks, config
-from functions.football import getMatches, getTable, get_jpl_code
+from functions.football import get_matches, get_table, get_jpl_code
 
 
 class Football(commands.Cog):
@@ -20,21 +20,16 @@ class Football(commands.Cog):
         pass
 
     @jpl.command(name="Matches", aliases=["M"], usage="[Week]*")
-    async def matches(self, ctx, *args):
-        args = list(args)
-
+    async def matches(self, ctx, day: int = None):
         # Default is current day
-        if not args:
-            args = [str(config.get("jpl_day"))]
+        if day is None:
+            day = int(config.get("jpl_day"))
 
-        if all(letter.isdigit() for letter in args[0]):
-            await ctx.send(getMatches(int(args[0])))
-        else:
-            return await ctx.send("Dit is geen geldige speeldag.")
+        await ctx.send(get_matches(day))
 
     @jpl.command(name="Table", aliases=["Ranking", "Rankings", "Ranks", "T"])
-    async def table(self, ctx, *args):
-        await ctx.send(getTable())
+    async def table(self, ctx):
+        await ctx.send(get_table())
 
     @commands.check(checks.isMe)
     @jpl.command(name="Update")
