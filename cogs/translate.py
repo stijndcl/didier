@@ -2,7 +2,7 @@ from decorators import help
 import discord
 from discord.ext import commands
 from enums.help_categories import Category
-from functions.stringFormatters import titleCase as tc
+from functions.stringFormatters import title_case as tc
 from googletrans import Translator, LANGUAGES
 import re
 

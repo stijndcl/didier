@@ -5,7 +5,7 @@ from datetime import datetime
 from enum import Enum
 from functions.timeFormatters import fromString
 from functions.scrapers.sporza import getJPLMatches, getJPLTable
-from functions.stringFormatters import leadingZero
+from functions.stringFormatters import leading_zero
 import re
 from requests import get
 import tabulate
@@ -103,7 +103,7 @@ class Match:
 
         # No score to show yet, show time when the match starts
         if not self._hasStarted():
-            return "{}:{}".format(leadingZero(str(self.start.hour)), leadingZero(str(self.start.minute)))
+            return "{}:{}".format(leading_zero(str(self.start.hour)), leading_zero(str(self.start.minute)))
 
         return "{} - {}".format(self.homeScore, self.awayScore)
 
