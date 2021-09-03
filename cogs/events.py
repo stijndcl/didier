@@ -100,8 +100,8 @@ class Events(commands.Cog):
         :param ctx: Discord Context
         :param err: the error thrown
         """
-        # Zandbak Didier shouldn't spam the error logs
-        if self.client.user.id == int(constants.coolerDidierId):
+        # Debugging Didier shouldn't spam the error logs
+        if self.client.user.id != int(constants.didierId):
             raise err
 
         # Don't handle commands that have their own custom error handler
@@ -135,9 +135,13 @@ class Events(commands.Cog):
         command_stats.invoked(command_stats.InvocationType.SlashCommand)
 
     @commands.Cog.listener()
-    async def on_slash_command_error(self, interaction, error):
+    async def on_slash_command_error(self, interaction, err):
+        # Debugging Didier shouldn't spam the error logs
+        if self.client.user.id != int(constants.didierId):
+            raise err
+
         usage = stringFormatters.format_slash_command_usage(interaction)
-        await self.sendErrorEmbed(error, "Slash Command", usage)
+        await self.sendErrorEmbed(err, "Slash Command", usage)
 
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, react):
@@ -300,8 +304,8 @@ class Events(commands.Cog):
         trace = stringFormatters.format_error_tb(error)
 
         embed = discord.Embed(colour=discord.Colour.red())
-        embed.set_author(name=f"{error_type} Error")
-        embed.add_field(name="Command:", value=usage, inline=False)
+        embed.set_author(name="Error")
+        embed.add_field(name=f"{error_type}:", value=usage, inline=False)
         embed.add_field(name="Error:", value=str(error)[:1024], inline=False)
         embed.add_field(name="Message:", value=str(trace)[:1024], inline=False)
 
