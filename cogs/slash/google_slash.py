@@ -22,7 +22,6 @@ class GoogleSlash(commands.Cog):
             return await interaction.reply("Er ging iets fout (Response {})".format(result.status_code))
 
         embed = create_google_embed(result)
-        print("got here")
         await interaction.reply(embed=embed)
 
 

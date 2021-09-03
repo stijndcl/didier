@@ -1,16 +1,20 @@
-from typing import Optional, List
+from typing import List
 
 import discord
 from bs4 import BeautifulSoup
 from dataclasses import dataclass
 from requests import get
-from urllib.parse import urlencode
+from urllib.parse import urlencode, unquote_plus
 
 
 @dataclass
 class SearchResult:
     status_code: int
+    query: str
     results: List[str]
+
+    def __post_init__(self):
+        self.query = unquote_plus(self.query[2:])
 
 
 def google_search(query) -> SearchResult:
@@ -27,7 +31,7 @@ def google_search(query) -> SearchResult:
     resp = get("https://www.google.com/search?{}&num=20&hl=en".format(query), headers=headers)
 
     if resp.status_code != 200:
-        return SearchResult(resp.status_code, [])
+        return SearchResult(resp.status_code, query, [])
 
     bs = BeautifulSoup(resp.text, "html.parser")
 
@@ -52,10 +56,10 @@ def google_search(query) -> SearchResult:
 
     # Map to urls
     links = []
-    for (link, title) in results:
-        links.append(f"[{title}]({link})")
+    for (l, t) in results:
+        links.append(f"[{t}]({l})")
 
-    return SearchResult(200, links[:10])
+    return SearchResult(200, query, links[:10])
 
 
 def create_google_embed(result: SearchResult) -> discord.Embed:
@@ -75,5 +79,11 @@ def create_google_embed(result: SearchResult) -> discord.Embed:
         links.append(f"{index + 1}: {link}")
 
     embed.description = "\n".join(links)
+
+    # Add query into embed
+    if len(result.query) > 256:
+        embed.title = result.query[:253] + "..."
+    else:
+        embed.title = result.query
 
     return embed
