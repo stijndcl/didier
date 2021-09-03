@@ -47,9 +47,24 @@ class Didier(commands.Bot):
             self.load_extension(f"cogs.{ext}")
 
         # Load all remaining cogs
-        for file in os.listdir("./cogs"):
-            if file.endswith(".py") and not (file.startswith(self._preload)):
-                self.load_extension("cogs.{}".format(file[:-3]))
+        self._init_directory("./cogs")
+
+    def _init_directory(self, path: str):
+        """
+        Load all cogs from a directory
+        """
+        # Path to pass into load_extension
+        load_path = path[2:].replace("/", ".")
+
+        for file in os.listdir(path):
+            # Python file
+            if file.endswith(".py"):
+                if not file.startswith(self._preload):
+                    self.load_extension(f"{load_path}.{file[:-3]}")
+            elif os.path.isdir(new_path := f"{path}/{file}"):
+                # Subdirectory
+                # Also walrus operator hype
+                self._init_directory(new_path)
 
     async def on_ipc_ready(self):
         print("IPC server is ready.")

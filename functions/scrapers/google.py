@@ -1,5 +1,6 @@
 from typing import Optional, List
 
+import discord
 from bs4 import BeautifulSoup
 from dataclasses import dataclass
 from requests import get
@@ -55,3 +56,24 @@ def google_search(query) -> SearchResult:
         links.append(f"[{title}]({link})")
 
     return SearchResult(200, links[:10])
+
+
+def create_google_embed(result: SearchResult) -> discord.Embed:
+    embed = discord.Embed(colour=discord.Colour.blue())
+    embed.set_author(name="Google Search")
+
+    # Empty list of results
+    if len(result.results) == 0:
+        embed.colour = discord.Colour.red()
+        embed.description = "Geen resultaten gevonden."
+        return embed
+
+    # Add results into a field
+    links = []
+
+    for index, link in enumerate(result.results):
+        links.append(f"{index + 1}: {link}")
+
+    embed.description = "\n".join(links)
+
+    return embed
