@@ -58,7 +58,7 @@
   "jpl table": "De huidige stand van het klassement.",
   "jpl update": "Haalt de nieuwe code voor de competitie van dit jaar op.",
   "leaderboard": "Bekijk de Top 10 van [Categorie].\nIndien je geen categorie opgeeft krijg je een lijst van categorieën.",
-  "les": "Bekijk het lessenrooster voor [Dag] in het [Jaargang]-de jaar.\nIndien je geen dag opgeeft, is dit standaard vandaag. De jaargang is standaard 2.\nLes Morgen/Overmorgen werkt ook.",
+  "les": "Bekijk het lessenrooster voor [Dag].\nIndien je geen dag opgeeft, is dit standaard vandaag.\nLes Morgen/Overmorgen werkt ook.",
   "lmgtfy": "Stuur iemand een LMGTFY link wanneer ze je een domme vraag stellen in plaats van het zelf op te zoeken.\nQueries met spaties moeten **niet** tussen aanhalingstekens staan.",
   "load": "Laadt [Cog] in.",
   "load all": "Laadt alle cogs in.",

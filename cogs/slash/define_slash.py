@@ -13,8 +13,7 @@ class DefineSlash(commands.Cog):
                    description="Urban Dictionary",
                    options=[
                      Option("query", "Search query", OptionType.STRING, required=True)
-                   ],
-                   guild_ids=[728361030404538488, 880175869841277008]
+                   ]
                    )
     async def _define_slash(self, interaction: SlashInteraction, query):
         embed = Definition(query).to_embed()

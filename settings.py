@@ -1,3 +1,5 @@
+from typing import List
+
 from dotenv import load_dotenv
 import os
 
@@ -31,3 +33,11 @@ TOKEN = os.getenv("TOKEN", "")
 HOST_IPC = _to_bool(os.getenv("HOSTIPC", "false"))
 READY_MESSAGE = os.getenv("READYMESSAGE", "I'M READY I'M READY I'M READY I'M READY")  # Yes, this is a Spongebob reference
 STATUS_MESSAGE = os.getenv("STATUSMESSAGE", "with your Didier Dinks.")
+
+# Guilds to test slash commands in
+# Ex: 123,456,789
+SLASH_TEST_GUILDS: List[int] = list(
+    map(lambda x: int(x),
+        os.getenv("SLASHTESTGUILDS", "").replace(" ", "").split(",")
+        )
+)

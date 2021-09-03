@@ -1,23 +1,20 @@
+from enum import IntEnum
+
 from functions.database import utils
+from functions.stringFormatters import leading_zero as lz
 import time
 
 
-def invoked():
+class InvocationType(IntEnum):
+    TextCommand = 0
+    SlashCommand = 1
+    ContextMenu = 2
+
+
+def invoked(inv: InvocationType):
     t = time.localtime()
-    day_string: str = f"{t.tm_year}-{_lz(t.tm_mon)}-{_lz(t.tm_mday)}"
-    _update(day_string)
-
-
-def _lz(arg: int) -> str:
-    """
-    Add leading zeroes if necessary (YYYY-MM-DD)
-    """
-    arg = str(arg)
-
-    if len(arg) == 1:
-        return f"0{arg}"
-
-    return arg
+    day_string: str = f"{t.tm_year}-{lz(t.tm_mon)}-{lz(t.tm_mday)}"
+    _update(day_string, inv)
 
 
 def _is_present(date: str) -> bool:
@@ -43,25 +40,27 @@ def _add_date(date: str):
     connection = utils.connect()
     cursor = connection.cursor()
 
-    cursor.execute("INSERT INTO command_stats(day, amount) VALUES (%s, 1)", (date,))
+    cursor.execute("INSERT INTO command_stats(day, commands, slash_commands, context_menus) VALUES (%s, 0, 0, 0)", (date,))
     connection.commit()
 
 
-def _update(date: str):
+def _update(date: str, inv: InvocationType):
     """
     Increase the counter for a given day
     """
-    # Date wasn't present yet, add it with a value of 1
+    # Date wasn't present yet, add it
     if not _is_present(date):
         _add_date(date)
-        return
 
     connection = utils.connect()
     cursor = connection.cursor()
 
-    cursor.execute("""
+    column_name = ["commands", "slash_commands", "context_menus"][inv.value]
+
+    # String formatting is safe here because the input comes from above ^
+    cursor.execute(f"""
                     UPDATE command_stats
-                        SET amount = amount + 1
+                        SET {column_name} = {column_name} + 1
                     WHERE day = %s
                     """, (date,))
     connection.commit()

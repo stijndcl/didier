@@ -12,8 +12,7 @@ class GoogleSlash(commands.Cog):
                    description="Google search",
                    options=[
                      Option("query", "Search query", OptionType.STRING, required=True)
-                   ],
-                   guild_ids=[728361030404538488, 880175869841277008]
+                   ]
                    )
     async def _google_slash(self, interaction: SlashInteraction, query: str):
         result = google_search(query)

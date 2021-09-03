@@ -14,11 +14,12 @@ class TranslateSlash(commands.Cog):
         description="Google Translate",
         options=[
             Option("text", "Tekst om te vertalen", OptionType.STRING, required=True),
-            Option("to", "Taal om naar te vertalen (default NL)", OptionType.STRING)
+            Option("from_lang", "Taal om van te vertalen (default auto-detect)", OptionType.STRING),
+            Option("to_lang", "Taal om naar te vertalen (default NL)", OptionType.STRING)
         ]
     )
-    async def _translate_slash(self, interaction: SlashInteraction, text: str, to: str = "nl"):
-        translation = Translation(text=text, to=to.lower())
+    async def _translate_slash(self, interaction: SlashInteraction, text: str, from_lang: str = "auto", to_lang: str = "nl"):
+        translation = Translation(text=text, fr=from_lang.lower(), to=to_lang.lower())
         await interaction.reply(embed=translation.to_embed())
 
 

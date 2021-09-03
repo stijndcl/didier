@@ -1,9 +1,11 @@
+from dislash import SlashInteraction
+
 from data import constants
 from data.snipe import Snipe, Action, should_snipe
 import datetime
 import discord
 from discord.ext import commands
-from functions import checks, easterEggResponses
+from functions import checks, easterEggResponses, stringFormatters
 from functions.database import stats, muttn, custom_commands, commands as command_stats
 import pytz
 from settings import READY_MESSAGE, SANDBOX, STATUS_MESSAGE
@@ -87,12 +89,9 @@ class Events(commands.Cog):
         Logs commands in your terminal.
         :param ctx: Discord Context
         """
-        DM = ctx.guild is None
-        print("{} in {}: {}".format(ctx.author.display_name,
-                                    "DM" if DM else "{} ({})".format(ctx.channel.name, ctx.guild.name),
-                                    ctx.message.content))
+        print(stringFormatters.format_command_usage(ctx))
 
-        command_stats.invoked()
+        command_stats.invoked(command_stats.InvocationType.TextCommand)
 
     @commands.Cog.listener()
     async def on_command_error(self, ctx, err):
@@ -123,14 +122,22 @@ class Events(commands.Cog):
         elif isinstance(err, (commands.BadArgument, commands.MissingRequiredArgument, commands.UnexpectedQuoteError)):
             await ctx.send("Controleer je argumenten.")
         else:
-            # Remove the InvokeCommandError because it's useless information
-            x = traceback.format_exception(type(err), err, err.__traceback__)
-            errorString = ""
-            for line in x:
-                if "direct cause of the following" in line:
-                    break
-                errorString += line.replace("*", "") + "\n" if line.strip() != "" else ""
-            await self.sendErrorEmbed(ctx, err, errorString)
+            usage = stringFormatters.format_command_usage(ctx)
+            await self.sendErrorEmbed(err, "Command", usage)
+
+    @commands.Cog.listener()
+    async def on_slash_command(self, interaction: SlashInteraction):
+        """
+        Function called whenever someone uses a slash command
+        """
+        print(stringFormatters.format_slash_command_usage(interaction))
+
+        command_stats.invoked(command_stats.InvocationType.SlashCommand)
+
+    @commands.Cog.listener()
+    async def on_slash_command_error(self, interaction, error):
+        usage = stringFormatters.format_slash_command_usage(interaction)
+        await self.sendErrorEmbed(error, "Slash Command", usage)
 
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, react):
@@ -286,19 +293,15 @@ class Events(commands.Cog):
             self.client.snipe[message.channel.id] = Snipe(message.author.id, message.channel.id, message.guild.id,
                                                           Action.Remove, message.content)
 
-    async def sendErrorEmbed(self, ctx, error: Exception, trace):
+    async def sendErrorEmbed(self, error: Exception, error_type: str, usage: str):
         """
         Function that sends an error embed in #ErrorLogs.
-        :param ctx: Discord Context
-        :param error: the error thrown
-        :param trace: the stacktrace of the error
         """
+        trace = stringFormatters.format_error_tb(error)
+
         embed = discord.Embed(colour=discord.Colour.red())
-        embed.set_author(name="Error")
-        embed.add_field(name="Command:", value="{} in {}: {}".format(ctx.author.display_name,
-                                                                     ctx.channel.name if str(
-                                                                         ctx.channel.type) != "private" else "DM",
-                                                                     ctx.message.content), inline=False)
+        embed.set_author(name=f"{error_type} Error")
+        embed.add_field(name="Command:", value=usage, inline=False)
         embed.add_field(name="Error:", value=str(error)[:1024], inline=False)
         embed.add_field(name="Message:", value=str(trace)[:1024], inline=False)
 

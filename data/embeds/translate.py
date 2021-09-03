@@ -5,26 +5,32 @@ from typing import Optional
 
 
 class Translation:
-    def __init__(self, text: str, to: str):
+    def __init__(self, text: str, fr: str, to: str):
         self.text = text
+        self.fr = fr
         self.to = to
         self.embed: Optional[discord.Embed] = None
         self.translation = None
 
-        self.translate(text, to)
+        self.translate(text, fr, to)
 
-    def translate(self, query: str, to: str):
+    def translate(self, query: str, fr: str, to: str):
         """
         Translate [query] into [to]
         """
         try:
             translator = Translator()
-            self.translation = translator.translate(query, to, "auto")
+            self.translation = translator.translate(query, to, fr)
         except ValueError as e:
             message = str(e)
 
             if "destination" in message:
                 self._create_error_embed(f"{title_case(to)} is geen geldige taal.")
+                return
+
+            if "source" in message:
+                self._create_error_embed(f"{title_case(fr)} is geen geldige taal.")
+                return
 
             raise e
 
@@ -42,8 +48,9 @@ class Translation:
         embed = discord.Embed(colour=discord.Colour.blue())
         embed.set_author(name="Didier Translate")
 
-        language = self.translation.src
-        embed.add_field(name="Gedetecteerde taal", value=title_case(LANGUAGES[language]))
+        if self.fr == "auto":
+            language = self.translation.src
+            embed.add_field(name="Gedetecteerde taal", value=title_case(LANGUAGES[language]))
 
         if self.translation.extra_data["confidence"] is not None:
             embed.add_field(name="Zekerheid", value="{}%".format(self.translation.extra_data["confidence"] * 100))

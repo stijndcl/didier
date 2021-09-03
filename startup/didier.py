@@ -2,7 +2,7 @@ from data.snipe import Snipe
 from discord.ext import commands, ipc
 from dislash import InteractionClient
 import os
-from settings import HOST_IPC
+from settings import HOST_IPC, SLASH_TEST_GUILDS
 from startup.init_files import check_all
 from typing import Dict
 
@@ -33,7 +33,7 @@ class Didier(commands.Bot):
         self.remove_command("help")
 
         # Create interactions client
-        self.interactions = InteractionClient(self, test_guilds=[728361030404538488, 880175869841277008])
+        self.interactions = InteractionClient(self, test_guilds=SLASH_TEST_GUILDS)
 
         # Load all extensions
         self.init_extensions()

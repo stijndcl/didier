@@ -1,4 +1,3 @@
-import discord
 from discord.ext import commands
 from decorators import help
 from enums.help_categories import Category
