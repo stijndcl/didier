@@ -182,15 +182,13 @@ class ModCommands(commands.Cog):
         embed = discord.Embed(colour=discord.Colour.blue())
 
         embed.set_author(name=user.display_name, icon_url=user.avatar_url)
-        embed.add_field(name="Discriminator", value="#{}".format(user.discriminator))
+        embed.add_field(name="Discriminator", value=f"#{user.discriminator}")
         embed.add_field(name="Discord id", value=user.id)
         embed.add_field(name="Bot", value="Nee" if not user.bot else "Ja")
 
         created_local = timeFormatters.epochToDate(user.created_at.timestamp())
 
-        embed.add_field(name="Account aangemaakt", value="{}\n({} geleden)".format(
-            created_local["date"], timeFormatters.diffYearBasisString(round(created_local["dateDT"].timestamp()))
-        ), inline=False)
+        embed.add_field(name="Account aangemaakt", value=f"<t:{round(created_local['dateDT'].timestamp())}:R>", inline=False)
 
         # Check if the user is in the current guild
         if ctx.guild is not None:
@@ -199,9 +197,8 @@ class ModCommands(commands.Cog):
             if member_instance is not None:
                 joined_local = timeFormatters.epochToDate(member_instance.joined_at.timestamp())
 
-                embed.add_field(name="Lid geworden van {} op".format(ctx.guild.name), value="{}\n({} Geleden)".format(
-                    joined_local["date"], timeFormatters.diffYearBasisString(round(joined_local["dateDT"].timestamp()))
-                ))
+                embed.add_field(name=f"Lid geworden van {ctx.guild.name}",
+                                value=f"<t:{round(joined_local['dateDT'].timestamp())}:R>")
 
                 embed.add_field(name="Mention String", value=member_instance.mention, inline=False)
 
