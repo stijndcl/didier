@@ -161,14 +161,14 @@ def fromString(timeString: str, formatString="%d/%m/%Y", tzinfo=pytz.timezone("E
 
 
 def fromArray(data: List[int]) -> datetime:
-    day = stringFormatters.leadingZero(str(data[0]))
-    month = stringFormatters.leadingZero(str(data[1]))
+    day = stringFormatters.leading_zero(str(data[0]))
+    month = stringFormatters.leading_zero(str(data[1]))
     year = str(data[2])
 
     if len(data) == 6:
-        hour = stringFormatters.leadingZero(str(data[3]))
-        minute = stringFormatters.leadingZero(str(data[4]))
-        second = stringFormatters.leadingZero(str(data[5]))
+        hour = stringFormatters.leading_zero(str(data[3]))
+        minute = stringFormatters.leading_zero(str(data[4]))
+        second = stringFormatters.leading_zero(str(data[5]))
 
         return fromString(f"{day}/{month}/{year} {hour}:{minute}:{second}", formatString="%d/%m/%Y %H:%M:%S")
 

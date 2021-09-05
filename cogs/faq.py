@@ -37,7 +37,7 @@ class Faq(commands.Cog):
             return await self.faqCategory(ctx, (constants.faq_channels[ctx.channel.id],))
 
         # List of all categories with the first letter capitalized
-        resp = [stringFormatters.titleCase(cat[0]) for cat in faq.getCategories()]
+        resp = [stringFormatters.title_case(cat[0]) for cat in faq.getCategories()]
 
         # Sort alphabetically
         resp.sort()
@@ -146,7 +146,7 @@ class Faq(commands.Cog):
         resp.sort(key=lambda x: int(x[0]))
 
         embed = discord.Embed(colour=discord.Colour.blue())
-        embed.set_author(name="FAQ {}".format(stringFormatters.titleCase(category)))
+        embed.set_author(name="FAQ {}".format(stringFormatters.title_case(category)))
 
         # Add everything into the embed
         for i, pair in enumerate(resp):

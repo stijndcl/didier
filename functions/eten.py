@@ -1,11 +1,8 @@
-#!/usr/bin/env python3
-
 import datetime
 import requests
-import sys
 
 
-def etenScript(weekDag):
+def etenScript(weekDag, resto: str = "sterre"):
     # What day
     weekdagen = ('ma', 'di', 'wo', 'do', 'vr', 'za', 'zo')
     deltas = {'morgen': 1,
@@ -26,7 +23,7 @@ def etenScript(weekDag):
 
     # Fetch from API
     try:
-        menu = requests.get(f"https://zeus.ugent.be/hydra/api/2.0/resto/menu/nl-sterre/{d.year}/{d.month}/{d.day}.json").json()
+        menu = requests.get(f"https://zeus.ugent.be/hydra/api/2.0/resto/menu/nl-{resto}/{d.year}/{d.month}/{d.day}.json").json()
 
         if not menu["meals"]:
             raise Exception()

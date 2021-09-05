@@ -5,7 +5,7 @@ from datetime import datetime
 from enum import Enum
 from functions.timeFormatters import fromString
 from functions.scrapers.sporza import getJPLMatches, getJPLTable
-from functions.stringFormatters import leadingZero
+from functions.stringFormatters import leading_zero
 import re
 from requests import get
 import tabulate
@@ -39,11 +39,11 @@ class Match:
         Parse class attributes out of a dictionary returned from an API request
         """
         # The API isn't public, so every single game state is differently formatted
-        self.status = self._getStatus(self.matchDict[Navigation.Status.value])
+        self.status = self._get_status(self.matchDict[Navigation.Status.value])
         self.home = self.matchDict[Navigation.HomeTeam.value][Navigation.Name.value]
         self.away = self.matchDict[Navigation.AwayTeam.value][Navigation.Name.value]
 
-        if self._hasStarted():
+        if self._has_started():
             self.homeScore = self.matchDict[Navigation.HomeScore.value]
             self.awayScore = self.matchDict[Navigation.AwayScore.value]
 
@@ -53,9 +53,9 @@ class Match:
             self.start = None
 
         self.date = self.start.strftime("%d/%m") if self.start is not None else "Uitgesteld"
-        self.weekDay = self._getWeekday() if self.start is not None else "??"
+        self.weekDay = self._get_weekday() if self.start is not None else "??"
 
-    def _getStatus(self, status: str):
+    def _get_status(self, status: str):
         """
         Gets the string representation for the status of this match
         """
@@ -80,7 +80,7 @@ class Match:
 
         return statusses[status.lower()]
 
-    def _getWeekday(self):
+    def _get_weekday(self):
         """
         Gets the day of the week this match is played on
         """
@@ -88,13 +88,13 @@ class Match:
         days = ["Ma", "Di", "Wo", "Do", "Vr", "Za", "Zo"]
         return days[day]
 
-    def getInfo(self):
+    def get_info(self):
         """
         Returns a list of all the info of this class in order to create a table
         """
-        return [self.weekDay, self.date, self.home, self._getScore(), self.away, self.status]
+        return [self.weekDay, self.date, self.home, self._get_score(), self.away, self.status]
 
-    def _getScore(self):
+    def _get_score(self):
         """
         Returns a string representing the scoreboard
         """
@@ -102,12 +102,12 @@ class Match:
             return "??"
 
         # No score to show yet, show time when the match starts
-        if not self._hasStarted():
-            return "{}:{}".format(leadingZero(str(self.start.hour)), leadingZero(str(self.start.minute)))
+        if not self._has_started():
+            return "{}:{}".format(leading_zero(str(self.start.hour)), leading_zero(str(self.start.minute)))
 
         return "{} - {}".format(self.homeScore, self.awayScore)
 
-    def _hasStarted(self):
+    def _has_started(self):
         return self.status not in [Status.AfterToday.value, Status.NotStarted.value, Status.Postponed.value]
 
 
@@ -128,7 +128,7 @@ class Navigation(Enum):
     Name = "name"
 
 
-def getMatches(matchweek: int):
+def get_matches(matchweek: int):
     """
     Function that constructs the list of matches for a given matchweek
     """
@@ -139,7 +139,7 @@ def getMatches(matchweek: int):
         return "Er ging iets fout. Probeer het later opnieuw."
 
     matches = list(map(Match, current_day))
-    matches = list(map(lambda x: x.getInfo(), matches))
+    matches = list(map(lambda x: x.get_info(), matches))
 
     header = "Jupiler Pro League - Speeldag {}".format(matchweek)
     table = tabulate.tabulate(matches, headers=["Dag", "Datum", "Thuis", "Stand", "Uit", "Tijd"])
@@ -147,7 +147,7 @@ def getMatches(matchweek: int):
     return "```{}\n\n{}```".format(header, table)
 
 
-def getTable():
+def get_table():
     """
     Function that constructs the current table of the JPL
     """
@@ -157,7 +157,7 @@ def getTable():
         return "Er ging iets fout. Probeer het later opnieuw."
 
     # Format every row to work for Tabulate
-    formatted = [_formatRow(row) for row in rows]
+    formatted = [_format_row(row) for row in rows]
 
     header = "Jupiler Pro League Klassement"
     table = tabulate.tabulate(formatted, headers=["#", "Ploeg", "Punten", "M", "M+", "M-", "M=", "D+", "D-", "D+/-"])
@@ -165,7 +165,7 @@ def getTable():
     return "```{}\n\n{}```".format(header, table)
 
 
-def _formatRow(row):
+def _format_row(row):
     """
     Function that formats a row into a list for Tabulate to use
     """

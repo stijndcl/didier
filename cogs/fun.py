@@ -120,7 +120,7 @@ class Fun(commands.Cog):
         memeList = memes.getAllMemes()
 
         # Turn the list into a list of [Name: fields]
-        memeList = [": ".join([stringFormatters.titleCase(meme[1]),
+        memeList = [": ".join([stringFormatters.title_case(meme[1]),
                                str(meme[2])]) for meme in sorted(memeList, key=lambda x: x[1])]
 
         pages = paginatedLeaderboard.Pages(source=paginatedLeaderboard.Source(memeList, "Memes", discord.Colour.blue()),

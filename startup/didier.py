@@ -1,7 +1,8 @@
 from data.snipe import Snipe
 from discord.ext import commands, ipc
+from dislash import InteractionClient
 import os
-from settings import HOST_IPC
+from settings import HOST_IPC, SLASH_TEST_GUILDS
 from startup.init_files import check_all
 from typing import Dict
 
@@ -10,6 +11,8 @@ class Didier(commands.Bot):
     """
     Main Bot class for Didier
     """
+    # Reference to interactions client
+    interactions: InteractionClient
 
     # Dict to store the most recent Snipe info per channel
     snipe: Dict[int, Snipe] = {}
@@ -29,6 +32,9 @@ class Didier(commands.Bot):
         # Remove default help command
         self.remove_command("help")
 
+        # Create interactions client
+        self.interactions = InteractionClient(self, test_guilds=SLASH_TEST_GUILDS)
+
         # Load all extensions
         self.init_extensions()
 
@@ -41,9 +47,24 @@ class Didier(commands.Bot):
             self.load_extension(f"cogs.{ext}")
 
         # Load all remaining cogs
-        for file in os.listdir("./cogs"):
-            if file.endswith(".py") and not (file.startswith(self._preload)):
-                self.load_extension("cogs.{}".format(file[:-3]))
+        self._init_directory("./cogs")
+
+    def _init_directory(self, path: str):
+        """
+        Load all cogs from a directory
+        """
+        # Path to pass into load_extension
+        load_path = path[2:].replace("/", ".")
+
+        for file in os.listdir(path):
+            # Python file
+            if file.endswith(".py"):
+                if not file.startswith(self._preload):
+                    self.load_extension(f"{load_path}.{file[:-3]}")
+            elif os.path.isdir(new_path := f"{path}/{file}"):
+                # Subdirectory
+                # Also walrus operator hype
+                self._init_directory(new_path)
 
     async def on_ipc_ready(self):
         print("IPC server is ready.")

@@ -163,8 +163,8 @@ class Birthdays(commands.Cog):
 
         # Create a datetime object for this birthday
         timeString = "{}/{}/{}".format(
-            stringFormatters.leadingZero(str(day)),
-            stringFormatters.leadingZero(str(month)),
+            stringFormatters.leading_zero(str(day)),
+            stringFormatters.leading_zero(str(month)),
             year
         )
 

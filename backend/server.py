@@ -19,7 +19,7 @@ ipc_client = ipc.Client(secret_key="SOME_SECRET_KEY")
 @app.route("/ping", methods=["GET"])
 async def ping():
     """
-    Send a ping request, monitors bot latency, endpoint time, and PSQL latency
+    Send a ping request, monitors bot latency and endpoint time
     """
     latency = await ipc_client.request("get_bot_latency")
 

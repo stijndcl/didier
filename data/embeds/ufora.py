@@ -1,6 +1,6 @@
 from datetime import datetime
 from discord import Embed, Colour
-from functions.stringFormatters import leadingZero as lz
+from functions.stringFormatters import leading_zero as lz
 from functions.timeFormatters import intToWeekday
 from markdownify import markdownify as md
 import pytz
