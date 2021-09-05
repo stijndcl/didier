@@ -8,10 +8,9 @@ from discord.ext import commands
 from functions import checks, easterEggResponses, stringFormatters
 from functions.database import stats, muttn, custom_commands, commands as command_stats
 import pytz
-from settings import READY_MESSAGE, SANDBOX, STATUS_MESSAGE
+from settings import READY_MESSAGE, SANDBOX
 from startup.didier import Didier
 import time
-import traceback
 
 
 class Events(commands.Cog):
@@ -35,9 +34,6 @@ class Events(commands.Cog):
         """
         Function called when the bot is ready & done leading.
         """
-        # Set status
-        await self.client.change_presence(status=discord.Status.online, activity=discord.Game(STATUS_MESSAGE))
-
         print(READY_MESSAGE)
 
         # Add constants to the client as a botvar
