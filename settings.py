@@ -36,8 +36,5 @@ STATUS_MESSAGE = os.getenv("STATUSMESSAGE", "with your Didier Dinks.")
 
 # Guilds to test slash commands in
 # Ex: 123,456,789
-SLASH_TEST_GUILDS: List[int] = list(
-    map(lambda x: int(x),
-        os.getenv("SLASHTESTGUILDS", "").replace(" ", "").split(",")
-        )
-)
+_guilds = os.getenv("SLASHTESTGUILDS", "").replace(" ", "")
+SLASH_TEST_GUILDS: List[int] = list(map(lambda x: int(x), _guilds.split(","))) if _guilds else []
