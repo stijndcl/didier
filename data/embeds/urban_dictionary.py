@@ -1,8 +1,7 @@
-import os
-from typing import Dict
-
 import discord
+import os
 import requests
+from typing import Dict
 
 
 class Definition:
@@ -28,7 +27,7 @@ class Definition:
 
         try:
             if word.lower() == "didier":
-                raise Exception
+                return Definition.define_didier()
 
             response = requests.get(url, headers=headers, params=querystring).json()["list"]
 
@@ -62,7 +61,7 @@ class Definition:
     @staticmethod
     def ratio(dic) -> float:
         """
-        Function that alculates the upvote/downvote ratio of the definition.
+        Function that calculates the upvote/downvote ratio of the definition.
         :param dic: the dictionary representing the definition
         :return: the upvote/downvote ratio (float)
         """
