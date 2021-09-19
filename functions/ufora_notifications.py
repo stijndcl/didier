@@ -1,21 +1,25 @@
 import re
 
-import feedparser
 from data.embeds import UforaNotification
+import feedparser
 import json
+from settings import UFORA_TOKEN
 
 
 course_urls = {
-    "Algoritmen en Datastructuren 2": "https://ufora.ugent.be/d2l/le/news/rss/222018/course?token=aehhv6utkf46t8cc102e0&ou=222018",
-    "Communicatienetwerken": "https://ufora.ugent.be/d2l/le/news/rss/221184/course?token=aehhv6utkf46t8cc102e0&ou=221184",
-    "Computerarchitectuur": "https://ufora.ugent.be/d2l/le/news/rss/228912/course?token=aehhv6utkf46t8cc102e0&ou=228912",
-    "Functioneel Programmeren": "https://ufora.ugent.be/d2l/le/news/rss/236396/course?token=aehhv6utkf46t8cc102e0&ou=236396",
-    "Multimedia": "https://ufora.ugent.be/d2l/le/news/rss/236949/course?token=aehhv6utkf46t8cc102e0&ou=236949",
-    "Software Engineering Lab 1": "https://ufora.ugent.be/d2l/le/news/rss/235800/course?token=aehhv6utkf46t8cc102e0&ou=235800",
-    "Statistiek en Probabiliteit": "https://ufora.ugent.be/d2l/le/news/rss/236398/course?token=aehhv6utkf46t8cc102e0&ou=236398",
-    "Systeemprogrammeren": "https://ufora.ugent.be/d2l/le/news/rss/222035/course?token=aehhv6utkf46t8cc102e0&ou=222035",
-    "Webdevelopment": "https://ufora.ugent.be/d2l/le/news/rss/223449/course?token=aehhv6utkf46t8cc102e0&ou=223449",
-    "Wetenschappelijk Rekenen": "https://ufora.ugent.be/d2l/le/news/rss/236404/course?token=aehhv6utkf46t8cc102e0&ou=236404"
+    "Algoritmen en Datastructuren 3": "https://ufora.ugent.be/d2l/le/news/rss/437923/course?token=",
+    "Artificiële Intelligentie": "https://ufora.ugent.be/d2l/le/news/rss/439739/course?token=",
+    "Automaten, Berekenbaarheid en Complexiteit": "https://ufora.ugent.be/d2l/le/news/rss/439079/course?token=",
+    "Besturingssystemen": "https://ufora.ugent.be/d2l/le/news/rss/442814/course?token=",
+    "Computationele Biologie": "https://ufora.ugent.be/d2l/le/news/rss/448904/course?token=",
+    "Computerarchitectuur": "https://ufora.ugent.be/d2l/le/news/rss/439172/course?token=",
+    "Informatiebeveiliging": "https://ufora.ugent.be/d2l/le/news/rss/444476/course?token=",
+    "Logisch Programmeren": "https://ufora.ugent.be/d2l/le/news/rss/443368/course?token=",
+    "Modelleren en Simuleren": "https://ufora.ugent.be/d2l/le/news/rss/439235/course?token=",
+    "Parallelle Computersystemen": "https://ufora.ugent.be/d2l/le/news/rss/449671/course?token=",
+    "Software Engineering Lab 2": "https://ufora.ugent.be/d2l/le/news/rss/445170/course?token=",
+    "Statistiek en Probabiliteit": "https://ufora.ugent.be/d2l/le/news/rss/445169/course?token=",
+    "Wetenschappelijk Rekenen": "https://ufora.ugent.be/d2l/le/news/rss/445174/course?token="
 }
 
 
@@ -36,7 +40,7 @@ def run():
             notifications[course] = []
 
         # Get the updated feed
-        feed = feedparser.parse(url)
+        feed = feedparser.parse(f"url{UFORA_TOKEN}")
 
         # Filter out old notifications
         feed = list(filter(lambda f: _parse_ids(f["id"])[0] not in notifications[course], feed.entries))
