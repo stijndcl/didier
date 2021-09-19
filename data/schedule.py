@@ -143,6 +143,7 @@ class Schedule:
         self.schedule_dict: Dict = self.load_schedule_file()
         self.start_date = fromArray(self.schedule_dict["semester_start"])
         self.end_date = fromArray(self.schedule_dict["semester_end"])
+        self._forward_to_semester()
 
         # Semester is over
         if self.end_date < self.day:
@@ -166,6 +167,14 @@ class Schedule:
         #     self.day = forward_to_weekday(self.day, target_weekday)
 
         self.weekday_str = intToWeekday(self.day.weekday())
+
+    def _forward_to_semester(self):
+        """
+        In case the semester hasn't started yet, fast forward the current date
+        by a week until it's no longer necessary
+        """
+        while self.day < self.start_date:
+            self.day += timedelta(weeks=1)
 
     def check_holidays(self):
         """
