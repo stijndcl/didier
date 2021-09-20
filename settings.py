@@ -21,6 +21,7 @@ SANDBOX = _to_bool(os.getenv("SANDBOX", "true"))
 URBANDICTIONARY = os.getenv("URBANDICTIONARY", "")
 IMGFLIP_NAME = os.getenv("IMGFLIPNAME", "")
 IMGFLIP_PASSWORD = os.getenv("IMGFLIPPASSWORD", "")
+UFORA_TOKEN = os.getenv("UFORA_TOKEN", "")
 
 # Database credentials
 DB_USERNAME = os.getenv("DBUSERNAME", "")

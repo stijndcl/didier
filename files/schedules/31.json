@@ -1,101 +1,217 @@
 {
-  "semester_start": [1, 7, 2021],
-  "semester_end": [1, 8, 2021],
+  "semester_start": [27, 9, 2021],
+  "semester_end": [23, 12, 2021],
   "holidays": [
     {
-      "start_date": [2, 7, 2021, 23, 59, 59],
-      "end_date": [10, 8, 2021, 23, 59, 59]
+      "start_date": [1, 11, 2021, 0, 0, 0],
+      "end_date": [2, 11, 2021, 23, 59, 59]
+    },
+    {
+      "start_date": [11, 11, 2021, 0, 0, 0],
+      "end_date": [11, 11, 2021, 23, 59, 59]
+    }
+  ],
+  "minors": [
+    {
+      "name": "Beveiliging en parallelle systemen",
+      "online_links": {
+        "zoom": "https://ufora.ugent.be/d2l/ext/rp/439235/lti/framedlaunch/556e197e-e87b-4c27-be5d-53adc7a41826"
+      },
+      "schedule": [
+        {
+          "course": "Modelleren en Simuleren",
+          "slots": [
+            {
+              "location": {
+                "campus": "Sterre",
+                "building": "S12",
+                "room": "0.1"
+              },
+              "time": {
+                "day": "maandag",
+                "start": 1000,
+                "end": 1300
+              }
+            },
+            {
+              "location": {
+                "campus": "Sterre",
+                "building": "S9",
+                "room": "3.1 Konrad Zuse"
+              },
+              "time": {
+                "day": "dinsdag",
+                "start": 1130,
+                "end": 1300
+              }
+            },
+            {
+              "location": {
+                "campus": "Sterre",
+                "building": "S9",
+                "room": "3.1 Konrad Zuse"
+              },
+              "time": {
+                "day": "donderdag",
+                "start": 1430,
+                "end": 1600
+              }
+            }
+          ]
+        },
+        {
+          "course": "Parallelle Computersystemen",
+          "online_links": {
+            "zoom": "https://ufora.ugent.be/d2l/ext/rp/449671/lti/framedlaunch/556e197e-e87b-4c27-be5d-53adc7a41826"
+          },
+          "slots": [
+            {
+              "location": {
+                "campus": "Ardoyen",
+                "building": "iGent 126",
+                "room": "Auditorium 1"
+              },
+              "time": {
+                "day": "woensdag",
+                "start": 1430,
+                "end": 1730
+              }
+            },
+            {
+              "location": {
+                "campus": "Ardoyen",
+                "building": "iGent 126",
+                "room": "Auditorium 1"
+              },
+              "time": {
+                "day": "vrijdag",
+                "start": 830,
+                "end": 1130
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Elektrotechniek en Telecommunicatie",
+      "schedule": [
+        {
+          "course": "Inleiding tot Telecommunicatie",
+          "slots": [
+            {
+              "location": {
+                "campus": "Ardoyen",
+                "building": "iGent 125",
+                "room": "Systems"
+              },
+              "time": {
+                "day": "maandag",
+                "start": 1000,
+                "end": 1300
+              }
+            },
+            {
+              "location": {
+                "campus": "Ardoyen",
+                "building": "iGent 125",
+                "room": "Systems"
+              },
+              "time": {
+                "day": "dinsdag",
+                "start": 1300,
+                "end": 1600
+              }
+            }
+          ]
+        },
+        {
+          "course": "Wiskundige Modellering",
+          "slots": [
+            {
+              "location": {
+                "campus": "Sterre",
+                "building": "S9",
+                "room": "1.1"
+              },
+              "time": {
+                "day": "maandag",
+                "start": 830,
+                "end": 1000
+              }
+            },
+            {
+              "location": {
+                "campus": "Sterre",
+                "building": "S8",
+                "room": "3.2"
+              },
+              "time": {
+                "day": "donderdag",
+                "start": 1430,
+                "end": 1600
+              }
+            },
+            {
+              "location": {
+                "campus": "Sterre",
+                "building": "S8",
+                "room": "3.2"
+              },
+              "time": {
+                "day": "vrijdag",
+                "start": 830,
+                "end": 1130
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Onderwijs",
+      "schedule": []
     }
   ],
   "schedule": [
     {
-      "course": "Computerarchitectuur",
+      "course": "Algoritmen en Datastructuren 3",
       "online_links": {
-        "zoom": "https://ufora.ugent.be/d2l/ext/rp/228912/lti/framedlaunch/556e197e-e87b-4c27-be5d-53adc7a41826",
-        "msteams": "https://teams.microsoft.com/l/team/19%3ad7295f0bc4634a61b461504d4a7134b3%40thread.tacv2/conversations?groupId=8755cb96-1ef5-4ea3-b806-eeebf8a85ae8&tenantId=d7811cde-ecef-496c-8f91-a1786241b99c"
-      },
-      "slots": [
-      ]
-    },
-    {
-      "course": "Multimedia",
-      "online_links": {
-        "zoom": "https://ugent-be.zoom.us/j/94248831947?pwd=ZCt4UnBLSzViZnFEQmkzWE5SYnF2QT09"
+        "zoom": "https://ufora.ugent.be/d2l/ext/rp/437923/lti/framedlaunch/556e197e-e87b-4c27-be5d-53adc7a41826"
       },
       "slots": [
         {
           "location": {
             "campus": "Sterre",
             "building": "S9",
-            "room": "A3"
+            "room": "3.1 Konrad Zuse"
           },
           "time": {
-            "day": "woensdag",
-            "start": 1130,
-            "end": 1330
-          }
-        },
-        {
-          "online": "zoom",
-          "time": {
-            "day": "vrijdag",
-            "start": 1300,
-            "end": 1530
-          }
-        }
-      ]
-    },
-    {
-      "course": "Wetenschappelijk Rekenen",
-      "online_links": {
-        "zoom": "https://ufora.ugent.be/d2l/ext/rp/236404/lti/framedlaunch/556e197e-e87b-4c27-be5d-53adc7a41826"
-      },
-      "slots": [
-        {
-          "online": "zoom",
-          "time": {
             "day": "dinsdag",
-            "start": 1130,
-            "end": 1300
-          }
-        },
-        {
-          "online": "zoom",
-          "time": {
-            "day": "woensdag",
-            "start": 1500,
-            "end": 1800
-          }
-        },
-        {
-          "online": "zoom",
-          "time": {
-            "day": "donderdag",
             "start": 830,
             "end": 1000
           }
-        }
-      ]
-    },
-    {
-      "course": "Software Engineering Lab 1",
-      "online_links": {
-        "zoom": "https://ufora.ugent.be/d2l/ext/rp/235800/lti/framedlaunch/556e197e-e87b-4c27-be5d-53adc7a41826",
-        "msteams": "https://teams.microsoft.com/l/team/19%3a4dfd5b2fb1ae4aa9b72706aa3a0d6867%40thread.tacv2/conversations?groupId=256d5c58-5d53-43f5-9436-497b0c852c75&tenantId=d7811cde-ecef-496c-8f91-a1786241b99c"
-      },
-      "slots": [
+        },
         {
-          "online": "msteams",
+          "location": {
+            "campus": "Sterre",
+            "building": "S9",
+            "room": "1.1 Alan Turing"
+          },
           "time": {
             "day": "dinsdag",
-            "start": 1430,
-            "end": 1700
+            "start": 1000,
+            "end": 1130
           }
         },
         {
-          "online": "msteams",
+          "location": {
+            "campus": "Sterre",
+            "building": "S9",
+            "room": "1.1 Alan Turing"
+          },
           "time": {
-            "day": "vrijdag",
+            "day": "woensdag",
             "start": 830,
             "end": 1130
           }
@@ -103,34 +219,77 @@
       ]
     },
     {
-      "course": "Webdevelopment",
+      "course": "Artificiële Intelligentie",
       "online_links": {
-        "zoom": "https://ugent-be.zoom.us/j/93166767783?pwd=MWdvb1BnNnlPSnAyNk52QmRzdjcwdz09"
+        "zoom": "https://ufora.ugent.be/d2l/ext/rp/439739/lti/framedlaunch/556e197e-e87b-4c27-be5d-53adc7a41826"
       },
       "slots": [
         {
-          "weeks": {
-            "6": {
-              "canceled": true
-            }
-          },
           "location": {
             "campus": "Sterre",
-            "building": "S9",
-            "room": "A3"
+            "building": "S8",
+            "room": "0.1"
           },
           "time": {
-            "day": "woensdag",
-            "start": 900,
-            "end": 1100
+            "day": "maandag",
+            "start": 1430,
+            "end": 1730
           }
         },
         {
-          "online": "zoom",
+          "location": {
+            "campus": "Sterre",
+            "building": "S9",
+            "room": "1.1 Alan Turing"
+          },
+          "time": {
+            "day": "woensdag",
+            "start": 1130,
+            "end": 1300
+          }
+        },
+        {
+          "location": {
+            "campus": "Sterre",
+            "building": "S9",
+            "room": "3.1 Konrad Zuse"
+          },
           "time": {
             "day": "donderdag",
-            "start": 1000,
-            "end": 1300
+            "start": 1300,
+            "end": 1430
+          }
+        }
+      ]
+    },
+    {
+      "course": "Besturingssystemen",
+      "online_links": {
+        "zoom": "https://ufora.ugent.be/d2l/ext/rp/442814/lti/framedlaunch/556e197e-e87b-4c27-be5d-53adc7a41826"
+      },
+      "slots": [
+        {
+          "location": {
+            "campus": "Ardoyen",
+            "building": "iGent 126",
+            "room": "Auditorium 1"
+          },
+          "time": {
+            "day": "donderdag",
+            "start": 830,
+            "end": 1130
+          }
+        },
+        {
+          "location": {
+            "campus": "Ardoyen",
+            "building": "iGent 126",
+            "room": "Auditorium 1"
+          },
+          "time": {
+            "day": "vrijdag",
+            "start": 1300,
+            "end": 1600
           }
         }
       ]
