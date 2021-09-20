@@ -15,12 +15,14 @@ course_urls = {
     "Computationele Biologie": "https://ufora.ugent.be/d2l/le/news/rss/448904/course?token=",
     "Computerarchitectuur": "https://ufora.ugent.be/d2l/le/news/rss/439172/course?token=",
     "Informatiebeveiliging": "https://ufora.ugent.be/d2l/le/news/rss/444476/course?token=",
+    "Inleiding tot Telecommunicatie": "https://ufora.ugent.be/d2l/le/news/rss/450232/course?token=",
     "Logisch Programmeren": "https://ufora.ugent.be/d2l/le/news/rss/443368/course?token=",
     "Modelleren en Simuleren": "https://ufora.ugent.be/d2l/le/news/rss/439235/course?token=",
     "Parallelle Computersystemen": "https://ufora.ugent.be/d2l/le/news/rss/449671/course?token=",
     "Software Engineering Lab 2": "https://ufora.ugent.be/d2l/le/news/rss/445170/course?token=",
     "Statistiek en Probabiliteit": "https://ufora.ugent.be/d2l/le/news/rss/445169/course?token=",
-    "Wetenschappelijk Rekenen": "https://ufora.ugent.be/d2l/le/news/rss/445174/course?token="
+    "Wetenschappelijk Rekenen": "https://ufora.ugent.be/d2l/le/news/rss/445174/course?token=",
+    "Wiskundige Modellering": "https://ufora.ugent.be/d2l/le/news/rss/446530/course?token="
 }
 
 
