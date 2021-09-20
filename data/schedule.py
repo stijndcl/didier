@@ -124,6 +124,7 @@ class Timeslot:
                         is_special=special, location=location, online_platform=online_platform, online_link=online_link)
 
 
+# TODO parse minors
 @dataclass
 class Schedule:
     day: datetime

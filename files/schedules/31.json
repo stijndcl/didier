@@ -94,8 +94,79 @@
       ]
     },
     {
-      "name": "Elektrotechniek en telecommunicatie",
-      "schedule": []
+      "name": "Elektrotechniek en Telecommunicatie",
+      "schedule": [
+        {
+          "name": "Inleiding tot Telecommunicatie",
+          "slots": [
+            {
+              "location": {
+                "campus": "Ardoyen",
+                "building": "iGent 125",
+                "room": "Systems"
+              },
+              "time": {
+                "day": "maandag",
+                "start": 1000,
+                "end": 1300
+              }
+            },
+            {
+              "location": {
+                "campus": "Ardoyen",
+                "building": "iGent 125",
+                "room": "Systems"
+              },
+              "time": {
+                "day": "dinsdag",
+                "start": 1300,
+                "end": 1600
+              }
+            }
+          ]
+        },
+        {
+          "name": "Wiskundige Modellering",
+          "slots": [
+            {
+              "location": {
+                "campus": "Sterre",
+                "building": "S9",
+                "room": "1.1"
+              },
+              "time": {
+                "day": "maandag",
+                "start": 830,
+                "end": 1000
+              }
+            },
+            {
+              "location": {
+                "campus": "Sterre",
+                "building": "S8",
+                "room": "3.2"
+              },
+              "time": {
+                "day": "donderdag",
+                "start": 1430,
+                "end": 1600
+              }
+            },
+            {
+              "location": {
+                "campus": "Sterre",
+                "building": "S8",
+                "room": "3.2"
+              },
+              "time": {
+                "day": "vrijdag",
+                "start": 830,
+                "end": 1130
+              }
+            }
+          ]
+        }
+      ]
     },
     {
       "name": "Onderwijs",
