@@ -97,7 +97,7 @@
       "name": "Elektrotechniek en Telecommunicatie",
       "schedule": [
         {
-          "name": "Inleiding tot Telecommunicatie",
+          "course": "Inleiding tot Telecommunicatie",
           "slots": [
             {
               "location": {
@@ -126,7 +126,7 @@
           ]
         },
         {
-          "name": "Wiskundige Modellering",
+          "course": "Wiskundige Modellering",
           "slots": [
             {
               "location": {

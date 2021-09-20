@@ -124,7 +124,6 @@ class Timeslot:
                         is_special=special, location=location, online_platform=online_platform, online_link=online_link)
 
 
-# TODO parse minors
 @dataclass
 class Schedule:
     day: datetime
@@ -244,6 +243,22 @@ class Schedule:
             return HolidayEmbed(self)
 
         slots: List[List[Timeslot]] = [self.find_slots_for_course(course) for course in self.schedule_dict["schedule"]]
+        minor_slots = {}
+
+        # Find minor slots
+        for minor in self.schedule_dict["minors"]:
+            m_slots = []
+            for course in minor["schedule"]:
+                # Go over every course
+                m_slots.append(self.find_slots_for_course(course))
+
+            # Flatten list
+            m_slots = [item for sublist in m_slots for item in sublist]
+            # Sort by timestamp
+            m_slots.sort(key=lambda x: x.start_time)
+
+            minor_slots[minor["name"]] = m_slots
+
         slots_flattened = [item for sublist in slots for item in sublist]
 
         # Sort by timestamp
@@ -254,7 +269,7 @@ class Schedule:
         if not not_canceled:
             return NoClassEmbed(self, slots_flattened)
 
-        return ScheduleEmbed(self, slots_flattened, not_canceled)
+        return ScheduleEmbed(self, slots_flattened, not_canceled, minor_slots)
 
 
 @dataclass
@@ -280,6 +295,9 @@ class LesEmbed(ABC):
     def get_extras(self) -> str:
         return ""
 
+    def add_minors(self, embed: Embed):
+        pass
+
     def get_online_links(self) -> str:
         return ""
 
@@ -298,6 +316,8 @@ class LesEmbed(ABC):
         links = self.get_online_links()
         if links:
             embed.add_field(name="Online links", value=links, inline=False)
+
+        self.add_minors(embed)
 
         # Add extras if there are any
         extras = self.get_extras()
@@ -342,9 +362,26 @@ class ScheduleEmbed(LesEmbed):
     """
     slots: List[Timeslot]
     slots_not_canceled: List[Timeslot]
+    minor_slots: Dict[str, List[Timeslot]]
 
     def get_description(self) -> str:
         return "\n".join(list(f"{entry}" for entry in self.slots_not_canceled))
+
+    def add_minors(self, embed: Embed):
+        for minor, slots in self.minor_slots.items():
+            if not slots:
+                continue
+
+            not_canceled = list(filter(lambda x: not x.canceled, slots))
+            info = "\n".join(list(str(entry) for entry in not_canceled))
+
+            special = list(filter(lambda x: x.is_special or x.canceled, slots))
+
+            # Add extra info about this minor
+            if special:
+                info += "\n" + "\n".join(list(entry.get_special_fmt_str() for entry in special))
+
+            embed.add_field(name=f"Minor {minor}", value=info, inline=False)
 
     def get_extras(self) -> str:
         special = list(filter(lambda x: x.is_special or x.canceled, self.slots))

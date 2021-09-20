@@ -11,6 +11,7 @@ course_urls = {
     "Artificiële Intelligentie": "https://ufora.ugent.be/d2l/le/news/rss/439739/course?token=",
     "Automaten, Berekenbaarheid en Complexiteit": "https://ufora.ugent.be/d2l/le/news/rss/439079/course?token=",
     "Besturingssystemen": "https://ufora.ugent.be/d2l/le/news/rss/442814/course?token=",
+    "Communicatienetwerken": "https://ufora.ugent.be/d2l/le/news/rss/447014/course?token=",
     "Computationele Biologie": "https://ufora.ugent.be/d2l/le/news/rss/448904/course?token=",
     "Computerarchitectuur": "https://ufora.ugent.be/d2l/le/news/rss/439172/course?token=",
     "Informatiebeveiliging": "https://ufora.ugent.be/d2l/le/news/rss/444476/course?token=",
