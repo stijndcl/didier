@@ -43,7 +43,7 @@ def run():
             notifications[course] = []
 
         # Get the updated feed
-        feed = feedparser.parse(f"url{UFORA_TOKEN}")
+        feed = feedparser.parse(f"{url}{UFORA_TOKEN}")
 
         # Filter out old notifications
         feed = list(filter(lambda f: _parse_ids(f["id"])[0] not in notifications[course], feed.entries))
