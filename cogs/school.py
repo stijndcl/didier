@@ -20,27 +20,29 @@ class School(commands.Cog):
     @commands.command(name="Eten", aliases=["Food", "Menu"], usage="[Dag]*")
     # @commands.check(checks.allowedChannels)
     @help.Category(category=Category.School)
-    async def eten(self, ctx, *day):
+    async def eten(self, ctx, day: str = None):
         day_dt = les.find_target_date(day if day else None)
         day_dt = skip_weekends(day_dt)
         day = intToWeekday(day_dt.weekday())
 
         # Create embed
-        menu = eten.etenScript(day)
+        menu = eten.etenScript(day_dt)
         embed = discord.Embed(colour=discord.Colour.blue())
-        embed.set_author(name="Menu voor {}".format(day))
+        embed.set_author(name="Menu voor {}".format(day.lower()))
 
         if "gesloten" in menu[0].lower():
             embed.description = "Restaurant gesloten"
         else:
-            embed.add_field(name="Soep:", value=menu[0], inline=False)
-            embed.add_field(name="Hoofdgerechten:", value=menu[1], inline=False)
+            embed.add_field(name="🥣 Soep:", value=menu[0], inline=False)
+            embed.add_field(name="🍴 Hoofdgerechten:", value=menu[1], inline=False)
 
             if menu[2]:
-                embed.add_field(name="Groenten:", value=menu[2], inline=False)
+                embed.add_field(name="❄️ Koud:", value=menu[2], inline=False)
 
-            embed.set_footer(text="Omwille van de coronamaatregelen is er een beperkter aanbod, en kan je enkel nog eten afhalen. Ter plaatse eten is niet meer mogelijk.")
-        await ctx.send(embed=embed)
+            if menu[3]:
+                embed.add_field(name="🥦 Groenten:", value=menu[3], inline=False)
+
+        await ctx.reply(embed=embed, mention_author=False)
 
     @commands.command(name="Les", aliases=["Class", "Classes", "Sched", "Schedule"], usage="[Dag]*")
     # @commands.check(checks.allowedChannels)
