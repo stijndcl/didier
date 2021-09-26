@@ -49,7 +49,7 @@ def etenScript(dag: datetime, resto: str = "sterre"):
 
         for v in menu["vegetables"]:
             menuGroenten += ("* {}\n".format(v))
-    except Exception as e:
+    except Exception:
         menuSoep += "Restaurant gesloten"
         menuGroenten += "Restaurant gesloten"
         menuHoofdgerechten += "Restaurant gesloten"
