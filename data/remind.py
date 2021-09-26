@@ -1,3 +1,5 @@
+from typing import Optional
+
 from data import schedule
 from functions import les, config
 from functions.database import remind
@@ -13,11 +15,15 @@ class Reminders:
 
         self._les = [int(user[0]) for user in rows if user[2]]
         self._lesMessages = ["Lessenrooster voor vandaag:"]
-        self.les = {"users": self._les, "messages": self._lesMessages, "embed": self.lesEmbed, "weekends": False, "disabled": True}
+        self.les = {"users": self._les, "messages": self._lesMessages, "embed": self.les_embed, "argsf": schedule.find_minor, "embed_once": False, "weekends": False, "disabled": False}
 
         self.categories = [self.nightly, self.les]
 
-    def lesEmbed(self):
+    def les_embed(self, minor: Optional[int] = None):
         dt = les.find_target_date()
         s = schedule.Schedule(dt, int(config.get("year")), int(config.get("semester")))
+
+        if minor is not None:
+            return s.create_schedule(minor_roles=[minor]).to_embed()
+
         return s.create_schedule().to_embed()

@@ -61,6 +61,11 @@ class School(commands.Cog):
         if s.semester_over:
             return await ctx.send("Het semester is afgelopen.")
 
+        # DM only shows user's own minor
+        if ctx.guild is None:
+            minor_roles = [*schedule.find_minor(self.client, ctx.author.id)]
+            return await ctx.send(embed=s.create_schedule(minor_roles=minor_roles).to_embed())
+
         return await ctx.send(embed=s.create_schedule().to_embed())
 
     @commands.command(name="Pin", usage="[Message]")

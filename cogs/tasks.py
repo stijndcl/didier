@@ -203,7 +203,7 @@ class Tasks(commands.Cog):
                     continue
 
                 # Create embed once because this can be heavy
-                if "embed" in category:
+                if "embed" in category and category["embed_once"]:
                     embed = category["embed"]()
                 else:
                     embed = None
@@ -219,6 +219,13 @@ class Tasks(commands.Cog):
                     if "embed" not in category:
                         await userInstance.send(random.choice(category["messages"]))
                     else:
+                        # Embed has to be customized per user
+                        if embed is None and "embed_once" in category:
+                            # TODO clean this up, there's a better way :)
+                            #   remind category with a before- method & setup per user
+                            args = category["argsf"](self.client, user)
+                            embed = category["embed"](*args)
+
                         await userInstance.send(random.choice(category["messages"]), embed=embed)
 
             with open("files/lastTasks.json", "w") as fp:

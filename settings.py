@@ -35,6 +35,9 @@ HOST_IPC = _to_bool(os.getenv("HOSTIPC", "false"))
 READY_MESSAGE = os.getenv("READYMESSAGE", "I'M READY I'M READY I'M READY I'M READY")  # Yes, this is a Spongebob reference
 STATUS_MESSAGE = os.getenv("STATUSMESSAGE", "with your Didier Dinks.")
 
+# Id's of servers/channels
+COC_ID: int = int(os.getenv("COC_ID", "626699611192688641"))
+
 # Guilds to test slash commands in
 # Ex: 123,456,789
 _guilds = os.getenv("SLASHTESTGUILDS", "").replace(" ", "")
