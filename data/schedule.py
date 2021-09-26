@@ -3,10 +3,13 @@ from dacite import from_dict
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from discord import Colour, Embed
+from discord.ext import commands
+
 from enums.platform import Platform, get_platform
 from functions.timeFormatters import fromArray, intToWeekday, timeFromInt
+from settings import COC_ID
 import json
-from typing import Dict, Optional, List
+from typing import Dict, Optional, List, Tuple
 
 
 @dataclass
@@ -235,7 +238,7 @@ class Schedule:
 
         return slots_today
 
-    def create_schedule(self):
+    def create_schedule(self, minor_roles: Optional[List[int]] = None):
         """
         Create the schedule for the current week
         """
@@ -247,6 +250,10 @@ class Schedule:
 
         # Find minor slots
         for minor in self.schedule_dict["minors"]:
+            # Customized schedule
+            if minor_roles is not None and minor["role"] not in minor_roles:
+                continue
+
             m_slots = []
             for course in minor["schedule"]:
                 # Go over every course
@@ -398,3 +405,16 @@ class ScheduleEmbed(LesEmbed):
             return ""
 
         return "\n".join(list(f"{entry.course}: **{entry.get_link_str()}**" for entry in has_link))
+
+
+def find_minor(client: commands.Bot, userid: int) -> Tuple[Optional[int]]:
+    guild = client.get_guild(COC_ID)
+    user = guild.get_member(userid)
+
+    minors_ids = [891744461405687808, 891744390035415111]
+
+    for role in user.roles:
+        if role.id in minors_ids:
+            return role.id,
+
+    return None,
