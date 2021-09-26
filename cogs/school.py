@@ -1,4 +1,5 @@
 from data import schedule
+from data.embeds.food import Menu
 from decorators import help
 import discord
 from discord.ext import commands
@@ -21,27 +22,7 @@ class School(commands.Cog):
     # @commands.check(checks.allowedChannels)
     @help.Category(category=Category.School)
     async def eten(self, ctx, day: str = None):
-        day_dt = les.find_target_date(day if day else None)
-        day_dt = skip_weekends(day_dt)
-        day = intToWeekday(day_dt.weekday())
-
-        # Create embed
-        menu = eten.etenScript(day_dt)
-        embed = discord.Embed(colour=discord.Colour.blue())
-        embed.set_author(name="Menu voor {}".format(day.lower()))
-
-        if "gesloten" in menu[0].lower():
-            embed.description = "Restaurant gesloten"
-        else:
-            embed.add_field(name="🥣 Soep:", value=menu[0], inline=False)
-            embed.add_field(name="🍴 Hoofdgerechten:", value=menu[1], inline=False)
-
-            if menu[2]:
-                embed.add_field(name="❄️ Koud:", value=menu[2], inline=False)
-
-            if menu[3]:
-                embed.add_field(name="🥦 Groenten:", value=menu[3], inline=False)
-
+        embed = Menu(day).to_embed()
         await ctx.reply(embed=embed, mention_author=False)
 
     @commands.command(name="Les", aliases=["Class", "Classes", "Sched", "Schedule"], usage="[Dag]*")
