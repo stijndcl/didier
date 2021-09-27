@@ -82,11 +82,11 @@ class Timeslot:
 
         # This class was canceled
         if self.canceled:
-            return f"{self.course} van {timeFromInt(self.start_time)} gaat vandaag **niet** door."
+            return f"⚠️ {self.course} van {timeFromInt(self.start_time)} gaat vandaag **niet** door."
 
         # Something else is wrong
-        return f"{self.course} gaat vandaag door van **{timeFromInt(self.start_time)}** tot " \
-               f"**{timeFromInt(self.end_time)}** {self._get_location_str(online_prefix='op')}"
+        return f"⚠️ {self.course} gaat vandaag door van **{timeFromInt(self.start_time)}** tot " \
+               f"**{timeFromInt(self.end_time)}** **{self._get_location_str(online_prefix='op')}**"
 
     @staticmethod
     def from_slot_dict(slot_dict: Dict, course_dict: Dict, current_week: int):

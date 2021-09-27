@@ -35,6 +35,15 @@
               }
             },
             {
+              "weeks": {
+                "1": {
+                  "location": {
+                    "campus": "Sterre",
+                    "building": "S9",
+                    "room": "A2"
+                  }
+                }
+              },
               "location": {
                 "campus": "Sterre",
                 "building": "S9",
@@ -114,6 +123,11 @@
               }
             },
             {
+              "weeks": {
+                "1": {
+                  "canceled": true
+                }
+              },
               "location": {
                 "campus": "Ardoyen",
                 "building": "iGent 125",
