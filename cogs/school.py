@@ -22,6 +22,9 @@ class School(commands.Cog):
     # @commands.check(checks.allowedChannels)
     @help.Category(category=Category.School)
     async def eten(self, ctx, day: str = None):
+        if day is not None:
+            day = day.lower()
+
         embed = Menu(day).to_embed()
         await ctx.reply(embed=embed, mention_author=False)
 
@@ -29,6 +32,9 @@ class School(commands.Cog):
     # @commands.check(checks.allowedChannels)
     @help.Category(category=Category.School)
     async def les(self, ctx, day=None):
+        if day is not None:
+            day = day.lower()
+
         date = les.find_target_date(day)
 
         # Person explicitly requested a weekend-day
