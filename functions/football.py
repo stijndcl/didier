@@ -169,7 +169,10 @@ def _format_row(row):
     """
     Function that formats a row into a list for Tabulate to use
     """
-    scoresArray = list([td.renderContents().decode("utf-8") for td in row.find_all("td")])[:9]
+    tds = row.find_all("td")
+    tds.pop(1)  # Relegation icon
+    tds.pop(1)  # Copy of team name
+    scoresArray = list([td.renderContents().decode("utf-8") for td in tds])[:9]
 
     # Insert the team name into the list
     scoresArray.insert(1, row.find_all("a")[0].renderContents().decode("utf-8").split("<!--")[0])
