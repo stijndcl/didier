@@ -266,6 +266,11 @@
           }
         },
         {
+          "weeks": {
+            "4": {
+              "canceled": true
+            }
+          },
           "location": {
             "campus": "Sterre",
             "building": "S9",
