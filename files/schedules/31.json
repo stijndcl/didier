@@ -23,6 +23,11 @@
           "course": "Modelleren en Simuleren",
           "slots": [
             {
+              "weeks": {
+                "6": {
+                  "canceled": true
+                }
+              },
               "location": {
                 "campus": "Sterre",
                 "building": "S9",
@@ -42,6 +47,9 @@
                     "building": "S9",
                     "room": "A2"
                   }
+                },
+                "6": {
+                  "canceled": true
                 }
               },
               "location": {
@@ -56,6 +64,11 @@
               }
             },
             {
+              "weeks": {
+                "6": {
+                  "canceled": true
+                }
+              },
               "location": {
                 "campus": "Sterre",
                 "building": "S9",
@@ -76,6 +89,11 @@
           },
           "slots": [
             {
+              "weeks": {
+                "6": {
+                  "canceled": true
+                }
+              },
               "location": {
                 "campus": "Ardoyen",
                 "building": "iGent 126",
@@ -111,6 +129,11 @@
           "course": "Inleiding tot Telecommunicatie",
           "slots": [
             {
+              "weeks": {
+                "6": {
+                  "canceled": true
+                }
+              },
               "location": {
                 "campus": "Ardoyen",
                 "building": "iGent 125",
@@ -125,6 +148,9 @@
             {
               "weeks": {
                 "1": {
+                  "canceled": true
+                },
+                "6": {
                   "canceled": true
                 }
               },
@@ -145,6 +171,11 @@
           "course": "Wiskundige Modellering",
           "slots": [
             {
+              "weeks": {
+                "6": {
+                  "canceled": true
+                }
+              },
               "location": {
                 "campus": "Sterre",
                 "building": "S9",
@@ -157,6 +188,11 @@
               }
             },
             {
+              "weeks": {
+                "6": {
+                  "canceled": true
+                }
+              },
               "location": {
                 "campus": "Sterre",
                 "building": "S8",
@@ -169,6 +205,11 @@
               }
             },
             {
+              "weeks": {
+                "6": {
+                  "canceled": true
+                }
+              },
               "location": {
                 "campus": "Sterre",
                 "building": "S8",
@@ -198,6 +239,11 @@
       },
       "slots": [
         {
+          "weeks": {
+            "6": {
+              "canceled": true
+            }
+          },
           "location": {
             "campus": "Sterre",
             "building": "S9",
@@ -210,6 +256,11 @@
           }
         },
         {
+          "weeks": {
+            "6": {
+              "canceled": true
+            }
+          },
           "location": {
             "campus": "Sterre",
             "building": "S9",
@@ -222,6 +273,11 @@
           }
         },
         {
+          "weeks": {
+            "6": {
+              "canceled": true
+            }
+          },
           "location": {
             "campus": "Sterre",
             "building": "S9",
@@ -242,6 +298,11 @@
       },
       "slots": [
         {
+          "weeks": {
+            "6": {
+              "canceled": true
+            }
+          },
           "location": {
             "campus": "Sterre",
             "building": "S8",
@@ -254,6 +315,11 @@
           }
         },
         {
+          "weeks": {
+            "6": {
+              "canceled": true
+            }
+          },
           "location": {
             "campus": "Sterre",
             "building": "S9",
@@ -268,6 +334,9 @@
         {
           "weeks": {
             "4": {
+              "canceled": true
+            },
+            "6": {
               "canceled": true
             }
           },
