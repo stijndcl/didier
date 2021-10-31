@@ -143,6 +143,8 @@ class Schedule:
     weekday_str: str = field(init=False)
 
     def __post_init__(self):
+        self.day = self.day.replace(hour=2, minute=0, second=0, microsecond=0)
+
         self.schedule_dict: Dict = self.load_schedule_file()
         self.start_date = fromArray(self.schedule_dict["semester_start"])
         self.end_date = fromArray(self.schedule_dict["semester_end"])
