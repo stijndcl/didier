@@ -360,6 +360,15 @@
       },
       "slots": [
         {
+          "weeks": {
+            "6": {
+              "location": {
+                "campus": "UFO",
+                "building": "De Brug",
+                "room": "Leslokaal"
+              }
+            }
+          },
           "location": {
             "campus": "Ardoyen",
             "building": "iGent 126",
