@@ -38,7 +38,7 @@ class Menu:
         embed = discord.Embed(colour=discord.Colour.blue())
         date_formatted = f"{lz(self._day.day)}/{lz(self._day.month)}/{self._day.year}"
         embed.set_author(name=f"Menu voor {self.day.lower()} {date_formatted}")
-        embed.title = f"Resto {restos[self.resto]}"
+        # embed.title = f"Resto {restos[self.resto]}"
 
         if "gesloten" in self._menu[0].lower():
             embed.description = "Restaurant gesloten"

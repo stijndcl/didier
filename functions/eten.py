@@ -24,7 +24,7 @@ def get_type(menu: Dict, type_: str) -> str:
     return acc
 
 
-def etenScript(dag: datetime, resto: str = "sterre"):
+def etenScript(dag: datetime):
     # What day
     menuSoep = ""
     menuHoofdgerechten = ""
@@ -33,7 +33,7 @@ def etenScript(dag: datetime, resto: str = "sterre"):
 
     # Fetch from API
     try:
-        menu = requests.get(f"https://zeus.ugent.be/hydra/api/2.0/resto/menu/nl-{resto}/{dag.year}/{dag.month}/{dag.day}.json").json()
+        menu = requests.get(f"https://zeus.ugent.be/hydra/api/2.0/resto/menu/nl/{dag.year}/{dag.month}/{dag.day}.json").json()
 
         if not menu["meals"]:
             raise Exception()
