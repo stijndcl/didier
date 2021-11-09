@@ -39,7 +39,7 @@ def freeGamesCheck(ctx):
 
     if link == "":
         return False
-    request = requests.get(link)
+    request = requests.head(link)
     if request.status_code != 200:
         return False
 
