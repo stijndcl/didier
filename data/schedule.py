@@ -73,7 +73,7 @@ class Timeslot:
         return f"[{self.online_platform.value.get('name')}]({self.online_link})"
 
     def _get_location_str(self, offline_prefix="in", online_prefix="**online** @") -> str:
-        return f"{offline_prefix} {self.location}" if self.location is not None \
+        return f"{offline_prefix} **{self.location}**" if self.location is not None \
             else f"{online_prefix} **{self.get_link_str()}**"
 
     def get_special_fmt_str(self) -> Optional[str]:
@@ -86,7 +86,7 @@ class Timeslot:
 
         # Something else is wrong
         return f"⚠️ {self.course} gaat vandaag door van **{timeFromInt(self.start_time)}** tot " \
-               f"**{timeFromInt(self.end_time)}** **{self._get_location_str(online_prefix='op')}**"
+               f"**{timeFromInt(self.end_time)}** {self._get_location_str(online_prefix='op')}"
 
     @staticmethod
     def from_slot_dict(slot_dict: Dict, course_dict: Dict, current_week: int):
@@ -95,14 +95,15 @@ class Timeslot:
         """
         special = False
 
-        if "weeks" in slot_dict and str(current_week) in slot_dict["weeks"]:
+        week = find_week(str(current_week), slot_dict)
+        if week is not None:
             # If at least one thing was changed, this slot requires extra attention
             special = True
             # Overwrite the normal data with the customized entries
-            slot_dict.update(slot_dict["weeks"][str(current_week)])
+            slot_dict.update(week)
 
             # Only happens online, not on-campus
-            online_only = slot_dict["weeks"][str(current_week)].get("online_only", False)
+            online_only = week.get("online_only", False)
             if online_only:
                 slot_dict.pop("location")
 
@@ -406,7 +407,9 @@ class ScheduleEmbed(LesEmbed):
         if not has_link:
             return ""
 
-        return "\n".join(list(f"{entry.course}: **{entry.get_link_str()}**" for entry in has_link))
+        # Store in a set first to remove duplicates
+        entries = list(set(f"{entry.course}: **{entry.get_link_str()}**" for entry in has_link))
+        return "\n".join(list(sorted(entries)))
 
 
 def find_minor(client: commands.Bot, userid: int) -> Tuple[Optional[int]]:
@@ -420,3 +423,20 @@ def find_minor(client: commands.Bot, userid: int) -> Tuple[Optional[int]]:
             return role.id,
 
     return None,
+
+
+def find_week(week: str, slot_dict: Dict) -> Optional[Dict]:
+    """Find a week in a slot_dict"""
+    if "weeks" not in slot_dict:
+        return None
+
+    # Split all entries based on commas
+    # to allow grouping weeks together
+    for w in slot_dict["weeks"]:
+        weeks = w.split(",")
+
+        if week in weeks:
+            return slot_dict["weeks"][w]
+
+    # Week was not in any of the lists
+    return None

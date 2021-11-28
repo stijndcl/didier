@@ -26,8 +26,12 @@
               "weeks": {
                 "6": {
                   "canceled": true
+                },
+                "10,11,12": {
+                  "online_only": true
                 }
               },
+              "online": "zoom",
               "location": {
                 "campus": "Sterre",
                 "building": "S9",
@@ -50,8 +54,12 @@
                 },
                 "6": {
                   "canceled": true
+                },
+                "10,11,12": {
+                  "online_only": true
                 }
               },
+              "online": "zoom",
               "location": {
                 "campus": "Sterre",
                 "building": "S9",
@@ -67,8 +75,12 @@
               "weeks": {
                 "6": {
                   "canceled": true
+                },
+                "10,11,12": {
+                  "online_only": true
                 }
               },
+              "online": "zoom",
               "location": {
                 "campus": "Sterre",
                 "building": "S9",
@@ -85,7 +97,8 @@
         {
           "course": "Parallelle Computersystemen",
           "online_links": {
-            "zoom": "https://ufora.ugent.be/d2l/ext/rp/449671/lti/framedlaunch/556e197e-e87b-4c27-be5d-53adc7a41826"
+            "zoom": "https://ufora.ugent.be/d2l/ext/rp/449671/lti/framedlaunch/556e197e-e87b-4c27-be5d-53adc7a41826",
+            "opencast": "https://elosp.ugent.be/opencastplanner/live/GCMobile-ocrec79"
           },
           "slots": [
             {
@@ -94,6 +107,7 @@
                   "canceled": true
                 }
               },
+              "online": "opencast",
               "location": {
                 "campus": "Ardoyen",
                 "building": "iGent 126",
@@ -106,6 +120,7 @@
               }
             },
             {
+              "online": "opencast",
               "location": {
                 "campus": "Ardoyen",
                 "building": "iGent 126",
@@ -152,8 +167,12 @@
                 },
                 "6": {
                   "canceled": true
+                },
+                "10,11,12": {
+                  "online_only": true
                 }
               },
+              "online": "zoom",
               "location": {
                 "campus": "Ardoyen",
                 "building": "iGent 125",
@@ -169,13 +188,20 @@
         },
         {
           "course": "Wiskundige Modellering",
+          "online_links": {
+            "zoom": "https://ufora.ugent.be/d2l/ext/rp/446530/lti/framedlaunch/556e197e-e87b-4c27-be5d-53adc7a41826"
+          },
           "slots": [
             {
               "weeks": {
                 "6": {
                   "canceled": true
+                },
+                "10,11,12": {
+                  "online_only": true
                 }
               },
+              "online": "zoom",
               "location": {
                 "campus": "Sterre",
                 "building": "S9",
@@ -191,8 +217,12 @@
               "weeks": {
                 "6": {
                   "canceled": true
+                },
+                "10,11,12": {
+                  "online_only": true
                 }
               },
+              "online": "zoom",
               "location": {
                 "campus": "Sterre",
                 "building": "S8",
@@ -208,8 +238,12 @@
               "weeks": {
                 "6": {
                   "canceled": true
+                },
+                "10,11,12": {
+                  "online_only": true
                 }
               },
+              "online": "zoom",
               "location": {
                 "campus": "Sterre",
                 "building": "S8",
@@ -242,8 +276,12 @@
           "weeks": {
             "6": {
               "canceled": true
+            },
+            "10,11,12": {
+              "online_only": true
             }
           },
+          "online": "zoom",
           "location": {
             "campus": "Sterre",
             "building": "S9",
@@ -259,8 +297,12 @@
           "weeks": {
             "6": {
               "canceled": true
+            },
+            "10,11,12": {
+              "online_only": true
             }
           },
+          "online": "zoom",
           "location": {
             "campus": "Sterre",
             "building": "S9",
@@ -276,8 +318,12 @@
           "weeks": {
             "6": {
               "canceled": true
+            },
+            "10,11,12": {
+              "online_only": true
             }
           },
+          "online": "zoom",
           "location": {
             "campus": "Sterre",
             "building": "S9",
@@ -301,8 +347,12 @@
           "weeks": {
             "6": {
               "canceled": true
+            },
+            "10,11,12": {
+              "online_only": true
             }
           },
+          "online": "zoom",
           "location": {
             "campus": "Sterre",
             "building": "S8",
@@ -318,8 +368,12 @@
           "weeks": {
             "6": {
               "canceled": true
+            },
+            "10,11,12": {
+              "online_only": true
             }
           },
+          "online": "zoom",
           "location": {
             "campus": "Sterre",
             "building": "S9",
@@ -338,8 +392,12 @@
             },
             "6": {
               "canceled": true
+            },
+            "10,11,12": {
+              "online_only": true
             }
           },
+          "online": "zoom",
           "location": {
             "campus": "Sterre",
             "building": "S9",
@@ -356,7 +414,8 @@
     {
       "course": "Besturingssystemen",
       "online_links": {
-        "zoom": "https://ufora.ugent.be/d2l/ext/rp/442814/lti/framedlaunch/556e197e-e87b-4c27-be5d-53adc7a41826"
+        "zoom": "https://ufora.ugent.be/d2l/ext/rp/442814/lti/framedlaunch/556e197e-e87b-4c27-be5d-53adc7a41826",
+        "opencast": "https://elosp.ugent.be/opencastplanner/live/GCMobile-ocrec79"
       },
       "slots": [
         {
@@ -369,6 +428,7 @@
               }
             }
           },
+          "online": "opencast",
           "location": {
             "campus": "Ardoyen",
             "building": "iGent 126",
@@ -381,6 +441,7 @@
           }
         },
         {
+          "online": "opencast",
           "location": {
             "campus": "Ardoyen",
             "building": "iGent 126",
