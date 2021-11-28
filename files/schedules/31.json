@@ -15,12 +15,12 @@
     {
       "name": "Beveiliging en parallelle systemen",
       "role": 891744461405687808,
-      "online_links": {
-        "zoom": "https://ufora.ugent.be/d2l/ext/rp/439235/lti/framedlaunch/556e197e-e87b-4c27-be5d-53adc7a41826"
-      },
       "schedule": [
         {
           "course": "Modelleren en Simuleren",
+          "online_links": {
+            "zoom": "https://ufora.ugent.be/d2l/ext/rp/439235/lti/framedlaunch/556e197e-e87b-4c27-be5d-53adc7a41826"
+          },
           "slots": [
             {
               "weeks": {
