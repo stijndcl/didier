@@ -44,6 +44,7 @@ def format_command_usage(ctx: Context) -> str:
 
 def format_slash_command_usage(interaction: SlashInteraction) -> str:
     # Create a string with the options used
+    # TODO look into the format used by the lib because it's terrible
     options = " ".join(list(map(
         lambda option: f"{option.name}: \"{option.value}\"",
         interaction.data.options.values()
@@ -51,3 +52,7 @@ def format_slash_command_usage(interaction: SlashInteraction) -> str:
 
     command = f"{interaction.slash_command.name} {options or ''}"
     return f"{interaction.author.display_name} in {_format_error_location(interaction)}: /{command}"
+
+
+def get_edu_year(index: int) -> str:
+    return ["1ste Bachelor", "2de Bachelor", "3de Bachelor", "1ste Master", "2de Master"][index - 1]

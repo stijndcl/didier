@@ -1,12 +1,13 @@
 from data import schedule
+from data.embeds.deadlines import Deadlines
 from data.embeds.food import Menu
 from decorators import help
 import discord
 from discord.ext import commands
 from enums.help_categories import Category
-from functions import config, eten, les
+from functions import config, les
 from functions.stringFormatters import capitalize
-from functions.timeFormatters import intToWeekday, skip_weekends
+from functions.timeFormatters import skip_weekends
 
 
 class School(commands.Cog):
@@ -69,6 +70,11 @@ class School(commands.Cog):
 
         await message.pin(reason="Didier Pin door {}".format(ctx.author.display_name))
         await ctx.message.add_reaction("✅")
+
+    @commands.command(name="Deadlines", aliases=["dl"])
+    @help.Category(category=Category.School)
+    async def deadlines(self, ctx):
+        await ctx.send(embed=Deadlines().to_embed())
 
 
 def setup(client):
