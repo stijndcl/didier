@@ -157,7 +157,12 @@ def fromString(timeString: str, formatString="%d/%m/%Y", tzinfo=pytz.timezone("E
     """
     Constructs a datetime object from an input string
     """
-    return datetime.datetime.strptime(timeString, formatString).replace(tzinfo=tzinfo)
+    dt = datetime.datetime.strptime(timeString, formatString)
+
+    if tzinfo is not None:
+        dt = dt.replace(tzinfo=tzinfo)
+
+    return dt
 
 
 def fromArray(data: List[int]) -> datetime:

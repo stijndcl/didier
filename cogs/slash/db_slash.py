@@ -66,7 +66,7 @@ class Slash(commands.Cog):
         if time.count(":") == 1:
             time += ":00"
 
-        dt = fromString(f"{date} {time}", formatString="%d/%m/%Y %H:%M:%S")
+        dt = fromString(f"{date} {time}", formatString="%d/%m/%Y %H:%M:%S", tzinfo=None)
 
         # Add year & course if necessary
         if str(year) not in deadlines:
