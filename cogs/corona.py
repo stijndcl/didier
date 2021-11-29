@@ -32,7 +32,10 @@ class Corona(commands.Cog):
             return
 
         # Vaccination stats
-        vaccine = self.getVaccineData(country, dic["today"]["population"], dic["yesterday"]["population"])
+        try:
+            vaccine = self.getVaccineData(country, dic["today"]["population"], dic["yesterday"]["population"])
+        except KeyError:
+            vaccine = None
 
         await self.sendEmbed(ctx, dic, vaccine)
 
@@ -209,6 +212,11 @@ class Corona(commands.Cog):
             #                 ))
             embed.add_field(name="Aantal toegediende vaccins:",
                             value="{:,}".format(vaccines["today"]["vaccines"]),
+                            inline=False)
+        else:
+            # Vaccine data is missing
+            embed.add_field(name="Aantal toegediende vaccins:",
+                            value="?",
                             inline=False)
 
         # Timestamp of last update
