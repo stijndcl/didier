@@ -3,7 +3,7 @@ from os import path
 
 
 def check_all():
-    files = ["hangman", "lastTasks", "locked", "lost", "stats", "ufora_notifications"]
+    files = ["deadlines", "hangman", "lastTasks", "locked", "lost", "stats", "ufora_notifications"]
 
     for f in files:
         if not path.isfile(path.join(f"files/{f}.json")):

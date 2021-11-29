@@ -167,12 +167,8 @@
                 },
                 "6": {
                   "canceled": true
-                },
-                "10,11,12": {
-                  "online_only": true
                 }
               },
-              "online": "zoom",
               "location": {
                 "campus": "Ardoyen",
                 "building": "iGent 125",

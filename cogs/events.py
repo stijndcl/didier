@@ -5,6 +5,7 @@ from data.snipe import Snipe, Action, should_snipe
 import datetime
 import discord
 from discord.ext import commands
+from dislash.application_commands.errors import InteractionCheckFailure
 from functions import checks, easterEggResponses, stringFormatters
 from functions.database import stats, muttn, custom_commands, commands as command_stats
 import pytz
@@ -135,6 +136,9 @@ class Events(commands.Cog):
         # Debugging Didier shouldn't spam the error logs
         if self.client.user.id != int(constants.didierId):
             raise err
+
+        if isinstance(err, InteractionCheckFailure):
+            return await interaction.reply("Je hebt geen toegang tot dit commando.", ephemeral=True)
 
         usage = stringFormatters.format_slash_command_usage(interaction)
         await self.sendErrorEmbed(err, "Slash Command", usage)
