@@ -52,7 +52,7 @@ class Deadlines:
             return embed
 
         courses: Dict
-        for year, courses in self.data.items():
+        for year, courses in sorted(self.data.items(), key=lambda x: x[0]):
             content = []
 
             deadlines: Dict[str, int]
@@ -63,6 +63,6 @@ class Deadlines:
             content.sort(key=lambda x: x.t)
             content = map(lambda x: str(x), content)
 
-            embed.add_field(name=get_edu_year(int(year)), value="\n".join(content))
+            embed.add_field(name=get_edu_year(int(year)), value="\n".join(content), inline=False)
 
         return embed
