@@ -29,7 +29,7 @@ class Deadline:
         v = f"{self.course} - {self.name}: <t:{self.t}:R>"
 
         if self.passed:
-            v = f"~~v~~"
+            v = f"~~{v}~~"
 
         return v
 
