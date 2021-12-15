@@ -98,7 +98,7 @@
           "course": "Parallelle Computersystemen",
           "online_links": {
             "zoom": "https://ufora.ugent.be/d2l/ext/rp/449671/lti/framedlaunch/556e197e-e87b-4c27-be5d-53adc7a41826",
-            "opencast": "https://elosp.ugent.be/opencastplanner/live/GCMobile-ocrec79"
+            "opencast": "https://elosp.ugent.be/opencastplanner/livestream/recording"
           },
           "slots": [
             {
@@ -411,7 +411,7 @@
       "course": "Besturingssystemen",
       "online_links": {
         "zoom": "https://ufora.ugent.be/d2l/ext/rp/442814/lti/framedlaunch/556e197e-e87b-4c27-be5d-53adc7a41826",
-        "opencast": "https://elosp.ugent.be/opencastplanner/live/GCMobile-ocrec79"
+        "opencast": "https://elosp.ugent.be/opencastplanner/livestream/recording"
       },
       "slots": [
         {
@@ -421,6 +421,14 @@
                 "campus": "Ufo",
                 "building": "De Brug",
                 "room": "Leslokaal"
+              }
+            },
+            "12": {
+              "online":"opencast",
+              "location": {
+                "campus": "Dunant",
+                "building": "D2",
+                "room": "Auditorium 1"
               }
             }
           },
