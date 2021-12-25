@@ -47,10 +47,6 @@ class Deadlines:
 
         now = time.time()
 
-        if not self.data:
-            embed.description = "Er staan geen deadlines gepland."
-            return embed
-
         courses: Dict
         for year, courses in sorted(self.data.items(), key=lambda x: x[0]):
             content = []
@@ -61,8 +57,14 @@ class Deadlines:
                     content.append(Deadline(course, deadline, t, t < now))
 
             content.sort(key=lambda x: x.t)
-            content = map(lambda x: str(x), content)
+            content = list(map(lambda x: str(x), content))
 
-            embed.add_field(name=get_edu_year(int(year)), value="\n".join(content), inline=False)
+            if content:
+                embed.add_field(name=get_edu_year(int(year)), value="\n".join(content), inline=False)
+
+        # No deadlines planned
+        if not embed.fields:
+            embed.description = "Er staan geen deadlines gepland."
+            embed.set_image(url="https://c.tenor.com/RUzJ3lDGQUsAAAAC/iron-man-you-can-rest-now.gif")
 
         return embed

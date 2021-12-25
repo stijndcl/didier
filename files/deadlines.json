@@ -1,35 +1,4 @@
 {
-  "2": {
-    "StatProb": {
-      "Project": 1639090740
-    },
-    "AD2": {
-      "Project": 1638738000
-    },
-    "FuncProg": {
-      "Project 3": 1640104200
-    }
-  },
-  "3": {
-    "AD3": {
-      "Project (code)": 1638967062,
-      "Project (verslag)": 1639571862
-    },
-    "AI": {
-      "Presentatie project": 1639870920,
-      "Verslag": 1640386799
-    },
-    "BestSys": {
-      "Linux pract 2": 1638402120,
-      "Linux pract 3": 1639006920
-    },
-    "Modsim": {
-      "Project": 1640386799
-    },
-    "Telecom": {
-      "Keuze artikel": 1638745140,
-      "Presentaties 1": 1639990800,
-      "Presentaties 2": 1640088000
-    }
-  }
+  "2": {},
+  "3": {}
 }
