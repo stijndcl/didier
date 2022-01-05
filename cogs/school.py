@@ -58,12 +58,26 @@ class School(commands.Cog):
 
     @commands.command(name="Pin", usage="[Message]")
     @help.Category(category=Category.Other)
-    async def pin(self, ctx, message: discord.Message):
+    async def pin(self, ctx, message: discord.Message = None):
         # In case people abuse, check if they're blacklisted
         blacklist = []
 
         if ctx.author.id in blacklist:
             return
+
+        # Support replying to the message that should be pinned
+        if message is None:
+            reference = ctx.message.reference
+
+            if reference is None:
+                return await ctx.reply("Controleer je argumenten.")
+
+            # If the message is cached, avoid sending an API call
+            if not reference.cached_message:
+                # Message is always in the current channel because we came from a reply
+                message = await ctx.channel.fetch_message(reference.message_id)
+            else:
+                message = reference.cached_message
 
         if message.is_system():
             return await ctx.send("Dus jij wil system messages pinnen?\nMag niet.")
