@@ -1,3 +1,4 @@
+from data.embeds.xkcd import XKCDEmbed
 from data.menus import paginatedLeaderboard
 from decorators import help
 import discord
@@ -136,6 +137,14 @@ class Fun(commands.Cog):
         """
         r = requests.get("https://official-joke-api.appspot.com/jokes/programming/random").json()
         await ctx.send(r[0]["setup"] + "\n" + r[0]["punchline"])
+
+    @commands.command(name="xkcd")
+    @help.Category(category=Category.Fun)
+    async def xkcd(self, ctx, n: int = None):
+        """
+        Send an xkcd comic
+        """
+        return await ctx.reply(embed=XKCDEmbed(n).create())
 
 
 def setup(client):

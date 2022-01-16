@@ -8,7 +8,7 @@ from functions.timeFormatters import fromString
 from startup.didier import Didier
 
 
-class Slash(commands.Cog):
+class DBSlash(commands.Cog):
     def __init__(self, client: Didier):
         self.client: Didier = client
 
@@ -84,4 +84,4 @@ class Slash(commands.Cog):
 
 
 def setup(client: Didier):
-    client.add_cog(Slash(client))
+    client.add_cog(DBSlash(client))
