@@ -46,6 +46,8 @@ class UforaNotification:
         return desc
 
     def _clean_content(self, text: str):
+        # Escape *-characters because they mess up the layout
+        text = text.replace("*", "\\*")
         return md(text)
 
     def _get_published(self):
