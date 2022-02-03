@@ -1,5 +1,5 @@
 from discord.ext import commands
-from dislash import slash_command, SlashInteraction, Option, OptionType
+from discord.commands import slash_command, ApplicationContext, Option
 from functions.scrapers.google import google_search, create_google_embed
 from startup.didier import Didier
 
@@ -8,20 +8,15 @@ class GoogleSlash(commands.Cog):
     def __init__(self, client: Didier):
         self.client: Didier = client
 
-    @slash_command(name="google",
-                   description="Google search",
-                   options=[
-                     Option("query", "Search query", OptionType.STRING, required=True)
-                   ]
-                   )
-    async def _google_slash(self, interaction: SlashInteraction, query: str):
+    @slash_command(name="google", description="Google search")
+    async def _google_slash(self, ctx: ApplicationContext, query: Option(str, "Search query")):
         result = google_search(query)
 
         if not result.results:
-            return await interaction.reply("Er ging iets fout (Response {})".format(result.status_code))
+            return await ctx.respond("Er ging iets fout (Response {})".format(result.status_code))
 
         embed = create_google_embed(result)
-        await interaction.reply(embed=embed)
+        await ctx.respond(embed=embed)
 
 
 def setup(client: Didier):

@@ -84,4 +84,5 @@ class DBSlash(commands.Cog):
 
 
 def setup(client: Didier):
-    client.add_cog(DBSlash(client))
+    # client.add_cog(DBSlash(client))
+    pass
