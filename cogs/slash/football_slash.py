@@ -23,6 +23,7 @@ class FootballSlash(commands.Cog):
 
     @_jpl_group.command(name="table", description="Huidige rangschikking")
     async def _jpl_table_slash(self, ctx: ApplicationContext):
+        await ctx.response.defer()
         await ctx.respond(get_table())
 
     @_jpl_group.command(name="update", description="Update de code voor deze competitie (owner-only)", default_permission=False)

@@ -9,3 +9,4 @@ files/ufora_notifications.json
 __pycache__
 .env
 /venv/
+.pytest_cache

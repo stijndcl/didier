@@ -52,7 +52,7 @@
   "hangman start": "Start een nieuwe Hangman game indien er nog geen bezig is. Indien je geen woord opgeeft, wordt er een willekeurig woord gekozen.\n**Indien je wel een woord opgeeft, werkt dit enkel in DM.**",
   "hangman guess": "Probeer het woord te raden.",
   "claim": "Claim [Aantal] Didier Dinks uit je profit.\nIndien je geen aantal opgeeft (of \"all\"), claim je alles, inclusief je investering.",
-  "inspire": "Generate quotes via [InspiroBot](https://inspirobot.me/).",
+  "inspire": "Genereer quotes via [InspiroBot](https://inspirobot.me/).",
   "inventory": "Bekijk de items in jouw inventory.",
   "invest": "Investeer [Aantal] Didier Dinks in jouw Didier Bank om rente te vergaren.",
   "jpl": "Informatie over de Jupiler Pro League.",
