@@ -23,4 +23,5 @@ class IPC(commands.Cog):
 
 
 def setup(client):
-    client.add_cog(IPC(client))
+    # client.add_cog(IPC(client))
+    pass

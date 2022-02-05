@@ -16,9 +16,4 @@ if __name__ == "__main__":
     intents.members = True
 
     client = Didier(command_prefix=get_prefix, case_insensitive=True, intents=intents, activity=activity, status=status)
-
-    # Run IPC server if necessary
-    if client.ipc is not None:
-        client.ipc.start()
-
     client.run(TOKEN)

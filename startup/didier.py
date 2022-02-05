@@ -1,8 +1,7 @@
 from data.snipe import Snipe
-from discord.ext import commands, ipc
+from discord.ext import commands
 from dislash import InteractionClient
 import os
-from settings import HOST_IPC
 from startup.init_files import check_all
 from typing import Dict
 
@@ -19,12 +18,6 @@ class Didier(commands.Bot):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-
-        self._host_ipc = HOST_IPC
-
-        # IPC Server
-        # TODO secret key
-        self.ipc = ipc.Server(self, secret_key="SOME_SECRET_KEY") if self._host_ipc else None
 
         # Cogs that should be loaded before the others
         self._preload = ("ipc", "utils", "failedchecks", "events",)
@@ -62,9 +55,3 @@ class Didier(commands.Bot):
                 # Subdirectory
                 # Also walrus operator hype
                 self._init_directory(new_path)
-
-    async def on_ipc_ready(self):
-        print("IPC server is ready.")
-
-    async def on_ipc_error(self, endpoint, error):
-        print(endpoint, "raised", error)
