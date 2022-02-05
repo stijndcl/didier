@@ -1,3 +1,5 @@
+from typing import Callable, Optional
+
 from data.menus import paginated_leaderboard
 from decorators import help
 import discord
@@ -10,7 +12,7 @@ import math
 import requests
 
 
-# TODO some sort of general leaderboard because all of them are the same
+# TODO some sort of general leaderboard generation because all of them are the same
 class Leaderboards(commands.Cog):
 
     def __init__(self, client):
@@ -20,6 +22,26 @@ class Leaderboards(commands.Cog):
     # Don't allow any commands to work when locked
     def cog_check(self, ctx):
         return not self.client.locked
+
+    def _generate_embed_data(self, entries: list,
+                             key_f: Callable = lambda x: x[0],
+                             data_f: Callable = lambda x: x[1],
+                             ignore_non_pos: bool = True) -> Optional[list[tuple]]:
+        data = []
+        for i, v in enumerate(sorted(entries, key=data_f, reverse=True)):
+            entry_data = data_f(v)
+
+            # Leaderboard is empty
+            if i == 0 and entry_data == 0 and ignore_non_pos:
+                return None
+
+            # Ignore entries with no data
+            if ignore_non_pos and entry_data <= 0:
+                continue
+
+            data.append((key_f(v), f"{entry_data:,}",))
+
+        return data
 
     @commands.group(name="Leaderboard", aliases=["Lb", "Leaderboards"], case_insensitive=True, usage="[Categorie]*",
                     invoke_without_command=True)
@@ -45,14 +67,11 @@ class Leaderboards(commands.Cog):
                 user[1] += platDinks[str(user[0])] * Numbers.q.value
                 entries[i] = user
 
-        data = []
-        for i, user in enumerate(sorted(entries, key=lambda x: (float(x[1]) + float(x[3])), reverse=True)):
-            if i == 0 and float(user[1]) + float(user[3]) == 0.0:
-                return await self.empty_leaderboard(ctx, "Dinks Leaderboard",
-                                                    "Er zijn nog geen personen met Didier Dinks.")
-            elif float(user[1]) + float(user[3]) > 0.0:
-                total_dinks = math.floor(float(user[1]) + float(user[3]))
-                data.append((user[0], total_dinks,))
+        data = self._generate_embed_data(entries, key_f=lambda x: x[0], data_f=lambda x: (float(x[1]) + float(x[3])))
+
+        if data is None:
+            return await self.empty_leaderboard(ctx, "Dinks Leaderboard",
+                                                "Er zijn nog geen personen met Didier Dinks.")
 
         lb = paginated_leaderboard.Leaderboard(
             ctx=ctx, title="Dinks Leaderboard", data=data, fetch_names=True
@@ -79,61 +98,49 @@ class Leaderboards(commands.Cog):
     @leaderboard.command(name="Bitcoin", aliases=["Bc"], hidden=True)
     async def bitcoin(self, ctx):
         users = currency.getAllRows()
-        boardTop = []
-        for i, user in enumerate(sorted(users, key=lambda x: x[8], reverse=True)):
-            # Don't create an empty leaderboard
-            if i == 0 and float(user[8]) == 0.0:
-                return await self.empty_leaderboard(ctx, "Bitcoin Leaderboard",
-                                                   "Er zijn nog geen personen met Bitcoins.")
-            elif float(user[8]) > 0.0:
-                # Only add people with more than 0
-                # Get the username in this guild
-                name = self.utilsCog.getDisplayName(ctx, user[0])
-                if int(user[0]) == int(ctx.author.id):
-                    boardTop.append("**{} ({:,})**".format(name, round(user[8], 8)))
-                else:
-                    boardTop.append("{} ({:,})".format(name, round(user[8], 8)))
+        data = self._generate_embed_data(users, data_f=lambda x: round(float(x[8]), 8))
 
-        await self.startPaginated(ctx, boardTop, "Bitcoin Leaderboard")
+        if data is None:
+            return await self.empty_leaderboard(ctx, "Bitcoin Leaderboard",
+                                                "Er zijn nog geen personen met Bitcoins.")
+
+        lb = paginated_leaderboard.Leaderboard(
+            ctx=ctx, title="Bitcoin Leaderboard", data=data, fetch_names=True
+        )
+
+        await lb.send(ctx)
 
     @leaderboard.command(name="Rob", hidden=True)
     async def rob(self, ctx):
         users = list(stats.getAllRows())
-        boardTop = []
-        for i, user in enumerate(sorted(users, key=lambda x: x[4], reverse=True)):
-            # Don't create an empty leaderboard
-            if i == 0 and float(user[4]) == 0.0:
-                return await self.empty_leaderboard(ctx, "Rob Leaderboard",
-                                                   "Er heeft nog niemand Didier Dinks gestolen.")
-            elif float(user[4]) > 0.0:
-                # Only add people with more than 0
-                # Get the username in this guild
-                name = self.utilsCog.getDisplayName(ctx, user[0])
-                if int(user[0]) == int(ctx.author.id):
-                    boardTop.append("**{} ({:,})**".format(name, math.floor(float(user[4]))))
-                else:
-                    boardTop.append("{} ({:,})".format(name, math.floor(float(user[4]))))
-        await self.startPaginated(ctx, boardTop, "Rob Leaderboard")
+        data = self._generate_embed_data(users, data_f=lambda x: math.floor(float(x[4])))
+
+        if data is None:
+            return await self.empty_leaderboard(ctx, "Rob Leaderboard",
+                                                "Er heeft nog niemand Didier Dinks gestolen.")
+
+        lb = paginated_leaderboard.Leaderboard(
+            ctx=ctx, title="Rob Leaderboard", data=data, fetch_names=True
+        )
+
+        await lb.send(ctx)
 
     @leaderboard.command(name="Poke", hidden=True)
     async def poke(self, ctx):
-        s = stats.getAllRows()
+        entries = stats.getAllRows()
         blacklist = poke.getAllBlacklistedUsers()
-        boardTop = []
-        for i, user in enumerate(sorted(s, key=lambda x: x[1], reverse=True)):
-            if i == 0 and int(user[1]) == 0:
-                return await self.empty_leaderboard(ctx, "Poke Leaderboard", "Er is nog niemand getikt.")
+        # Remove blacklisted users
+        entries = list(filter(lambda x: x[0] not in blacklist, entries))
 
-            elif int(user[1]) == 0:
-                break
-            # Don't include blacklisted users
-            elif str(user[0]) not in blacklist:
-                name = self.utilsCog.getDisplayName(ctx, user[0])
-                if int(user[0]) == int(ctx.author.id):
-                    boardTop.append("**{} ({:,})**".format(name, round(int(user[1]))))
-                else:
-                    boardTop.append("{} ({:,})".format(name, round(int(user[1]))))
-        await self.startPaginated(ctx, boardTop, "Poke Leaderboard")
+        data = self._generate_embed_data(entries, data_f=lambda x: round(int(x[1])))
+        if data is None:
+            return await self.empty_leaderboard(ctx, "Poke Leaderboard", "Er is nog niemand getikt.")
+
+        lb = paginated_leaderboard.Leaderboard(
+            ctx=ctx, title="Poke Leaderboard", data=data, fetch_names=True
+        )
+
+        await lb.send(ctx)
 
     @leaderboard.command(name="Xp", aliases=["Level"], hidden=True)
     async def xp(self, ctx):

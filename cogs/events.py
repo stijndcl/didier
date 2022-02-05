@@ -85,7 +85,6 @@ class Events(commands.Cog):
         Logs commands in your terminal.
         :param ctx: Discord Context
         """
-        print("a")
         print(stringFormatters.format_command_usage(ctx))
 
         command_stats.invoked(command_stats.InvocationType.TextCommand)

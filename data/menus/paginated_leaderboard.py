@@ -23,7 +23,7 @@ class Leaderboard:
 
     def __post_init__(self):
         if self.format_f is None:
-            self.format_f = self._format
+            self .format_f = lambda x: x
 
     def _should_highlight(self, data) -> bool:
         """Check if an entry should be highlighted"""
@@ -38,7 +38,7 @@ class Leaderboard:
         if self.fetch_names:
             name = get_display_name(self.ctx, int(data[0]))
 
-        s = f"{index + 1}: {name} ({data[1]})"
+        s = f"{index + 1}: {name} ({self.format_f(data[1])})"
 
         return s
 
@@ -64,7 +64,7 @@ class Leaderboard:
 
         description = ""
         for i, v in enumerate(self.data):
-            s = self.format_f(i, v)
+            s = self._format(i, v)
 
             if self._should_highlight(v[0]):
                 s = f"**{s}**"

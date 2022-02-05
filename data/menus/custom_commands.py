@@ -2,6 +2,7 @@ import discord
 from discord.ext import menus
 
 
+# TODO rework pagination
 class CommandsList(menus.ListPageSource):
     def __init__(self, data, colour=discord.Colour.blue()):
         super().__init__(data, per_page=15)
