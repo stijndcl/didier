@@ -21,10 +21,6 @@ class Leaderboard:
     colour: discord.Colour = discord.Colour.blue()
     fetch_names: bool = False
 
-    def __post_init__(self):
-        if self.format_f is None:
-            self .format_f = lambda x: x
-
     def _should_highlight(self, data) -> bool:
         """Check if an entry should be highlighted"""
         if self.fetch_names:
@@ -38,7 +34,9 @@ class Leaderboard:
         if self.fetch_names:
             name = get_display_name(self.ctx, int(data[0]))
 
-        s = f"{index + 1}: {name} ({self.format_f(data[1])})"
+        formatted_data = self.format_f(data[2]) if self.format_f is not None else data[1]
+
+        s = f"{index + 1}: {name} ({formatted_data})"
 
         return s
 

@@ -39,7 +39,7 @@ class Leaderboards(commands.Cog):
             if ignore_non_pos and entry_data <= 0:
                 continue
 
-            data.append((key_f(v), f"{entry_data:,}",))
+            data.append((key_f(v), f"{entry_data:,}", entry_data,))
 
         return data
 
@@ -144,60 +144,50 @@ class Leaderboards(commands.Cog):
 
     @leaderboard.command(name="Xp", aliases=["Level"], hidden=True)
     async def xp(self, ctx):
-        s = stats.getAllRows()
-        boardTop = []
-        for i, user in enumerate(sorted(s, key=lambda x: x[12], reverse=True)):
-            if int(user[12]) == 0:
-                break
+        entries = stats.getAllRows()
+        data = self._generate_embed_data(entries, data_f=lambda x: round(int(x[12])))
 
-            name = self.utilsCog.getDisplayName(ctx, user[0])
-            if int(user[0]) == int(ctx.author.id):
-                boardTop.append("**{} (Level {:,} | {:,} XP)**".format(name,
-                                                                       xp.calculate_level(round(int(user[12]))),
-                                                                       round(int(user[12]))))
-            else:
-                boardTop.append("{} (Level {:,} | {:,} XP)".format(name,
-                                                                   xp.calculate_level(round(int(user[12]))),
-                                                                   round(int(user[12]))))
-        await self.startPaginated(ctx, boardTop, "XP Leaderboard")
+        def _format_entry(entry: int) -> str:
+            return f"Level {xp.calculate_level(entry):,} | {entry:,} XP"
+
+        lb = paginated_leaderboard.Leaderboard(
+            ctx=ctx, title="XP Leaderboard", data=data, fetch_names=True, format_f=_format_entry
+        )
+
+        await lb.send(ctx)
 
     @leaderboard.command(name="Messages", aliases=["Mc", "Mess"], hidden=True)
     async def messages(self, ctx):
-        s = stats.getAllRows()
-        boardTop = []
-
+        entries = stats.getAllRows()
         message_count = stats.getTotalMessageCount()
 
-        for i, user in enumerate(sorted(s, key=lambda x: x[11], reverse=True)):
-            if int(user[11]) == 0:
-                break
+        data = self._generate_embed_data(entries, data_f=lambda x: round(int(x[11])))
 
-            perc = round(int(user[11]) * 100 / message_count, 2)
+        def _format_entry(entry: int) -> str:
+            perc = round(entry * 100 / message_count, 2)
+            return f"{entry:,} | {perc}%"
 
-            name = self.utilsCog.getDisplayName(ctx, user[0])
-            if int(user[0]) == int(ctx.author.id):
-                boardTop.append("**{} ({:,} | {}%)**".format(name, round(int(user[11])), perc))
-            else:
-                boardTop.append("{} ({:,} | {}%)".format(name, round(int(user[11])), perc))
-        await self.startPaginated(ctx, boardTop, "Messages Leaderboard")
+        lb = paginated_leaderboard.Leaderboard(
+            ctx=ctx, title="Messages Leaderboard", data=data, fetch_names=True, format_f=_format_entry
+        )
+
+        await lb.send(ctx)
 
     @leaderboard.command(name="Muttn", aliases=["M", "Mutn", "Mutten"], hidden=True)
     async def muttn(self, ctx):
-        users = muttn.getAllRows()
-        boardTop = []
-        for i, user in enumerate(sorted(users, key=lambda x: x[1], reverse=True)):
-            if i == 0 and int(user[1]) == 0:
-                return await self.empty_leaderboard(ctx, "Muttn Leaderboard", "Der zittn nog geen muttns in de server.")
+        entries = muttn.getAllRows()
+        data = self._generate_embed_data(entries, data_f=lambda x: round(float(x[1]), 2))
+        if data is None:
+            return await self.empty_leaderboard(ctx, "Muttn Leaderboard", "Der zittn nog geen muttns in de server.")
 
-            if float(user[1]) == 0:
-                break
+        def _format_entry(entry: float) -> str:
+            return f"{entry}%"
 
-            name = self.utilsCog.getDisplayName(ctx, user[0])
-            if int(user[0]) == int(ctx.author.id):
-                boardTop.append("**{} ({})%**".format(name, round(float(user[1]), 2)))
-            else:
-                boardTop.append("{} ({}%)".format(name, round(float(user[1]), 2)))
-        await self.startPaginated(ctx, boardTop, "Muttn Leaderboard")
+        lb = paginated_leaderboard.Leaderboard(
+            ctx=ctx, title="Muttn Leaderboard", data=data, fetch_names=True, format_f=_format_entry
+        )
+
+        await lb.send(ctx)
 
     async def callLeaderboard(self, name, ctx):
         command = [command for command in self.leaderboard.commands if command.name.lower() == name.lower()][0]
