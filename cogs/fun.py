@@ -1,5 +1,5 @@
 from data.embeds.xkcd import XKCDEmbed
-from data.menus import paginatedLeaderboard
+from data.menus import paginated_leaderboard
 from decorators import help
 import discord
 from discord.ext import commands
@@ -124,8 +124,9 @@ class Fun(commands.Cog):
         memeList = [": ".join([stringFormatters.title_case(meme[1]),
                                str(meme[2])]) for meme in sorted(memeList, key=lambda x: x[1])]
 
-        pages = paginatedLeaderboard.Pages(source=paginatedLeaderboard.Source(memeList, "Memes", discord.Colour.blue()),
-                                           clear_reactions_after=True)
+        pages = paginated_leaderboard.Pages(
+            source=paginated_leaderboard.Source(memeList, "Memes", discord.Colour.blue()),
+            clear_reactions_after=True)
         await pages.start(ctx)
 
     @commands.command(name="Pjoke")

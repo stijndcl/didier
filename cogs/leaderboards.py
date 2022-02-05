@@ -1,4 +1,4 @@
-from data.menus import paginatedLeaderboard
+from data.menus import paginated_leaderboard
 from decorators import help
 import discord
 from discord.ext import commands
@@ -45,35 +45,36 @@ class Leaderboards(commands.Cog):
                 user[1] += platDinks[str(user[0])] * Numbers.q.value
                 entries[i] = user
 
-        boardTop = []
+        data = []
         for i, user in enumerate(sorted(entries, key=lambda x: (float(x[1]) + float(x[3])), reverse=True)):
             if i == 0 and float(user[1]) + float(user[3]) == 0.0:
-                return await self.emptyLeaderboard(ctx, "Dinks Leaderboard", "Er zijn nog geen personen met Didier Dinks.")
+                return await self.empty_leaderboard(ctx, "Dinks Leaderboard",
+                                                    "Er zijn nog geen personen met Didier Dinks.")
             elif float(user[1]) + float(user[3]) > 0.0:
+                total_dinks = math.floor(float(user[1]) + float(user[3]))
+                data.append((user[0], total_dinks,))
 
-                # Get the username in this guild
-                name = self.utilsCog.getDisplayName(ctx, user[0])
+        lb = paginated_leaderboard.Leaderboard(
+            ctx=ctx, title="Dinks Leaderboard", data=data, fetch_names=True
+        )
 
-                if int(user[0]) == int(ctx.author.id):
-                    boardTop.append("**{} ({:,})**".format(name, math.floor(float(user[1]) + float(user[3]))))
-                else:
-                    boardTop.append("{} ({:,})".format(name, math.floor(float(user[1]) + float(user[3]))))
-
-        await self.startPaginated(ctx, boardTop, "Dinks Leaderboard")
+        await lb.send(ctx)
 
     @leaderboard.command(name="Corona", hidden=True)
     async def corona(self, ctx):
-        result = requests.get("http://corona.lmao.ninja/v2/countries").json()
+        result = requests.get("https://disease.sh/v3/covid-19/countries").json()
         result.sort(key=lambda x: int(x["cases"]), reverse=True)
-        board = []
-        for land in result:
 
-            if land["country"] == "Belgium":
-                board.append("**{} ({:,})**".format(land["country"], land["cases"]))
-            else:
-                board.append("{} ({:,})".format(land["country"], land["cases"]))
+        data = []
+        for country in result:
+            data.append((country["country"], f"{country['cases']:,}",))
 
-        await self.startPaginated(ctx, board, "Corona Leaderboard", discord.Colour.red())
+        lb = paginated_leaderboard.Leaderboard(
+            ctx=ctx, title="Corona Leaderboard", data=data, highlight="Belgium",
+            colour=discord.Colour.red()
+        )
+
+        await lb.send(ctx)
 
     @leaderboard.command(name="Bitcoin", aliases=["Bc"], hidden=True)
     async def bitcoin(self, ctx):
@@ -82,7 +83,8 @@ class Leaderboards(commands.Cog):
         for i, user in enumerate(sorted(users, key=lambda x: x[8], reverse=True)):
             # Don't create an empty leaderboard
             if i == 0 and float(user[8]) == 0.0:
-                return await self.emptyLeaderboard(ctx, "Bitcoin Leaderboard", "Er zijn nog geen personen met Bitcoins.")
+                return await self.empty_leaderboard(ctx, "Bitcoin Leaderboard",
+                                                   "Er zijn nog geen personen met Bitcoins.")
             elif float(user[8]) > 0.0:
                 # Only add people with more than 0
                 # Get the username in this guild
@@ -101,7 +103,8 @@ class Leaderboards(commands.Cog):
         for i, user in enumerate(sorted(users, key=lambda x: x[4], reverse=True)):
             # Don't create an empty leaderboard
             if i == 0 and float(user[4]) == 0.0:
-                return await self.emptyLeaderboard(ctx, "Rob Leaderboard", "Er heeft nog niemand Didier Dinks gestolen.")
+                return await self.empty_leaderboard(ctx, "Rob Leaderboard",
+                                                   "Er heeft nog niemand Didier Dinks gestolen.")
             elif float(user[4]) > 0.0:
                 # Only add people with more than 0
                 # Get the username in this guild
@@ -119,7 +122,7 @@ class Leaderboards(commands.Cog):
         boardTop = []
         for i, user in enumerate(sorted(s, key=lambda x: x[1], reverse=True)):
             if i == 0 and int(user[1]) == 0:
-                return await self.emptyLeaderboard(ctx, "Poke Leaderboard", "Er is nog niemand getikt.")
+                return await self.empty_leaderboard(ctx, "Poke Leaderboard", "Er is nog niemand getikt.")
 
             elif int(user[1]) == 0:
                 break
@@ -177,7 +180,7 @@ class Leaderboards(commands.Cog):
         boardTop = []
         for i, user in enumerate(sorted(users, key=lambda x: x[1], reverse=True)):
             if i == 0 and int(user[1]) == 0:
-                return await self.emptyLeaderboard(ctx, "Muttn Leaderboard", "Der zittn nog geen muttns in de server.")
+                return await self.empty_leaderboard(ctx, "Muttn Leaderboard", "Der zittn nog geen muttns in de server.")
 
             if float(user[1]) == 0:
                 break
@@ -190,14 +193,15 @@ class Leaderboards(commands.Cog):
         await self.startPaginated(ctx, boardTop, "Muttn Leaderboard")
 
     async def callLeaderboard(self, name, ctx):
-        await [command for command in self.leaderboard.commands if command.name.lower() == name.lower()][0](ctx)
+        command = [command for command in self.leaderboard.commands if command.name.lower() == name.lower()][0]
+        await command(ctx)
 
     async def startPaginated(self, ctx, source, name, colour=discord.Colour.blue()):
-        pages = paginatedLeaderboard.Pages(source=paginatedLeaderboard.Source(source, name, colour),
-                                           clear_reactions_after=True)
+        pages = paginated_leaderboard.Pages(source=paginated_leaderboard.Source(source, name, colour),
+                                            clear_reactions_after=True)
         await pages.start(ctx)
 
-    async def emptyLeaderboard(self, ctx, name, message, colour=discord.Colour.blue()):
+    async def empty_leaderboard(self, ctx, name, message, colour=discord.Colour.blue()):
         embed = discord.Embed(colour=colour)
         embed.set_author(name=name)
         embed.description = message

@@ -1,4 +1,4 @@
-from data.menus import paginatedLeaderboard
+from data.menus import paginated_leaderboard
 from decorators import help
 import discord
 from discord.ext import commands, menus
@@ -36,10 +36,10 @@ class Train(commands.Cog):
             await self.sendEmbed(ctx, embed)
             return
 
-        pages = paginatedLeaderboard.Pages(source=TrainPagination(self.formatConnections(req["connection"]),
-                                                                  self.formatCity(departure),
-                                                                  self.formatCity(destination)),
-                                           clear_reactions_after=True)
+        pages = paginated_leaderboard.Pages(source=TrainPagination(self.formatConnections(req["connection"]),
+                                                                   self.formatCity(departure),
+                                                                   self.formatCity(destination)),
+                                            clear_reactions_after=True)
         await pages.start(ctx)
 
     def formatConnections(self, connections):

@@ -1,5 +1,4 @@
 from converters.numbers import Abbreviated
-from data.menus import storePages
 from decorators import help
 import discord
 from discord.ext import commands
@@ -22,11 +21,12 @@ class Store(commands.Cog):
     @commands.check(checks.allowedChannels)
     @help.Category(Category.Currency)
     async def store(self, ctx):
-        entries = store.getAllItems()
-        await storePages.Pages(source=storePages.Source(entries), clear_reactions_after=True).start(ctx)
+        pass
+        # entries = store.getAllItems()
+        # await storePages.Pages(source=storePages.Source(entries), clear_reactions_after=True).start(ctx)
 
     @store.command(name="Buy", aliases=["Get"], hidden=True)
-    async def storeBuy(self, ctx, item, amount: Abbreviated = 1):
+    async def store_buy(self, ctx, item, amount: Abbreviated = 1):
         if amount is None:
             return
 
@@ -56,7 +56,7 @@ class Store(commands.Cog):
         ))
 
     @store.command(name="Sell", hidden=True)
-    async def storeSell(self, ctx, itemid, amount: Abbreviated = 1):
+    async def store_sell(self, ctx, itemid, amount: Abbreviated = 1):
         if amount is None:
             return
         await self.sell(ctx, itemid, amount)
