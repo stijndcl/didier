@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 import os
 
 
-load_dotenv()
+load_dotenv(verbose=True)
 
 
 def _to_bool(value: str) -> bool:
@@ -31,7 +31,6 @@ DB_NAME = os.getenv("DBNAME", "")
 
 # Discord-related
 TOKEN = os.getenv("TOKEN", "")
-HOST_IPC = _to_bool(os.getenv("HOSTIPC", "false"))
 READY_MESSAGE = os.getenv("READYMESSAGE", "I'M READY I'M READY I'M READY I'M READY")  # Yes, this is a Spongebob reference
 STATUS_MESSAGE = os.getenv("STATUSMESSAGE", "with your Didier Dinks.")
 

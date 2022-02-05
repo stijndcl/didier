@@ -1,11 +1,10 @@
-from dislash import SlashInteraction
+from discord import Interaction
 
 from data import constants
 from data.snipe import Snipe, Action, should_snipe
 import datetime
 import discord
 from discord.ext import commands
-from dislash.application_commands.errors import InteractionCheckFailure
 from functions import checks, easterEggResponses, stringFormatters
 from functions.database import stats, muttn, custom_commands, commands as command_stats
 import pytz
@@ -86,6 +85,7 @@ class Events(commands.Cog):
         Logs commands in your terminal.
         :param ctx: Discord Context
         """
+        print("a")
         print(stringFormatters.format_command_usage(ctx))
 
         command_stats.invoked(command_stats.InvocationType.TextCommand)
@@ -123,24 +123,27 @@ class Events(commands.Cog):
             await self.sendErrorEmbed(err, "Command", usage)
 
     @commands.Cog.listener()
-    async def on_slash_command(self, interaction: SlashInteraction):
+    async def on_interaction(self, interaction: Interaction):
         """
         Function called whenever someone uses a slash command
         """
+        if not interaction.is_command():
+            return
+
         print(stringFormatters.format_slash_command_usage(interaction))
 
         command_stats.invoked(command_stats.InvocationType.SlashCommand)
 
     @commands.Cog.listener()
-    async def on_slash_command_error(self, interaction, err):
+    async def on_application_command_error(self, ctx: discord.ApplicationContext, err):
         # Debugging Didier shouldn't spam the error logs
         if self.client.user.id != int(constants.didierId):
             raise err
 
-        if isinstance(err, InteractionCheckFailure):
-            return await interaction.reply("Je hebt geen toegang tot dit commando.", ephemeral=True)
+        if isinstance(err, commands.CheckFailure):
+            return await ctx.respond("Je hebt geen toegang tot dit commando.", ephemeral=True)
 
-        usage = stringFormatters.format_slash_command_usage(interaction)
+        usage = stringFormatters.format_slash_command_usage(ctx.interaction)
         await self.sendErrorEmbed(err, "Slash Command", usage)
 
     @commands.Cog.listener()

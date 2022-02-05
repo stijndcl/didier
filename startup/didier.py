@@ -1,6 +1,5 @@
 from data.snipe import Snipe
 from discord.ext import commands
-from dislash import InteractionClient
 import os
 from startup.init_files import check_all
 from typing import Dict
@@ -10,9 +9,6 @@ class Didier(commands.Bot):
     """
     Main Bot class for Didier
     """
-    # Reference to interactions client
-    interactions: InteractionClient
-
     # Dict to store the most recent Snipe info per channel
     snipe: Dict[int, Snipe] = {}
 
@@ -20,7 +16,7 @@ class Didier(commands.Bot):
         super().__init__(*args, **kwargs)
 
         # Cogs that should be loaded before the others
-        self._preload = ("ipc", "utils", "failedchecks", "events",)
+        self._preload = ("utils", "failedchecks", "events",)
 
         # Remove default help command
         self.remove_command("help")
