@@ -1,5 +1,5 @@
 from data.embeds.xkcd import XKCDEmbed
-from data.menus import paginated_leaderboard
+from data.menus import leaderboards
 from decorators import help
 import discord
 from discord.ext import commands
