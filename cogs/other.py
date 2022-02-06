@@ -5,8 +5,6 @@ from data.menus import custom_commands
 from data.snipe import Action, Snipe
 from decorators import help
 from enums.help_categories import Category
-from functions.database.custom_commands import get_all
-from functions.stringFormatters import capitalize
 from startup.didier import Didier
 
 
@@ -14,10 +12,9 @@ class Other(commands.Cog):
     def __init__(self, client: Didier):
         self.client: Didier = client
 
-    # TODO add locked field to Didier instead of client
-    # # Don't allow any commands to work when locked
-    # def cog_check(self, ctx):
-    #     return not self.client.locked
+    # Don't allow any commands to work when locked
+    def cog_check(self, _):
+        return not self.client.locked
 
     @commands.command(name="Custom")
     @help.Category(category=Category.Didier)
@@ -25,10 +22,7 @@ class Other(commands.Cog):
         """
         Get a list of all custom commands
         """
-        all_commands = get_all()
-        formatted = list(sorted(map(lambda x: capitalize(x["name"]), all_commands)))
-        src = custom_commands.CommandsList(formatted)
-        await custom_commands.Pages(source=src, clear_reactions_after=True).start(ctx)
+        await custom_commands.CommandsList(ctx).send()
 
     @commands.command(name="Snipe")
     @help.Category(category=Category.Other)

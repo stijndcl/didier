@@ -6,7 +6,6 @@ from typing import Union, Optional
 import discord
 import requests
 from discord import ApplicationContext
-from discord.ext import menus
 from discord.ext.commands import Context
 
 from data.menus.paginated import Paginated
@@ -80,7 +79,7 @@ class Leaderboard(Paginated, ABC):
     def empty_description(self) -> str:
         return ""
 
-    async def empty_leaderboard(self, ctx: Union[ApplicationContext, Context]):
+    async def empty_leaderboard(self, ctx: Union[ApplicationContext, Context], **kwargs):
         embed = discord.Embed(colour=self.colour)
         embed.set_author(name=self.title)
         embed.description = self.empty_description
@@ -88,19 +87,19 @@ class Leaderboard(Paginated, ABC):
         if isinstance(ctx, ApplicationContext):
             return await ctx.respond(embed=embed)
 
-        return await ctx.reply(embed=embed, mention_author=False)
+        return await ctx.reply(embed=embed, **kwargs)
 
     async def respond(self, **kwargs) -> discord.Message:
         if self.data is None:
-            return await self.empty_leaderboard(self.ctx)
+            return await self.empty_leaderboard(self.ctx, **kwargs)
 
         return await super().respond(**kwargs)
 
     async def send(self, **kwargs) -> discord.Message:
         if self.data is None:
-            return await self.empty_leaderboard(self.ctx)
+            return await self.empty_leaderboard(self.ctx, mention_author=False, **kwargs)
 
-        return await super().send(**kwargs)
+        return await super().send(mention_author=False, **kwargs)
 
 
 @dataclass
@@ -245,31 +244,3 @@ class XPLeaderboard(Leaderboard):
     def format_entry_data(self, data: tuple) -> str:
         entry = data[2]
         return f"Level {xp.calculate_level(entry):,} | {entry:,} XP"
-
-
-class Source(menus.ListPageSource):
-    def __init__(self, data, name, colour=discord.Colour.blue()):
-        super().__init__(data, per_page=10)
-        self.name = name
-        self.colour = colour
-
-    async def format_page(self, menu: menus.MenuPages, entries):
-        offset = menu.current_page * self.per_page
-
-        description = ""
-        for i, v in enumerate(entries, start=offset):
-            # Check if the person's name has to be highlighted
-            if v.startswith("**") and v.endswith("**"):
-                description += "**"
-                v = v[2:]
-            description += "{}: {}\n".format(i + 1, v)
-        embed = discord.Embed(colour=self.colour)
-        embed.set_author(name=self.name)
-        embed.description = description
-        embed.set_footer(text="{}/{}".format(menu.current_page + 1, self.get_max_pages()))
-        return embed
-
-
-class Pages(menus.MenuPages):
-    def __init__(self, source, clear_reactions_after, timeout=30.0):
-        super().__init__(source, timeout=timeout, delete_message_after=True, clear_reactions_after=clear_reactions_after)
