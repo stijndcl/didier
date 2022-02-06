@@ -10,6 +10,8 @@ def generate(meme: Meme, fields):
     """
     Main function that takes a Meme as input & generates an image.
     """
+    fields = list(fields)
+
     # If there's only one field, the user isn't required to use quotes
     if meme.fields == 1:
         fields = [" ".join(fields)]
@@ -37,10 +39,13 @@ def generate(meme: Meme, fields):
 
     # Adding a message parameter makes the code in the cog a lot cleaner
     if not reply["success"]:
+        reply["success"] = False
         reply["message"] = "Error! Controleer of je de juiste syntax hebt gebruikt. Gebruik het commando " \
                            "\"memes\" voor een lijst aan geaccepteerde meme-namen."
     else:
         reply["message"] = reply["data"]["url"]
+
+    reply["success"] = False
 
     return reply
 
@@ -77,7 +82,8 @@ def _apply_meme(meme: Meme, fields):
         102156234: mocking_spongebob,
         91538330: _x_x_everywhere,
         252600902: _always_has_been,
-        167754325: _math_is_math
+        167754325: _math_is_math,
+        206493414: _i_used_the_x_to_destroy_the_x
     }
 
     # Meme needs no special treatment
@@ -104,6 +110,12 @@ def _always_has_been(fields):
 
 
 def _math_is_math(fields):
+    word = fields[0].upper()
+
+    return ["", f"{word} IS {word}!"]
+
+
+def _i_used_the_x_to_destroy_the_x(fields):
     word = fields[0]
 
-    return [f"{word.upper()} IS {word.upper()}!"]
+    return ["", f"I used the {word} to destroy the {word}"]
