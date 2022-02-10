@@ -109,6 +109,7 @@ class Events(commands.Cog):
         # Don't handle commands that have their own custom error handler
         if hasattr(ctx.command, 'on_error'):
             return
+
         # Someone just mentioned Didier without calling a real command,
         # don't care about this error
         if isinstance(err, (commands.CommandNotFound, commands.CheckFailure, commands.TooManyArguments, commands.ExpectedClosingQuoteError), ):
@@ -120,9 +121,11 @@ class Events(commands.Cog):
             await ctx.send("Geen message gevonden die overeenkomt met het opgegeven argument.")
         elif isinstance(err, (commands.ChannelNotFound, commands.ChannelNotReadable)):
             await ctx.send("Geen channel gevonden dat overeenkomt met het opgegeven argument.")
+        elif isinstance(err, commands.ThreadNotFound):
+            await ctx.reply("Thread niet gevonden.", mention_author=False)
         # Someone forgot an argument or passed an invalid argument
         elif isinstance(err, (commands.BadArgument, commands.MissingRequiredArgument, commands.UnexpectedQuoteError)):
-            await ctx.send("Controleer je argumenten.")
+            await ctx.reply("Controleer je argumenten.", mention_author=False)
         else:
             usage = stringFormatters.format_command_usage(ctx)
             await self.sendErrorEmbed(err, "Command", usage)

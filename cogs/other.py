@@ -1,3 +1,4 @@
+import discord
 from discord.ext import commands
 
 from data.embeds.snipe import EditSnipe, DeleteSnipe
@@ -23,6 +24,16 @@ class Other(commands.Cog):
         Get a list of all custom commands
         """
         await custom_commands.CommandsList(ctx).send()
+
+    @commands.command(name="Join", usage="[Thread]")
+    @help.Category(category=Category.Didier)
+    async def join_thread(self, ctx, thread: discord.Thread):
+        """
+        Join threads
+        """
+        if thread.me is None:
+            await thread.join()
+            await ctx.message.add_reaction("✅")
 
     @commands.command(name="Snipe")
     @help.Category(category=Category.Other)
