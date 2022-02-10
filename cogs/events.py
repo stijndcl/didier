@@ -79,6 +79,12 @@ class Events(commands.Cog):
         stats.sentMessage(message)
 
     @commands.Cog.listener()
+    async def on_thread_join(self, thread: discord.Thread):
+        # Join threads automatically
+        if thread.me is None:
+            await thread.join()
+
+    @commands.Cog.listener()
     async def on_command(self, ctx):
         """
         Function called whenever someone invokes a command.

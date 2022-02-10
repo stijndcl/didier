@@ -82,7 +82,7 @@ class School(commands.Cog):
         if message.is_system():
             return await ctx.send("Dus jij wil system messages pinnen?\nMag niet.")
 
-        await message.pin(reason="Didier Pin door {}".format(ctx.author.display_name))
+        await message.pin(reason=f"Didier Pin door {ctx.author.display_name}")
         await ctx.message.add_reaction("✅")
 
     @commands.command(name="Deadlines", aliases=["dl"])
