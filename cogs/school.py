@@ -9,6 +9,7 @@ from enums.help_categories import Category
 from functions import config, les
 from functions.stringFormatters import capitalize
 from functions.timeFormatters import skip_weekends
+from functions.utils import reply_to_reference
 
 
 class School(commands.Cog):
@@ -101,7 +102,9 @@ class School(commands.Cog):
 
         # Get the guide for the current year
         year = 2018 + int(config.get("year"))
-        return await ctx.reply(f"https://studiekiezer.ugent.be/studiefiche/nl/{course.code}/{year}", mention_author=False)
+        link = f"https://studiekiezer.ugent.be/studiefiche/nl/{course.code}/{year}"
+
+        return await reply_to_reference(ctx, content=link)
 
     @commands.command(name="Deadlines", aliases=["dl"])
     @help.Category(category=Category.School)

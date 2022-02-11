@@ -7,6 +7,7 @@ from data.menus import custom_commands
 from data.snipe import Action, Snipe
 from decorators import help
 from enums.help_categories import Category
+from functions.utils import reply_to_reference
 from startup.didier import Didier
 
 
@@ -20,7 +21,7 @@ class Other(commands.Cog):
 
     @commands.command(name="Link", usage="[Naam]")
     @help.Category(category=Category.Other)
-    async def link(self, ctx, name: str):
+    async def link(self, ctx: commands.Context, name: str):
         """
         Send commonly used links
         """
@@ -29,7 +30,7 @@ class Other(commands.Cog):
         if match is None:
             return await ctx.reply(f"Geen match gevonden voor \"{name}\".", mention_author=False, delete_after=15)
 
-        return await ctx.reply(match, mention_author=False)
+        await reply_to_reference(ctx, content=match)
 
     @commands.command(name="Custom")
     @help.Category(category=Category.Didier)
