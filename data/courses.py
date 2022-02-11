@@ -3,6 +3,7 @@ from typing import Optional
 
 import dacite
 import json
+from os import path
 
 
 @dataclass
@@ -16,7 +17,9 @@ class Course:
 
 def load_courses() -> dict[str, Course]:
     """Create a list of all courses"""
-    with open("files/courses.json", "r") as file:
+    # Allows testing
+    filepath = path.join(path.dirname(__file__), "..", "files", "courses.json")
+    with open(filepath, "r") as file:
         data = json.load(file)
 
     courses = {}

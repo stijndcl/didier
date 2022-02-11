@@ -70,7 +70,7 @@ class SchoolSlash(commands.Cog):
 
     @slash_command(name="fiche", description="Zoek de studiefiche voor een vak.")
     async def _study_guide_slash(self, ctx: ApplicationContext,
-                                 vak: Option(str, description="Naam van het vak. Afkortingen werken ook, maar worden niet ge-autocompletet.",
+                                 vak: Option(str, description="Naam van het vak. Afkortingen werken ook, maar worden niet geautocompletet.",
                                              required=True, autocomplete=course_autocomplete)):
         # Find code corresponding to the search query
         course = find_course_from_name(vak, courses)
