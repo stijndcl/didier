@@ -1,4 +1,5 @@
 from data import schedule
+from data.courses import find_course_from_name
 from data.embeds.deadlines import Deadlines
 from data.embeds.food import Menu
 from decorators import help
@@ -84,6 +85,23 @@ class School(commands.Cog):
 
         await message.pin(reason=f"Didier Pin door {ctx.author.display_name}")
         await ctx.message.add_reaction("✅")
+
+    @commands.command(name="Fiche", usage="[Vak]", aliases=["guide", "studiefiche"])
+    @help.Category(category=Category.School)
+    async def study_guide(self, ctx, name: str):
+        """
+        Send links to study guides
+        """
+        # Find code corresponding to the search query
+        course = find_course_from_name(name)
+
+        # Code not found
+        if course is None:
+            return await ctx.reply(f"Onbekend vak: \"{name}\".", mention_author=False, delete_after=15)
+
+        # Get the guide for the current year
+        year = 2018 + int(config.get("year"))
+        return await ctx.reply(f"https://studiekiezer.ugent.be/studiefiche/nl/{course.code}/{year}", mention_author=False)
 
     @commands.command(name="Deadlines", aliases=["dl"])
     @help.Category(category=Category.School)
