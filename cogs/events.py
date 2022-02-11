@@ -1,11 +1,10 @@
-from dislash import SlashInteraction
+from discord import Interaction
 
 from data import constants
 from data.snipe import Snipe, Action, should_snipe
 import datetime
 import discord
 from discord.ext import commands
-from dislash.application_commands.errors import InteractionCheckFailure
 from functions import checks, easterEggResponses, stringFormatters
 from functions.database import stats, muttn, custom_commands, commands as command_stats
 import pytz
@@ -80,6 +79,12 @@ class Events(commands.Cog):
         stats.sentMessage(message)
 
     @commands.Cog.listener()
+    async def on_thread_join(self, thread: discord.Thread):
+        # Join threads automatically
+        if thread.me is None:
+            await thread.join()
+
+    @commands.Cog.listener()
     async def on_command(self, ctx):
         """
         Function called whenever someone invokes a command.
@@ -104,6 +109,7 @@ class Events(commands.Cog):
         # Don't handle commands that have their own custom error handler
         if hasattr(ctx.command, 'on_error'):
             return
+
         # Someone just mentioned Didier without calling a real command,
         # don't care about this error
         if isinstance(err, (commands.CommandNotFound, commands.CheckFailure, commands.TooManyArguments, commands.ExpectedClosingQuoteError), ):
@@ -115,32 +121,37 @@ class Events(commands.Cog):
             await ctx.send("Geen message gevonden die overeenkomt met het opgegeven argument.")
         elif isinstance(err, (commands.ChannelNotFound, commands.ChannelNotReadable)):
             await ctx.send("Geen channel gevonden dat overeenkomt met het opgegeven argument.")
+        elif isinstance(err, commands.ThreadNotFound):
+            await ctx.reply("Thread niet gevonden.", mention_author=False)
         # Someone forgot an argument or passed an invalid argument
         elif isinstance(err, (commands.BadArgument, commands.MissingRequiredArgument, commands.UnexpectedQuoteError)):
-            await ctx.send("Controleer je argumenten.")
+            await ctx.reply("Controleer je argumenten.", mention_author=False)
         else:
             usage = stringFormatters.format_command_usage(ctx)
             await self.sendErrorEmbed(err, "Command", usage)
 
     @commands.Cog.listener()
-    async def on_slash_command(self, interaction: SlashInteraction):
+    async def on_interaction(self, interaction: Interaction):
         """
         Function called whenever someone uses a slash command
         """
+        if not interaction.is_command():
+            return
+
         print(stringFormatters.format_slash_command_usage(interaction))
 
         command_stats.invoked(command_stats.InvocationType.SlashCommand)
 
     @commands.Cog.listener()
-    async def on_slash_command_error(self, interaction, err):
+    async def on_application_command_error(self, ctx: discord.ApplicationContext, err):
         # Debugging Didier shouldn't spam the error logs
         if self.client.user.id != int(constants.didierId):
             raise err
 
-        if isinstance(err, InteractionCheckFailure):
-            return await interaction.reply("Je hebt geen toegang tot dit commando.", ephemeral=True)
+        if isinstance(err, commands.CheckFailure):
+            return await ctx.respond("Je hebt geen toegang tot dit commando.", ephemeral=True)
 
-        usage = stringFormatters.format_slash_command_usage(interaction)
+        usage = stringFormatters.format_slash_command_usage(ctx.interaction)
         await self.sendErrorEmbed(err, "Slash Command", usage)
 
     @commands.Cog.listener()

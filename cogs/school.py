@@ -1,4 +1,5 @@
 from data import schedule
+from data.courses import find_course_from_name
 from data.embeds.deadlines import Deadlines
 from data.embeds.food import Menu
 from decorators import help
@@ -8,6 +9,7 @@ from enums.help_categories import Category
 from functions import config, les
 from functions.stringFormatters import capitalize
 from functions.timeFormatters import skip_weekends
+from functions.utils import reply_to_reference
 
 
 class School(commands.Cog):
@@ -82,8 +84,27 @@ class School(commands.Cog):
         if message.is_system():
             return await ctx.send("Dus jij wil system messages pinnen?\nMag niet.")
 
-        await message.pin(reason="Didier Pin door {}".format(ctx.author.display_name))
+        await message.pin(reason=f"Didier Pin door {ctx.author.display_name}")
         await ctx.message.add_reaction("✅")
+
+    @commands.command(name="Fiche", usage="[Vak]", aliases=["guide", "studiefiche"])
+    @help.Category(category=Category.School)
+    async def study_guide(self, ctx, name: str):
+        """
+        Send links to study guides
+        """
+        # Find code corresponding to the search query
+        course = find_course_from_name(name)
+
+        # Code not found
+        if course is None:
+            return await ctx.reply(f"Onbekend vak: \"{name}\".", mention_author=False, delete_after=15)
+
+        # Get the guide for the current year
+        year = 2018 + int(config.get("year"))
+        link = f"https://studiekiezer.ugent.be/studiefiche/nl/{course.code}/{year}"
+
+        return await reply_to_reference(ctx, content=link)
 
     @commands.command(name="Deadlines", aliases=["dl"])
     @help.Category(category=Category.School)

@@ -10,11 +10,13 @@ def generate(meme: Meme, fields):
     """
     Main function that takes a Meme as input & generates an image.
     """
+    fields = list(fields)
+
     # If there's only one field, the user isn't required to use quotes
     if meme.fields == 1:
         fields = [" ".join(fields)]
 
-    fields = _applyMeme(meme, fields)
+    fields = _apply_meme(meme, fields)
 
     # List of fields to send to the API
     boxes = [{"text": ""}, {"text": ""}, {"text": ""}, {"text": ""}]
@@ -33,19 +35,22 @@ def generate(meme: Meme, fields):
         return {"success": False, "message": "Er is een fout opgetreden."}
 
     # Post meme
-    reply = _postMeme(meme, boxes)
+    reply = _post_meme(meme, boxes)
 
     # Adding a message parameter makes the code in the cog a lot cleaner
     if not reply["success"]:
+        reply["success"] = False
         reply["message"] = "Error! Controleer of je de juiste syntax hebt gebruikt. Gebruik het commando " \
                            "\"memes\" voor een lijst aan geaccepteerde meme-namen."
     else:
         reply["message"] = reply["data"]["url"]
 
+    reply["success"] = False
+
     return reply
 
 
-def _postMeme(meme: Meme, boxes):
+def _post_meme(meme: Meme, boxes):
     """
     Performs API request to generate the meme
     """
@@ -65,7 +70,7 @@ def _postMeme(meme: Meme, boxes):
     return memeReply
 
 
-def _applyMeme(meme: Meme, fields):
+def _apply_meme(meme: Meme, fields):
     """
     Some memes are in a special format that only requires
     a few words to be added, or needs the input to be changed.
@@ -74,9 +79,11 @@ def _applyMeme(meme: Meme, fields):
     Links certain meme id's to functions that need to be applied first.
     """
     memeDict = {
-        102156234: _mockingSpongebob,
-        91538330: _xXEverywhere,
-        252600902: _alwaysHasBeen
+        102156234: mocking_spongebob,
+        91538330: _x_x_everywhere,
+        252600902: _always_has_been,
+        167754325: _math_is_math,
+        206493414: _i_used_the_x_to_destroy_the_x
     }
 
     # Meme needs no special treatment
@@ -86,17 +93,29 @@ def _applyMeme(meme: Meme, fields):
     return memeDict[meme.meme_id](fields)
 
 
-def _mockingSpongebob(fields):
+def mocking_spongebob(fields):
     return list(map(mock, fields))
 
 
-def _xXEverywhere(fields):
+def _x_x_everywhere(fields):
     word = fields[0]
 
     return ["{}".format(word), "{} everywhere".format(word)]
 
 
-def _alwaysHasBeen(fields):
+def _always_has_been(fields):
     word = fields[0]
 
-    return ["Wait, it's all {}?".format(word), "Always has been"]
+    return ["Wait, {}?".format(word), "Always has been"]
+
+
+def _math_is_math(fields):
+    word = fields[0].upper()
+
+    return ["", f"{word} IS {word}!"]
+
+
+def _i_used_the_x_to_destroy_the_x(fields):
+    word = fields[0]
+
+    return ["", f"I used the {word} to destroy the {word}"]

@@ -151,7 +151,7 @@ class Oneliners(commands.Cog):
     @commands.command(name="Inspire")
     @help.Category(Category.Other)
     async def inspire(self, ctx):
-        image = get("http://inspirobot.me/api?generate=true")
+        image = get("https://inspirobot.me/api?generate=true")
 
         if image.status_code == 200:
             await ctx.send(image.text)

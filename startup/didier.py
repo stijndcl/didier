@@ -1,8 +1,6 @@
 from data.snipe import Snipe
-from discord.ext import commands, ipc
-from dislash import InteractionClient
+from discord.ext import commands
 import os
-from settings import HOST_IPC, SLASH_TEST_GUILDS
 from startup.init_files import check_all
 from typing import Dict
 
@@ -11,29 +9,17 @@ class Didier(commands.Bot):
     """
     Main Bot class for Didier
     """
-    # Reference to interactions client
-    interactions: InteractionClient
-
     # Dict to store the most recent Snipe info per channel
     snipe: Dict[int, Snipe] = {}
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self._host_ipc = HOST_IPC
-
-        # IPC Server
-        # TODO secret key
-        self.ipc = ipc.Server(self, secret_key="SOME_SECRET_KEY") if self._host_ipc else None
-
         # Cogs that should be loaded before the others
-        self._preload = ("ipc", "utils", "failedchecks", "events",)
+        self._preload = ("utils", "failedchecks", "events",)
 
         # Remove default help command
         self.remove_command("help")
-
-        # Create interactions client
-        self.interactions = InteractionClient(self, test_guilds=SLASH_TEST_GUILDS)
 
         # Load all extensions
         self.init_extensions()
@@ -65,9 +51,3 @@ class Didier(commands.Bot):
                 # Subdirectory
                 # Also walrus operator hype
                 self._init_directory(new_path)
-
-    async def on_ipc_ready(self):
-        print("IPC server is ready.")
-
-    async def on_ipc_error(self, endpoint, error):
-        print(endpoint, "raised", error)

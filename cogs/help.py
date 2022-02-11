@@ -1,5 +1,6 @@
 from data import constants
 import discord
+from discord.commands import SlashCommand
 from discord.ext import commands
 from enums.help_categories import categories, getCategory, Category
 import json
@@ -49,7 +50,7 @@ class HelpCommand(commands.MinimalHelpCommand):
             return await self.send_bot_help(self.get_bot_mapping())
 
         # Turn dic to lowercase to allow proper name searching
-        all_commands = dict((k.lower(), v) for k, v in bot.all_commands.items())
+        all_commands = dict((k.lower(), v) for k, v in bot.all_commands.items() if not isinstance(v, SlashCommand))
 
         if spl[0].lower() not in all_commands:
             return await self.send_error_message(await self.command_not_found(spl[0]))

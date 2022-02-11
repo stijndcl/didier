@@ -1,7 +1,7 @@
 import traceback
 
+from discord import Interaction
 from discord.ext.commands import Context
-from dislash import SlashInteraction
 
 
 def title_case(string):
@@ -42,16 +42,15 @@ def format_command_usage(ctx: Context) -> str:
     return f"{ctx.author.display_name} in {_format_error_location(ctx)}: {ctx.message.content}"
 
 
-def format_slash_command_usage(interaction: SlashInteraction) -> str:
+def format_slash_command_usage(interaction: Interaction) -> str:
     # Create a string with the options used
-    # TODO look into the format used by the lib because it's terrible
     options = " ".join(list(map(
-        lambda option: f"{option.name}: \"{option.value}\"",
-        interaction.data.options.values()
+        lambda o: f"{o['name']}: \"{o['value']}\"",
+        interaction.data.get("options", [])
     )))
 
-    command = f"{interaction.slash_command.name} {options or ''}"
-    return f"{interaction.author.display_name} in {_format_error_location(interaction)}: /{command}"
+    command = f"{interaction.data['name']} {options or ''}"
+    return f"{interaction.user.display_name} in {_format_error_location(interaction)}: /{command}"
 
 
 def get_edu_year(index: int) -> str:

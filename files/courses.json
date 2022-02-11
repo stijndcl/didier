@@ -1,0 +1,121 @@
+{
+  "Algoritmen en Datastructuren 2": {
+    "abbreviations": ["AD2"],
+    "code": "C003777",
+    "year": 2
+  },
+  "Algoritmen en Datastructuren 3": {
+    "abbreviations": ["AD3"],
+    "code": "C003782",
+    "year": 3
+  },
+  "Artificiële Intelligentie": {
+    "abbreviations": ["AI"],
+    "code": "C003756",
+    "year": 3
+  },
+  "Automaten, Berekenbaarheid en Complexiteit": {
+    "abbreviations": ["ABC"],
+    "code": "C003785",
+    "year": 3
+  },
+  "Besturingssystemen": {
+    "abbreviations": ["BS"],
+    "code": "E019010",
+    "year": 3
+  },
+  "Communicatienetwerken": {
+    "abbreviations": ["Comnet"],
+    "code": "E008620",
+    "year": 2
+  },
+  "Computationele Biologie": {
+    "abbreviations": ["Compbio"],
+    "code": "C003789",
+    "year": 3
+  },
+  "Computerarchitectuur": {
+    "abbreviations": ["CA", "Comparch"],
+    "code": "E034110",
+    "year": 2
+  },
+  "Functioneel Programmeren": {
+    "abbreviations": ["FP", "Funcprog"],
+    "code": "C003775",
+    "year": 2
+  },
+  "Informatiebeveiliging": {
+    "abbreviations": ["Infosec"],
+    "alt": "Information Security",
+    "code": "E019400",
+    "year": 3
+  },
+  "Inleiding tot Elektrotechniek": {
+    "abbreviations": [],
+    "alt": "Elektrotechniek",
+    "code": "C003806",
+    "year": 3
+  },
+  "Inleiding tot Telecommunicatie": {
+    "abbreviations": ["Telecom"],
+    "code": "C003787",
+    "year": 3
+  },
+  "Logisch Programmeren": {
+    "abbreviations": ["LP", "Logprog", "Prolog"],
+    "code": "C003783",
+    "year": 3
+  },
+  "Modelleren en Simuleren": {
+    "abbreviations": ["Modsim"],
+    "code": "C003786",
+    "year": 3
+  },
+  "Multimedia": {
+    "abbreviations": ["MM"],
+    "code": "C002126",
+    "year": 2
+  },
+  "Parallelle Computersystemen": {
+    "abbreviations": ["Paracomp", "Parallelle", "PCS"],
+    "alt": "Parallel Computer Systems",
+    "code": "E034140",
+    "year": 3
+  },
+  "Statistiek en Probabiliteit": {
+    "abbreviations": ["Stat","Statistiek", "Statprob"],
+    "code": "C003778",
+    "year": 2
+  },
+  "Software Engineering Lab 1": {
+    "abbreviations": ["SEL1"],
+    "code": "C003780",
+    "year": 2
+  },
+  "Software Engineering Lab 2": {
+    "abbreviations": ["SEL2"],
+    "code": "C003784",
+    "year": 3
+  },
+  "Systeemprogrammeren": {
+    "abbreviations": ["Sysprog"],
+    "code": "C003776",
+    "year": 2
+  },
+  "Webdevelopment": {
+    "abbreviations": ["Webdev"],
+    "code": "C003779",
+    "year": 2
+  },
+  "Wetenschappelijk Rekenen": {
+    "abbreviations": ["Wetrek"],
+    "code": "C001521",
+    "year": 2
+  },
+  "Wiskundige Modellering in de Ingenieurswetenschappen": {
+    "abbreviations": ["Wimo"],
+    "alt": "Wiskundige Modellering",
+    "code": "C003788",
+    "year": 3
+  }
+}

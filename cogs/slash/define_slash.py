@@ -1,5 +1,5 @@
 from discord.ext import commands
-from dislash import SlashInteraction, slash_command, Option, OptionType
+from discord.commands import slash_command, ApplicationContext, Option
 
 from data.embeds.urban_dictionary import Definition
 from startup.didier import Didier
@@ -9,15 +9,10 @@ class DefineSlash(commands.Cog):
     def __init__(self, client: Didier):
         self.client: Didier = client
 
-    @slash_command(name="define",
-                   description="Urban Dictionary",
-                   options=[
-                     Option("query", "Search query", OptionType.STRING, required=True)
-                   ]
-                   )
-    async def _define_slash(self, interaction: SlashInteraction, query):
+    @slash_command(name="define", description="Urban Dictionary")
+    async def _define_slash(self, ctx: ApplicationContext, query: Option(str, "Search query", required=True)):
         embed = Definition(query).to_embed()
-        await interaction.reply(embed=embed)
+        await ctx.respond(embed=embed)
 
 
 def setup(client: Didier):

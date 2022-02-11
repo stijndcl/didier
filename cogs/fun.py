@@ -1,15 +1,16 @@
-from data.embeds.xkcd import XKCDEmbed
-from data.menus import paginatedLeaderboard
-from decorators import help
-import discord
-from discord.ext import commands
-from enums.help_categories import Category
-from functions import checks, stringFormatters
-from functions.database import memes, trump, dadjoke
-from functions.memes import generate
 import json
 import random
+
 import requests
+from discord.ext import commands
+
+from data.embeds.xkcd import XKCDEmbed
+from data.menus.memes import MemesList
+from decorators import help
+from enums.help_categories import Category
+from functions import checks
+from functions.database import memes, trump, dadjoke
+from functions.memes import generate
 
 
 class Fun(commands.Cog):
@@ -98,17 +99,10 @@ class Fun(commands.Cog):
         if result is None:
             return await ctx.send("Deze meme staat niet in de database.")
 
-        # Convert to list to support item assignment
-        fields = list(fields)
-
         generated = generate(result, fields)
 
-        # If the request was successful, remove the message calling it
-        if generated["success"]:
-            await self.utilsCog.removeMessage(ctx.message)
-
         # Send the meme's url or the error message
-        await ctx.send(generated["message"])
+        await ctx.reply(generated["message"], mention_author=False)
 
     @commands.command(name="Memes")
     @commands.check(checks.allowedChannels)
@@ -118,15 +112,7 @@ class Fun(commands.Cog):
         Command that shows a list of memes in the database.
         :param ctx: Discord Context
         """
-        memeList = memes.getAllMemes()
-
-        # Turn the list into a list of [Name: fields]
-        memeList = [": ".join([stringFormatters.title_case(meme[1]),
-                               str(meme[2])]) for meme in sorted(memeList, key=lambda x: x[1])]
-
-        pages = paginatedLeaderboard.Pages(source=paginatedLeaderboard.Source(memeList, "Memes", discord.Colour.blue()),
-                                           clear_reactions_after=True)
-        await pages.start(ctx)
+        return await MemesList(ctx=ctx).send()
 
     @commands.command(name="Pjoke")
     @help.Category(category=Category.Fun)
