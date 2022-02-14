@@ -27,7 +27,7 @@ class Xp(commands.Cog):
         perc = round(int(target_stats[11]) * 100/message_count, 2)
 
         embed = discord.Embed(colour=discord.Colour.blue())
-        embed.set_author(name=target.display_name, icon_url=target.avatar_url)
+        embed.set_author(name=target.display_name, icon_url=target.avatar.url)
         embed.add_field(name="Aantal Berichten", value="{:,} ({}%)".format(int(target_stats[11]), perc))
         embed.add_field(name="Level", value=str(xp.calculate_level(target_stats[12])))
         embed.add_field(name="XP", value="{:,}".format(int(target_stats[12])))

@@ -93,7 +93,7 @@ class SelfPromo(commands.Cog):
 
     async def createPersonalPromo(self, ctx, user, link, colour, type):
         embed = discord.Embed(colour=colour)
-        embed.set_author(name="{} Links".format(type), icon_url=user.avatar_url)
+        embed.set_author(name="{} Links".format(type), icon_url=user.avatar.url)
         embed.add_field(name="{} link van {}".format(type, user.display_name), value=link)
         await ctx.send(embed=embed)
 

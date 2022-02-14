@@ -164,7 +164,7 @@ class Dinks(commands.Cog):
 
         embed = discord.Embed(colour=discord.Colour.blue())
         embed.set_author(name="Bank van {}".format(ctx.author.display_name))
-        embed.set_thumbnail(url=str(ctx.author.avatar_url))
+        embed.set_thumbnail(url=str(ctx.author.avatar.url))
         embed.add_field(name="Level:", value=str(response[2]) + maxLevels, inline=True)
         embed.add_field(name="Ratio:", value=str(ratio), inline=True)
         embed.add_field(name="Prijs voor volgend level:", value="{:,}".format(interestLevelPrice), inline=False)

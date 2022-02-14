@@ -15,7 +15,7 @@ class EditSnipe:
         member: discord.Member = guild.get_member(self.snipe.user)
 
         embed = discord.Embed(title="Edit Snipe", colour=discord.Colour.blue())
-        embed.set_author(name=member.display_name, icon_url=member.avatar_url)
+        embed.set_author(name=member.display_name, icon_url=member.avatar.url)
         embed.add_field(name="Voor", value=self.snipe.old, inline=False)
         embed.add_field(name="Na", value=self.snipe.new, inline=False)
 
@@ -34,7 +34,7 @@ class DeleteSnipe:
         member: discord.Member = guild.get_member(self.snipe.user)
 
         embed = discord.Embed(title="Delete Snipe", colour=discord.Colour.blue())
-        embed.set_author(name=member.display_name, icon_url=member.avatar_url)
+        embed.set_author(name=member.display_name, icon_url=member.avatar.url)
         embed.add_field(name="Message", value=self.snipe.old)
 
         return embed

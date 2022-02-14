@@ -33,7 +33,7 @@ class ModCommands(commands.Cog):
         try:
             self.client.load_extension("cogs.{}".format(extension))
             await self.sendDm(constants.myId, "Loaded **{}**".format(extension))
-        except discord.ext.commands.errors.ExtensionAlreadyLoaded:
+        except discord.ExtensionAlreadyLoaded:
             await self.sendDm(constants.myId, "**{}** has already been loaded".format(extension))
 
     @commands.command(name="Config", aliases=["Setup", "Set"], case_insensitive=True, usage="[Categorie] [Value]",
@@ -59,7 +59,7 @@ class ModCommands(commands.Cog):
         try:
             self.client.unload_extension("cogs.{}".format(extension))
             await self.sendDm(constants.myId, "Unloaded **{}**".format(extension))
-        except discord.ext.commands.errors.ExtensionNotLoaded:
+        except discord.ExtensionNotLoaded:
             await self.sendDm(constants.myId, "**{}** has already been unloaded".format(extension))
 
     # Unload all cogs except for modCommands
@@ -181,7 +181,7 @@ class ModCommands(commands.Cog):
 
         embed = discord.Embed(colour=discord.Colour.blue())
 
-        embed.set_author(name=user.display_name, icon_url=user.avatar_url)
+        embed.set_author(name=user.display_name, icon_url=user.avatar.url)
         embed.add_field(name="Discriminator", value=f"#{user.discriminator}")
         embed.add_field(name="Discord id", value=user.id)
         embed.add_field(name="Bot", value="Nee" if not user.bot else "Ja")

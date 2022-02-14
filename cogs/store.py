@@ -109,7 +109,7 @@ class Store(commands.Cog):
         inv = sorted(inv, key=lambda x: x[1])
         embed = discord.Embed(colour=discord.Colour.blue())
         embed.set_author(name="Inventory van {}".format(ctx.author.display_name))
-        embed.set_thumbnail(url=str(ctx.author.avatar_url))
+        embed.set_thumbnail(url=str(ctx.author.avatar.url))
         if len(inv) == 0:
             embed.description = "Je hebt nog niets gekocht!\n" \
                                 "Koop iets in de Store wanneer DJ STIJN niet langer te lui is om er iets in te steken."
