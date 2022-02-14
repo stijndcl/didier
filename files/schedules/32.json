@@ -206,6 +206,11 @@
       "course": "Software Engineering Lab 2",
       "slots": [
         {
+          "weeks": {
+            "2": {
+              "canceled": true
+            }
+          },
           "location": {
             "campus": "Sterre",
             "building": "S8",
