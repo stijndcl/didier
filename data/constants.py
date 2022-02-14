@@ -40,7 +40,8 @@ allowedChannels = {
     "generalZandbak": 728361031008780422,
     "freegamesZandbak": 728545397127118898,
     "spelenZandbak": 769248992957038612,
-    "warzone": 691933718880714843
+    "warzone": 691933718880714843,
+    "dangerzone": 918519109203931136
 }
 
 creationDate = 1582243200
