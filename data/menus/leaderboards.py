@@ -97,9 +97,9 @@ class Leaderboard(Paginated, ABC):
 
     async def send(self, **kwargs) -> discord.Message:
         if self.data is None:
-            return await self.empty_leaderboard(self.ctx, mention_author=False, **kwargs)
+            return await self.empty_leaderboard(self.ctx, **kwargs)
 
-        return await super().send(mention_author=False, **kwargs)
+        return await super().send(**kwargs)
 
 
 @dataclass
