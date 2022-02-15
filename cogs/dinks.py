@@ -86,6 +86,7 @@ class Dinks(commands.Cog):
         """
         await self.client.get_cog("Leaderboards").callLeaderboard("dinks", ctx)
 
+    @dinks.command(aliases=["nachtelijk"], hidden=True)
     @commands.command(name="Nightly")
     @commands.check(checks.allowedChannels)
     @help.Category(category=Category.Currency)
