@@ -151,8 +151,17 @@
     },
     {
       "course": "Computationele Biologie",
+      "online_links": {
+        "zoom": "https://ufora.ugent.be/d2l/ext/rp/448904/lti/framedlaunch/556e197e-e87b-4c27-be5d-53adc7a41826"
+      },
       "slots": [
         {
+          "weeks": {
+            "1": {
+              "online_only": true
+            }
+          },
+          "online": "zoom",
           "location": {
             "campus": "Sterre",
             "building": "S9",
@@ -165,6 +174,12 @@
           }
         },
         {
+          "weeks": {
+            "1": {
+              "online_only": true
+            }
+          },
+          "online": "zoom",
           "location": {
             "campus": "Sterre",
             "building": "S9",
