@@ -78,18 +78,27 @@ class Poke(commands.Cog):
         await self.client.get_cog("Leaderboards").callLeaderboard("poke", ctx)
 
     async def pokeChecks(self, ctx):
+        # no mentions
         if len(ctx.message.mentions) == 0:
             await ctx.send("Dit is geen geldige persoon.")
             return False
-        if len(ctx.message.mentions) > 1:
+        # more than one mention? Check if Didier is tagged first
+        if len(ctx.message.mentions) > 1 and str(ctx.message.mentions[0].id) not in constants.didier_identities:
             await ctx.send("Je kan maar 1 persoon tegelijk tikken.")
             return False
+
+        # author poking themselves
         if ctx.message.mentions[0].id == ctx.author.id:
             await ctx.send("Je kan jezelf niet tikken, {}.".format(ctx.author.display_name))
             return False
+
+        # author poking didier
         if ctx.message.mentions[0].id == self.client.user.id:
-            await ctx.send("Je kan me niet tikken, {}.".format(ctx.author.display_name))
-            return False
+            if len(ctx.message.mentions) == 1:
+                await ctx.send("Je kan me niet tikken, {}.".format(ctx.author.display_name))
+                return False
+
+        # author poking bots
         if str(ctx.message.mentions[0].id) in constants.botIDs:
             await ctx.send("Je kan geen bots tikken, {}.".format(ctx.author.display_name))
             return False
@@ -106,6 +115,7 @@ class Poke(commands.Cog):
             await ctx.send("Deze persoon heeft zichzelf geblacklisted en kan niet meer getikt worden.")
             return False
 
+        print("passed the function")
         return True
 
 
