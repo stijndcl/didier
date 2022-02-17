@@ -33,7 +33,7 @@ def etenScript(dag: datetime):
 
     # Fetch from API
     try:
-        menu = requests.get(f"https://zeus.ugent.be/hydra/api/2.0/resto/menu/nl/{dag.year}/{dag.month}/{dag.day}.json").json()
+        menu = requests.get(f"https://hydra.ugent.be/api/2.0/resto/menu/nl/{dag.year}/{dag.month}/{dag.day}.json").json()
 
         if not menu["meals"]:
             raise Exception()
