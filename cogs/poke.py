@@ -1,3 +1,5 @@
+import discord
+
 from data import constants
 import datetime
 from decorators import help
@@ -19,17 +21,16 @@ class Poke(commands.Cog):
     @commands.group(name="Poke", usage="[@Persoon]", case_insensitive=True, invoke_without_command=True)
     @commands.check(checks.allowedChannels)
     @help.Category(category=Category.Games)
-    async def poke(self, ctx, member=None):
-        if not await self.pokeChecks(ctx):
+    async def poke(self, ctx, poked: discord.Member = None):
+        if not await self.pokeChecks(ctx, poked):
             return
 
-        member = ctx.message.mentions[0]
         await ctx.send("**{}** heeft **{}** getikt. **{}** is hem!".format(
-            ctx.author.display_name, member.display_name, member.display_name))
+            ctx.author.display_name, poked.display_name, poked.display_name))
 
         # Add into the database
-        poke.update(ctx.author.id, member.id)
-        stats.update(member.id, "poked", int(stats.getOrAddUser(member.id)[1]) + 1)
+        poke.update(ctx.author.id, poked.id)
+        stats.update(poked.id, "poked", int(stats.getOrAddUser(poked.id)[1]) + 1)
 
     @poke.command(name="Blacklist", aliases=["Bl"])
     async def blacklist(self, ctx):
@@ -77,45 +78,46 @@ class Poke(commands.Cog):
     async def leaderboard(self, ctx):
         await self.client.get_cog("Leaderboards").callLeaderboard("poke", ctx)
 
-    async def pokeChecks(self, ctx):
+    async def pokeChecks(self, ctx, poked: discord.Member = None):
         # no mentions
-        if len(ctx.message.mentions) == 0:
+        if poked is None:
             await ctx.send("Dit is geen geldige persoon.")
-            return False
-        # more than one mention? Check if Didier is tagged first
-        if len(ctx.message.mentions) > 1 and str(ctx.message.mentions[0].id) not in constants.didier_identities:
-            await ctx.send("Je kan maar 1 persoon tegelijk tikken.")
-            return False
+            return None
 
         # author poking themselves
-        if ctx.message.mentions[0].id == ctx.author.id:
+        print(f"Poked: {poked}, author: {ctx.author}")
+        if poked == ctx.author:
             await ctx.send("Je kan jezelf niet tikken, {}.".format(ctx.author.display_name))
             return False
 
         # author poking didier
-        if ctx.message.mentions[0].id == self.client.user.id:
-            if len(ctx.message.mentions) == 1:
-                await ctx.send("Je kan me niet tikken, {}.".format(ctx.author.display_name))
-                return False
+        if poked == self.client.user:
+            await ctx.send("Je kan me niet tikken, {}.".format(ctx.author.display_name))
+            return False
 
         # author poking bots
-        if str(ctx.message.mentions[0].id) in constants.botIDs:
+        if poked.bot:
             await ctx.send("Je kan geen bots tikken, {}.".format(ctx.author.display_name))
             return False
 
         # Check database things
         p = poke.get()
+
+        # author poking outside their turn
         if str(p[0]) != str(ctx.author.id):
             await ctx.send("Het is niet jouw beurt, {}.".format(ctx.author.display_name))
             return False
-        if str(ctx.message.mentions[0].id) == str(p[2]):
+
+        # author poking back
+        if poked.id == str(p[2]):
             await ctx.send("Je mag niet terugtikken, {}.".format(ctx.author.display_name))
             return False
-        if poke.blacklisted(ctx.message.mentions[0].id):
+
+        # author poking someone who wishes not to be poked
+        if poke.blacklisted(poked):
             await ctx.send("Deze persoon heeft zichzelf geblacklisted en kan niet meer getikt worden.")
             return False
 
-        print("passed the function")
         return True
 
 
