@@ -113,7 +113,7 @@
       "slots": [
         {
           "weeks": {
-            "1,2,3,4,5,6,7,8,9,10,11,12": {
+            "1": {
               "online_only": true
             }
           },
@@ -131,7 +131,7 @@
         },
         {
           "weeks": {
-            "1,2,3,4,5,6,7,8,9,10,11,12": {
+            "1": {
               "online_only": true
             }
           },
@@ -201,6 +201,11 @@
       "slots": [
         {
           "online": "zoom",
+          "location": {
+            "campus": "Sterre",
+            "building": "S8",
+            "room": "3.2"
+          },
           "time": {
             "day": "maandag",
             "start": 1430,
@@ -209,6 +214,11 @@
         },
         {
           "online": "zoom",
+          "location": {
+            "campus": "Sterre",
+            "building": "S9",
+            "room": "PC 3.1 Konrad Zuse"
+          },
           "time": {
             "day": "donderdag",
             "start": 830,
