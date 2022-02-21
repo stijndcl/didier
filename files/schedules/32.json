@@ -108,7 +108,8 @@
     {
       "course": "Automaten, Berekenbaarheid en Complexiteit",
       "online_links": {
-        "zoom": "https://ufora.ugent.be/d2l/ext/rp/439079/lti/framedlaunch/556e197e-e87b-4c27-be5d-53adc7a41826"
+        "zoom": "https://ufora.ugent.be/d2l/ext/rp/439079/lti/framedlaunch/556e197e-e87b-4c27-be5d-53adc7a41826",
+        "opencast": "https://eloprd.ugent.be/opencastplanner/livestream/recording"
       },
       "slots": [
         {
@@ -117,7 +118,7 @@
               "online_only": true
             }
           },
-          "online": "zoom",
+          "online": "opencast",
           "location": {
             "campus": "Sterre",
             "building": "S25",
