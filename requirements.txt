@@ -1,5 +1,5 @@
 # Beta version of Discord.py fork
-py-cord==2.0.0b1
+py-cord==2.0.0b5
 
 python-dotenv==0.14.0
 beautifulsoup4==4.9.1

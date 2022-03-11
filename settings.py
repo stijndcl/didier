@@ -41,3 +41,6 @@ COC_ID: int = int(os.getenv("COC_ID", "626699611192688641"))
 # Ex: 123,456,789
 _guilds = os.getenv("SLASHTESTGUILDS", "").replace(" ", "")
 SLASH_TEST_GUILDS: List[int] = list(map(lambda x: int(x), _guilds.split(","))) if _guilds else None
+
+# GitHub token (UGent)
+UGENT_GH_TOKEN = os.getenv("UGENTGHTOKEN", "")
