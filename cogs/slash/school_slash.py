@@ -107,7 +107,6 @@ class SchoolSlash(commands.Cog):
 
         with open("files/compbio_benchmarks_2.json", "w") as fp:
             file[submission] = ctx.user.id
-
             json.dump(file, fp)
 
         return await ctx.respond(f"✅ Submission **{submission}** is aan jouw naam gelinkt.", ephemeral=True)

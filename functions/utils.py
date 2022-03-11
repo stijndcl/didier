@@ -26,12 +26,10 @@ def get_member_or_user(ctx: Union[ApplicationContext, Context], user_id: int) ->
             return member
 
         # Try to fetch the user
-        user = ctx.bot.get_user(user_id)
-        return user
+        return ctx.bot.get_user(user_id)
 
     # Guild exists, use that instead
-    mem = ctx.guild.get_member(user_id)
-    return mem
+    return ctx.guild.get_member(user_id)
 
 
 def get_display_name(ctx: Union[ApplicationContext, Context], user_id: int) -> str:
