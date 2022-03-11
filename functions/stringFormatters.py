@@ -45,7 +45,7 @@ def format_command_usage(ctx: Context) -> str:
 def format_slash_command_usage(interaction: Interaction) -> str:
     # Create a string with the options used
     options = " ".join(list(map(
-        lambda o: f"{o['name']}: \"{o['value']}\"",
+        lambda o: f"{o['name']}: \"{o['value']}\"" if "value" in o else o["name"],
         interaction.data.get("options", [])
     )))
 

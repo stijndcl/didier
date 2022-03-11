@@ -1,3 +1,6 @@
+import json
+
+from discord import SlashCommandGroup
 from discord.ext import commands
 from discord.commands import slash_command, ApplicationContext, Option, AutocompleteContext
 
@@ -5,6 +8,7 @@ from data import schedule
 from data.courses import load_courses, find_course_from_name
 from data.embeds.food import Menu
 from data.embeds.deadlines import Deadlines
+from data.menus import leaderboards
 from functions import les, config
 from functions.stringFormatters import capitalize
 from functions.timeFormatters import skip_weekends
@@ -82,6 +86,30 @@ class SchoolSlash(commands.Cog):
         # Get the guide for the current year
         year = 2018 + int(config.get("year"))
         return await ctx.respond(f"https://studiekiezer.ugent.be/studiefiche/nl/{course.code}/{year}")
+
+    _compbio_group = SlashCommandGroup("compbio", "Commands voor compbio opdrachten")
+
+    @_compbio_group.command(name="leaderboard", description="Gesorteerd en ingevuld leaderboard")
+    async def _compbio_lb_slash(self, ctx: ApplicationContext):
+        lb = leaderboards.CompbioLeaderboard(ctx)
+        await lb.respond()
+
+    @_compbio_group.command(name="submit", description="Link een Dodona-submission aan jouw username")
+    async def _compbio_submit_slash(self, ctx: ApplicationContext,
+                                    submission: Option(int, description="Id van je Dodona indiening.", required=True)):
+        with open("files/compbio_benchmarks_2.json", "r") as fp:
+            file = json.load(fp)
+
+        submission = str(submission)
+
+        if submission in file:
+            return await ctx.respond("❌ Deze submission is al aan iemand gelinkt.", ephemeral=True)
+
+        with open("files/compbio_benchmarks_2.json", "w") as fp:
+            file[submission] = ctx.user.id
+            json.dump(file, fp)
+
+        return await ctx.respond(f"✅ Submission **{submission}** is aan jouw naam gelinkt.", ephemeral=True)
 
 
 def setup(client: Didier):

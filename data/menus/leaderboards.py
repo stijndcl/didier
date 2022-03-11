@@ -1,3 +1,4 @@
+import json
 import math
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
@@ -8,11 +9,12 @@ import requests
 from discord import ApplicationContext
 from discord.ext.commands import Context
 
+import settings
 from data.menus.paginated import Paginated
 from enums.numbers import Numbers
 from functions import xp
 from functions.database import currency, stats, poke, muttn
-from functions.utils import get_display_name
+from functions.utils import get_display_name, get_mention
 
 
 @dataclass
@@ -21,6 +23,7 @@ class Leaderboard(Paginated, ABC):
     colour: discord.Colour = discord.Colour.blue()
     fetch_names: bool = True
     ignore_non_pos: bool = True
+    reverse: bool = True
 
     def __post_init__(self):
         self.data = self.process_data(self.get_data())
@@ -31,7 +34,7 @@ class Leaderboard(Paginated, ABC):
 
     def process_data(self, entries: list[tuple]) -> Optional[list[tuple]]:
         data = []
-        for i, v in enumerate(sorted(entries, key=self.get_value, reverse=True)):
+        for i, v in enumerate(sorted(entries, key=self.get_value, reverse=self.reverse)):
             entry_data = self.get_value(v)
 
             # Leaderboard is empty
@@ -90,13 +93,13 @@ class Leaderboard(Paginated, ABC):
         return await ctx.reply(embed=embed, **kwargs)
 
     async def respond(self, **kwargs) -> discord.Message:
-        if self.data is None:
+        if self.data is None or not self.data:
             return await self.empty_leaderboard(self.ctx, **kwargs)
 
         return await super().respond(**kwargs)
 
     async def send(self, **kwargs) -> discord.Message:
-        if self.data is None:
+        if self.data is None or not self.data:
             return await self.empty_leaderboard(self.ctx, **kwargs)
 
         return await super().send(**kwargs)
@@ -115,6 +118,56 @@ class BitcoinLeaderboard(Leaderboard):
     @property
     def empty_description(self) -> str:
         return "Er zijn nog geen personen met Bitcoins."
+
+
+@dataclass
+class CompbioLeaderboard(Leaderboard):
+    colour: discord.Colour = field(default=discord.Colour.green())
+    title: str = field(default="Leaderboard Computationele Biologie #2")
+    reverse: bool = False
+
+    def get_submission_user(self, submission_id: str) -> str:
+        with open("files/compbio_benchmarks_2.json", "r") as fp:
+            file = json.load(fp)
+
+        if submission_id in file:
+            user_id = file[submission_id]
+            return get_mention(self.ctx, user_id)
+
+        return f"[# {submission_id}]"
+
+    def get_data(self) -> list[tuple]:
+        headers = {"Authorization": f"token {settings.UGENT_GH_TOKEN}"}
+        result = requests.get(f"https://github.ugent.be/raw/computationele-biologie/benchmarks-2022/main/reconstruction/J02459.1.50mers.md", headers=headers).text
+        # Remove table headers
+        result = result.split("\n")[2:]
+        data = []
+
+        for line in result:
+            try:
+                cells = line.split("|")
+                submission_id = cells[1].strip()
+                mean = float(cells[2].strip().split(" ")[0])
+            except IndexError:
+                # Other lines because of markdown formatting
+                continue
+
+            data.append((submission_id, mean, ))
+
+        return data
+
+    def _should_highlight(self, data) -> bool:
+        # TODO maybe find a fix for this?
+        return False
+
+    def format_entry(self, index: int, data: tuple) -> str:
+        return f"{index + 1}: {self.get_submission_user(data[0])} ({self.format_entry_data(data)})"
+
+    def format_entry_data(self, data: tuple) -> str:
+        return f"{str(data[1])} ms"
+
+    def get_value(self, data: tuple):
+        return data[1]
 
 
 @dataclass
