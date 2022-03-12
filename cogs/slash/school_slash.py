@@ -91,25 +91,28 @@ class SchoolSlash(commands.Cog):
 
     @_compbio_group.command(name="leaderboard", description="Gesorteerd en ingevuld leaderboard")
     async def _compbio_lb_slash(self, ctx: ApplicationContext):
+        await ctx.response.defer()
         lb = leaderboards.CompbioLeaderboard(ctx)
         await lb.respond()
 
     @_compbio_group.command(name="submit", description="Link een Dodona-submission aan jouw username")
     async def _compbio_submit_slash(self, ctx: ApplicationContext,
                                     submission: Option(int, description="Id van je Dodona indiening.", required=True)):
+        await ctx.response.defer(ephemeral=True)
+
         with open("files/compbio_benchmarks_2.json", "r") as fp:
             file = json.load(fp)
 
         submission = str(submission)
 
         if submission in file:
-            return await ctx.respond("❌ Deze submission is al aan iemand gelinkt.", ephemeral=True)
+            return await ctx.send_followup("❌ Deze submission is al aan iemand gelinkt.")
 
         with open("files/compbio_benchmarks_2.json", "w") as fp:
             file[submission] = ctx.user.id
             json.dump(file, fp)
 
-        return await ctx.respond(f"✅ Submission **{submission}** is aan jouw naam gelinkt.", ephemeral=True)
+        return await ctx.send_followup(f"✅ Submission **{submission}** is aan jouw naam gelinkt.")
 
 
 def setup(client: Didier):

@@ -164,7 +164,7 @@ class CompbioLeaderboard(Leaderboard):
         return f"{index + 1}: {self.get_submission_user(data[0])} ({self.format_entry_data(data)})"
 
     def format_entry_data(self, data: tuple) -> str:
-        return f"{str(data[1])} ms"
+        return f"{str(data[1])} s"
 
     def get_value(self, data: tuple):
         return data[1]
