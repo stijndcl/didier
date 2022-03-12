@@ -125,6 +125,11 @@ class CompbioLeaderboard(Leaderboard):
     colour: discord.Colour = field(default=discord.Colour.green())
     title: str = field(default="Leaderboard Computationele Biologie #2")
     reverse: bool = False
+    kmer: int = 600
+
+    def __post_init__(self):
+        self.title += f" (k = {self.kmer})"
+        super().__post_init__()
 
     def get_submission_user(self, submission_id: str) -> str:
         with open("files/compbio_benchmarks_2.json", "r") as fp:
@@ -137,8 +142,17 @@ class CompbioLeaderboard(Leaderboard):
         return f"[# {submission_id}]"
 
     def get_data(self) -> list[tuple]:
+        files = {
+            6: "J02459.1",
+            10: "J02459.1",
+            50: "J02459.1",
+            600: "AF033819.3"
+        }
+
+        url = f"https://github.ugent.be/raw/computationele-biologie/benchmarks-2022/main/reconstruction/{files[self.kmer]}.{self.kmer}mers.md"
         headers = {"Authorization": f"token {settings.UGENT_GH_TOKEN}"}
-        result = requests.get(f"https://github.ugent.be/raw/computationele-biologie/benchmarks-2022/main/reconstruction/J02459.1.50mers.md", headers=headers).text
+        result = requests.get(url, headers=headers).text
+
         # Remove table headers
         result = result.split("\n")[2:]
         data = []

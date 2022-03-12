@@ -90,9 +90,10 @@ class SchoolSlash(commands.Cog):
     _compbio_group = SlashCommandGroup("compbio", "Commands voor compbio opdrachten")
 
     @_compbio_group.command(name="leaderboard", description="Gesorteerd en ingevuld leaderboard")
-    async def _compbio_lb_slash(self, ctx: ApplicationContext):
+    async def _compbio_lb_slash(self, ctx: ApplicationContext,
+                                benchmark: Option(int, "De specifieke benchmark om op te halen (default k=600)", choices=[6, 10, 50, 600], default=600)):
         await ctx.response.defer()
-        lb = leaderboards.CompbioLeaderboard(ctx)
+        lb = leaderboards.CompbioLeaderboard(ctx, kmer=benchmark)
         await lb.respond()
 
     @_compbio_group.command(name="submit", description="Link een Dodona-submission aan jouw username")
