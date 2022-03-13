@@ -150,6 +150,9 @@ class Events(commands.Cog):
 
         if isinstance(err, commands.CheckFailure):
             return await ctx.respond("Je hebt geen toegang tot dit commando.", ephemeral=True)
+        elif isinstance(err, discord.NotFound):
+            print("Don't care")
+            return
 
         usage = stringFormatters.format_slash_command_usage(ctx.interaction)
         await self.sendErrorEmbed(err, "Slash Command", usage)
