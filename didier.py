@@ -11,6 +11,7 @@ if __name__ == "__main__":
     # Configure intents (1.5.0)
     intents = discord.Intents.default()
     intents.members = True
+    intents.message_content = True
 
     client = Didier(command_prefix=get_prefix, case_insensitive=True, intents=intents, activity=activity, status=status)
     client.run(TOKEN)
