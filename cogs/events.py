@@ -301,7 +301,7 @@ class Events(commands.Cog):
         if not checks.freeGamesCheck(after):
             return await self.failedChecksCog.freeGames(after)
 
-        if should_snipe(before):
+        if before.content and after.content and should_snipe(before):
             self.client.snipe[before.channel.id] = Snipe(before.author.id, before.channel.id, before.guild.id, Action.Edit,
                                                          before.content, after.content)
 
