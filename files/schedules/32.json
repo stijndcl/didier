@@ -214,6 +214,11 @@
           }
         },
         {
+          "weeks": {
+            "6": {
+              "canceled": true
+            }
+          },
           "online": "zoom",
           "location": {
             "campus": "Sterre",
