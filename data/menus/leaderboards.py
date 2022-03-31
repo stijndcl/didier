@@ -123,16 +123,17 @@ class BitcoinLeaderboard(Leaderboard):
 @dataclass
 class CompbioLeaderboard(Leaderboard):
     colour: discord.Colour = field(default=discord.Colour.green())
-    title: str = field(default="Leaderboard Computationele Biologie #2")
+    title: str = field(default="Leaderboard Computationele Biologie #4")
     reverse: bool = False
-    kmer: int = 600
+    size: int = 10000
+    amount: int = 10
 
     def __post_init__(self):
-        self.title += f" (k = {self.kmer})"
+        self.title += f" ({self.size}-{self.amount})"
         super().__post_init__()
 
     def get_submission_user(self, submission_id: str) -> str:
-        with open("files/compbio_benchmarks_2.json", "r") as fp:
+        with open("files/compbio_benchmarks_4.json", "r") as fp:
             file = json.load(fp)
 
         if submission_id in file:
@@ -142,14 +143,7 @@ class CompbioLeaderboard(Leaderboard):
         return f"[# {submission_id}]"
 
     def get_data(self) -> list[tuple]:
-        files = {
-            6: "J02459.1",
-            10: "J02459.1",
-            50: "J02459.1",
-            600: "AF033819.3"
-        }
-
-        url = f"https://github.ugent.be/raw/computationele-biologie/benchmarks-2022/main/reconstruction/{files[self.kmer]}.{self.kmer}mers.md"
+        url = f"https://github.ugent.be/raw/computationele-biologie/benchmarks-2022/tree/main/profile_hmm/size{self.size}-amount{self.amount}.md"
         headers = {"Authorization": f"token {settings.UGENT_GH_TOKEN}"}
         result = requests.get(url, headers=headers).text
 

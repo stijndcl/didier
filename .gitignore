@@ -6,6 +6,7 @@ files/lost.json
 files/locked.json
 files/ufora_notifications.json
 files/compbio_benchmarks_2.json
+files/compbio_benchmarks_4.json
 .idea/
 __pycache__
 .env
