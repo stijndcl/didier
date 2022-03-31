@@ -143,7 +143,7 @@ class CompbioLeaderboard(Leaderboard):
         return f"[# {submission_id}]"
 
     def get_data(self) -> list[tuple]:
-        url = f"https://github.ugent.be/raw/computationele-biologie/benchmarks-2022/tree/main/profile_hmm/size{self.size}-amount{self.amount}.md"
+        url = f"https://github.ugent.be/raw/computationele-biologie/benchmarks-2022/main/profile_hmm/size{self.size}-amount{self.amount}.md"
         headers = {"Authorization": f"token {settings.UGENT_GH_TOKEN}"}
         result = requests.get(url, headers=headers).text
 
