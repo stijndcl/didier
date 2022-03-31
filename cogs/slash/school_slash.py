@@ -102,7 +102,7 @@ class SchoolSlash(commands.Cog):
                                     submission: Option(int, description="Id van je Dodona indiening.", required=True)):
         await ctx.response.defer(ephemeral=True)
 
-        with open("files/compbio_benchmarks_2.json", "r") as fp:
+        with open("files/compbio_benchmarks_4.json", "r") as fp:
             file = json.load(fp)
 
         submission = str(submission)
@@ -110,7 +110,7 @@ class SchoolSlash(commands.Cog):
         if submission in file:
             return await ctx.send_followup("❌ Deze submission is al aan iemand gelinkt.")
 
-        with open("files/compbio_benchmarks_2.json", "w") as fp:
+        with open("files/compbio_benchmarks_4.json", "w") as fp:
             file[submission] = ctx.user.id
             json.dump(file, fp)
 
