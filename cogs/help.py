@@ -50,7 +50,16 @@ class HelpCommand(commands.MinimalHelpCommand):
             return await self.send_bot_help(self.get_bot_mapping())
 
         # Turn dic to lowercase to allow proper name searching
-        all_commands = dict((k.lower(), v) for k, v in bot.all_commands.items() if not isinstance(v, SlashCommand))
+        all_commands = {}
+
+        for k, v in bot.all_commands.items():
+            if k is None or v is None:
+                continue
+
+            if isinstance(v, SlashCommand):
+                continue
+
+            all_commands[k.lower()] = v
 
         if spl[0].lower() not in all_commands:
             return await self.send_error_message(await self.command_not_found(spl[0]))
