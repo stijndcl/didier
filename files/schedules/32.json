@@ -114,7 +114,7 @@
       "slots": [
         {
           "weeks": {
-            "1": {
+            "1,8": {
               "online_only": true
             }
           },
