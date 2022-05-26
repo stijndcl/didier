@@ -37,13 +37,13 @@ def freeGamesCheck(ctx):
             link = word.strip()
             break
 
-    if link == "":
-        return False
-    request = requests.head(link)
-    if request.status_code != 200:
-        return False
+    #if link == "":
+    #    return False
+    #request = requests.head(link)
+    #if request.status_code != 200:
+    #    return False
 
-    return True
+    return len(link) > 0
 
 
 # Checks if a user can invest/gamble/... [amount]
