@@ -1,0 +1,20 @@
+[tool.black]
+line-length = 120
+
+[tool.mypy]
+plugins = [
+    "sqlalchemy.ext.mypy.plugin"
+]
+
+[tool.pylint.master]
+disable = [
+    "missing-module-docstring",
+    "too-few-public-methods"
+]
+
+[tool.pylint.format]
+max-line-length = 120
+good-names = ["i"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"

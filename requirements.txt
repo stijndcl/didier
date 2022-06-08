@@ -1,4 +1,6 @@
+aiohttp==3.8.1
 alembic==1.8.0
 # Dev version of dpy
 git+https://github.com/Rapptz/discord.py
+environs==9.5.0
 sqlalchemy[asyncio]==1.4.37
