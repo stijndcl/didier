@@ -4,6 +4,7 @@ from logging.handlers import RotatingFileHandler
 import asyncio
 
 import settings
+from database.migrations import ensure_latest_migration
 from didier import Didier
 
 
@@ -28,7 +29,12 @@ def setup_logging():
     logging.getLogger("discord").setLevel(logging.ERROR)
 
 
-if __name__ == "__main__":
+async def main():
+    """Do some setup & checks, and then run the bot"""
     setup_logging()
+    await ensure_latest_migration()
+    await run_bot()
 
-    asyncio.run(run_bot())
+
+if __name__ == "__main__":
+    asyncio.run(main())
