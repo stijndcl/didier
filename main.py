@@ -22,9 +22,9 @@ def setup_logging():
 
     handler = RotatingFileHandler(settings.LOGFILE, mode="a", maxBytes=max_log_size, backupCount=5)
     handler.setFormatter(logging.Formatter("[%(asctime)s] [%(levelname)s]: %(message)s"))
-    handler.setLevel(logging.INFO)
 
     didier_log.addHandler(handler)
+    didier_log.setLevel(logging.INFO)
 
     logging.getLogger("discord").setLevel(logging.ERROR)
 
