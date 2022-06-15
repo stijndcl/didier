@@ -9,7 +9,8 @@ plugins = [
 [tool.pylint.master]
 disable = [
     "missing-module-docstring",
-    "too-few-public-methods"
+    "too-few-public-methods",
+    "too-many-arguments"
 ]
 
 [tool.pylint.format]

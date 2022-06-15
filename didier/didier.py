@@ -1,7 +1,6 @@
 import os
 import sys
 import traceback
-from typing import Union, Optional
 
 import discord
 from discord.ext import commands
@@ -15,7 +14,7 @@ from didier.utils.prefix import get_prefix
 class Didier(commands.Bot):
     """DIDIER <3"""
 
-    initial_extensions: tuple[str] = ()
+    initial_extensions: tuple[str, ...] = ()
 
     def __init__(self):
         activity = discord.Activity(type=discord.ActivityType.playing, name=settings.DISCORD_STATUS_MESSAGE)
@@ -74,21 +73,6 @@ class Didier(commands.Bot):
                 await self.load_extension(f"{load_path}.{file[:-3]}")
             elif os.path.isdir(new_path := f"{path}/{file}"):
                 await self._load_directory_extensions(new_path)
-
-    async def respond(
-        self,
-        context: Union[commands.Context, discord.Interaction],
-        message: str,
-        mention_author: bool = False,
-        ephemeral: bool = True,
-        embeds: Optional[list[discord.Embed]] = None,
-    ):
-        """Function to respond to both a normal message and an interaction"""
-        if isinstance(context, commands.Context):
-            return await context.reply(message, mention_author=mention_author, embeds=embeds)
-
-        if isinstance(context, discord.Interaction):
-            return await context.response.send_message(message, ephemeral=ephemeral, embeds=embeds)
 
     async def resolve_message(self, reference: discord.MessageReference) -> discord.Message:
         """Fetch a message from a reference"""
