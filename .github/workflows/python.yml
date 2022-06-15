@@ -42,7 +42,7 @@ jobs:
       - name: Run Pytest
         run: pytest tests
   linting:
-    needs: [tests]
+    needs: [dependencies]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -62,7 +62,7 @@ jobs:
       - name: Linting
         run: pylint didier database
   typing:
-    needs: [tests]
+    needs: [dependencies]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -82,7 +82,7 @@ jobs:
       - name: Typing
         run: mypy didier database
   formatting:
-    needs: [tests]
+    needs: [dependencies]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
