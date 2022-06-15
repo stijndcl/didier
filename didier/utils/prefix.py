@@ -11,7 +11,7 @@ def get_prefix(client: commands.Bot, message: Message) -> str:
     This is done dynamically to allow variable amounts of whitespace,
     and through regexes to allow case-insensitivity among other things.
     """
-    mention = f"<@!{client.user.id}>"
+    mention = f"<@!?{client.user.id}>"
     regex = r"^({})\s*"
 
     # Check which prefix was used
