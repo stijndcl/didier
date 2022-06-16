@@ -16,6 +16,7 @@ def tables():
     while we're at it
     """
     print("CWD: ", os.getcwd())
+    print("Contents: ", list(os.listdir(os.getcwd())))
     alembic_config = config.Config("alembic.ini")
     command.upgrade(alembic_config, "head")
     yield
