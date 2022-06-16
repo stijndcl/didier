@@ -19,3 +19,8 @@ good-names = ["i"]
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
+env = [
+    "DB_NAME = didier-tests",
+    "DB_USERNAME = postgres",
+    "DB_HOST = postgres"
+]

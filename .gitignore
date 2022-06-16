@@ -154,3 +154,6 @@ cython_debug/
 
 # PyCharm
 .idea/
+
+# SQLite testing database
+tests.db
