@@ -15,8 +15,6 @@ def tables():
     Starts from an empty database and runs through all the migrations to check those as well
     while we're at it
     """
-    print("CWD: ", os.getcwd())
-    print("Contents: ", list(os.listdir(os.getcwd())))
     alembic_config = config.Config("alembic.ini")
     command.upgrade(alembic_config, "head")
     yield
