@@ -44,4 +44,4 @@ class UforaAnnouncement(Base):
     announcement_id = Column(Integer, primary_key=True)
     course_id = Column(Integer, ForeignKey("ufora_courses.course_id"))
 
-    course = relationship("UforaCourse", back_populates="announcements", uselist=False)
+    course: UforaCourse = relationship("UforaCourse", back_populates="announcements", uselist=False)

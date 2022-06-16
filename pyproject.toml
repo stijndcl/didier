@@ -5,6 +5,9 @@ line-length = 120
 plugins = [
     "sqlalchemy.ext.mypy.plugin"
 ]
+[[tool.mypy.overrides]]
+module = "discord.*"
+ignore_missing_imports = true
 
 [tool.pylint.master]
 disable = [
