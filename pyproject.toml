@@ -22,5 +22,6 @@ asyncio_mode = "auto"
 env = [
     "DB_NAME = didier-tests",
     "DB_USERNAME = postgres",
-    "DB_HOST = postgres"
+    "DB_HOST = postgres",
+    "DISC_TOKEN = token"
 ]
