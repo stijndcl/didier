@@ -26,12 +26,14 @@ class UforaNotification:
     _view_url: str = field(init=False)
     _title: str = field(init=False)
     _description: str = field(init=False)
+    published_dt: datetime = field(init=False)
     _published: str = field(init=False)
 
     def __post_init__(self):
         self._view_url = self._create_url()
         self._title = self._clean_content(self.content["title"])
         self._description = self._get_description()
+        self.published_dt = self._published_datetime()
         self._published = self._get_published()
 
     def to_embed(self) -> discord.Embed:
@@ -69,7 +71,8 @@ class UforaNotification:
         text = text.replace("*", "\\*")
         return md(text)
 
-    def _get_published(self) -> str:
+    def _published_datetime(self) -> datetime:
+        """Get a datetime instance of the publication date"""
         # Datetime is unable to parse the timezone because it's useless
         # We will hereby cut it out and pray the timezone will always be UTC+0
         published = self.content["published"].rsplit(" ", 1)[0]
@@ -81,6 +84,10 @@ class UforaNotification:
         if offset is not None:
             dt += offset
 
+        return dt
+
+    def _get_published(self) -> str:
+        """Get a formatted string that represents when this announcement was published"""
         # TODO
         return "Placeholder :) TODO make the functions to format this"
 
@@ -137,9 +144,10 @@ async def fetch_ufora_announcements(session: AsyncSession) -> list[UforaNotifica
 
                 # Create a new notification
                 notification_id, course_id = parsed
-                notifications.append(UforaNotification(item, course, notification_id, course_id))
+                notification = UforaNotification(item, course, notification_id, course_id)
+                notifications.append(notification)
 
                 # Create new db entry
-                await crud.create_new_announcement(session, notification_id, course)
+                await crud.create_new_announcement(session, notification_id, course, notification.published_dt)
 
     return notifications

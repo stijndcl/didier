@@ -1,6 +1,8 @@
 from __future__ import annotations
 
-from sqlalchemy import Column, Integer, Text, ForeignKey, Boolean
+from datetime import datetime
+
+from sqlalchemy import Column, Integer, Text, ForeignKey, Boolean, DateTime
 from sqlalchemy.orm import declarative_base, relationship
 
 Base = declarative_base()
@@ -44,5 +46,6 @@ class UforaAnnouncement(Base):
 
     announcement_id = Column(Integer, primary_key=True)
     course_id = Column(Integer, ForeignKey("ufora_courses.course_id"))
+    publication_date: datetime = Column(DateTime(timezone=True))
 
     course: UforaCourse = relationship("UforaCourse", back_populates="announcements", uselist=False, lazy="selectin")

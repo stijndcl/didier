@@ -1,8 +1,8 @@
-"""Initial migration: Ufora announcements
+"""Initial migration
 
-Revision ID: 9e8ce58c0a26
+Revision ID: 4ec79dd5b191
 Revises: 
-Create Date: 2022-06-17 01:36:02.767151
+Create Date: 2022-06-19 00:31:58.384360
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '9e8ce58c0a26'
+revision = '4ec79dd5b191'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -23,6 +23,7 @@ def upgrade() -> None:
     sa.Column('name', sa.Text(), nullable=False),
     sa.Column('code', sa.Text(), nullable=False),
     sa.Column('year', sa.Integer(), nullable=False),
+    sa.Column('log_announcements', sa.Boolean(), nullable=False),
     sa.PrimaryKeyConstraint('course_id'),
     sa.UniqueConstraint('code'),
     sa.UniqueConstraint('name')
@@ -30,6 +31,7 @@ def upgrade() -> None:
     op.create_table('ufora_announcements',
     sa.Column('announcement_id', sa.Integer(), nullable=False),
     sa.Column('course_id', sa.Integer(), nullable=True),
+    sa.Column('publication_date', sa.DateTime(timezone=True), nullable=True),
     sa.ForeignKeyConstraint(['course_id'], ['ufora_courses.course_id'], ),
     sa.PrimaryKeyConstraint('announcement_id')
     )
