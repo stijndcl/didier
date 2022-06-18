@@ -3,22 +3,23 @@ import traceback
 from discord.ext import commands, tasks
 
 import settings
+from database.crud.ufora_announcements import remove_old_announcements
 from didier import Didier
 from didier.data.embeds.ufora.announcements import fetch_ufora_announcements
 
 
-# TODO task to clean up old announcements? (> 1 week)
 class Tasks(commands.Cog):
     """Task loops that run periodically"""
 
     client: Didier
 
-    def __init__(self, client: Didier):
+    def __init__(self, client: Didier):  # pylint: disable=no-member
         self.client = client
 
         # Only pull announcements if a token was provided
         if settings.UFORA_RSS_TOKEN is not None and settings.UFORA_ANNOUNCEMENTS_CHANNEL is not None:
-            self.pull_ufora_announcements.start()  # pylint: disable=no-member
+            self.pull_ufora_announcements.start()
+            self.remove_old_ufora_announcements.start()
 
     @tasks.loop(minutes=10)
     async def pull_ufora_announcements(self):
@@ -42,6 +43,15 @@ class Tasks(commands.Cog):
     async def _on_announcements_error(self, error: BaseException):
         """Error handler for the Ufora Announcements task"""
         print("".join(traceback.format_exception(type(error), error, error.__traceback__)))
+
+    @tasks.loop(hours=24)
+    async def remove_old_ufora_announcements(self):
+        """Remove all announcements that are over 1 week old, once per day"""
+        await remove_old_announcements(self.client.db_session)
+
+    @remove_old_ufora_announcements.before_loop
+    async def _before_remove_old_ufora_announcements(self):
+        await self.client.wait_until_ready()
 
 
 async def setup(client: Didier):
