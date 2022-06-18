@@ -7,7 +7,7 @@ from sqlalchemy.orm import sessionmaker
 import settings
 
 # Run local tests against SQLite instead of Postgres
-if settings.DB_TEST_SQLITE:
+if settings.TESTING and settings.DB_TEST_SQLITE:
     engine = create_async_engine(
         URL.create(
             drivername="sqlite+aiosqlite",

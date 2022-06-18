@@ -6,23 +6,25 @@ plugins = [
     "sqlalchemy.ext.mypy.plugin"
 ]
 [[tool.mypy.overrides]]
-module = "discord.*"
+module = ["discord.*", "feedparser.*", "markdownify.*"]
 ignore_missing_imports = true
 
 [tool.pylint.master]
 disable = [
     "missing-module-docstring",
     "too-few-public-methods",
-    "too-many-arguments"
+    "too-many-arguments",
+    "too-many-instance-attributes"
 ]
 
 [tool.pylint.format]
 max-line-length = 120
-good-names = ["i"]
+good-names = ["i", "dt"]
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
 env = [
+    "TESTING = true",
     "DB_NAME = didier_action",
     "DB_USERNAME = postgres",
     "DB_HOST = localhost",

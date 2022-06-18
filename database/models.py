@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from sqlalchemy import Column, Integer, Text, ForeignKey
+from sqlalchemy import Column, Integer, Text, ForeignKey, Boolean
 from sqlalchemy.orm import declarative_base, relationship
 
 Base = declarative_base()
@@ -15,12 +15,13 @@ class UforaCourse(Base):
     name: str = Column(Text, nullable=False, unique=True)
     code: str = Column(Text, nullable=False, unique=True)
     year: int = Column(Integer, nullable=False)
+    log_announcements: bool = Column(Boolean, default=False, nullable=False)
 
     announcements: list[UforaAnnouncement] = relationship(
-        "UforaAnnouncement", back_populates="course", cascade="all, delete-orphan"
+        "UforaAnnouncement", back_populates="course", cascade="all, delete-orphan", lazy="selectin"
     )
     aliases: list[UforaCourseAlias] = relationship(
-        "UforaCourseAlias", back_populates="course", cascade="all, delete-orphan"
+        "UforaCourseAlias", back_populates="course", cascade="all, delete-orphan", lazy="selectin"
     )
 
 
@@ -33,7 +34,7 @@ class UforaCourseAlias(Base):
     alias: str = Column(Text, nullable=False, unique=True)
     course_id: int = Column(Integer, ForeignKey("ufora_courses.course_id"))
 
-    course: UforaCourse = relationship("UforaCourse", back_populates="aliases", uselist=False)
+    course: UforaCourse = relationship("UforaCourse", back_populates="aliases", uselist=False, lazy="selectin")
 
 
 class UforaAnnouncement(Base):
@@ -44,4 +45,4 @@ class UforaAnnouncement(Base):
     announcement_id = Column(Integer, primary_key=True)
     course_id = Column(Integer, ForeignKey("ufora_courses.course_id"))
 
-    course: UforaCourse = relationship("UforaCourse", back_populates="announcements", uselist=False)
+    course: UforaCourse = relationship("UforaCourse", back_populates="announcements", uselist=False, lazy="selectin")

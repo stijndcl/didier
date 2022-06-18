@@ -1,3 +1,5 @@
+from typing import Optional
+
 from environs import Env
 
 # Read the .env file (if present)
@@ -7,6 +9,7 @@ env.read_env()
 """General config"""
 SANDBOX: bool = env.bool("SANDBOX", True)
 LOGFILE: str = env.str("LOGFILE", "didier.log")
+TESTING: bool = env.bool("TESTING", False)
 
 """Database"""
 DB_NAME: str = env.str("DB_NAME", "didier")
@@ -21,3 +24,7 @@ DISCORD_TOKEN: str = env.str("DISC_TOKEN")
 DISCORD_READY_MESSAGE: str = env.str("DISC_READY_MESSAGE", "I'M READY I'M READY I'M READY")
 DISCORD_STATUS_MESSAGE: str = env.str("DISC_STATUS_MESSAGE", "with your Didier Dinks.")
 DISCORD_TEST_GUILDS: list[int] = env.list("DISC_TEST_GUILDS", [], subcast=int)
+UFORA_ANNOUNCEMENTS_CHANNEL: Optional[int] = env.int("UFORA_ANNOUNCEMENTS_CHANNEL", None)
+
+"""API Keys"""
+UFORA_RSS_TOKEN: Optional[str] = env.str("UFORA_RSS_TOKEN", None)
