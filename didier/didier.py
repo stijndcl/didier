@@ -8,6 +8,7 @@ from discord.ext import commands
 from sqlalchemy.ext.asyncio import AsyncSession
 
 import settings
+from database.crud import custom_commands
 from database.engine import DBSession
 from didier.utils.discord.prefix import get_prefix
 
@@ -109,8 +110,22 @@ class Didier(commands.Bot):
         """Check if the message tries to invoke a custom command
         If it does, send the reply associated with it
         """
+        # Doesn't start with the custom command prefix
         if not message.content.startswith(settings.DISCORD_CUSTOM_COMMAND_PREFIX):
             return False
+
+        async with self.db_session as session:
+            # Remove the prefix
+            content = message.content[len(settings.DISCORD_CUSTOM_COMMAND_PREFIX) :]
+            command = await custom_commands.get_command(session, content)
+
+            # Command found
+            if command is not None:
+                await message.reply(command.response, mention_author=False)
+                return True
+
+        # Nothing found
+        return False
 
     async def on_command_error(self, context: commands.Context, exception: commands.CommandError, /) -> None:
         """Event triggered when a regular command errors"""

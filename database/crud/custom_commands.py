@@ -34,8 +34,7 @@ async def create_alias(session: AsyncSession, command: str, alias: str) -> Custo
         raise NoResultFoundException
 
     # Check if the alias exists (either as an alias or as a name)
-    alias_instance = await get_command(session, alias)
-    if alias_instance is not None:
+    if await get_command(session, alias) is not None:
         raise DuplicateInsertException
 
     alias_instance = CustomCommandAlias(alias=alias, indexed_alias=clean_name(alias), command=command_instance)
@@ -47,7 +46,7 @@ async def create_alias(session: AsyncSession, command: str, alias: str) -> Custo
 
 async def get_command(session: AsyncSession, message: str) -> Optional[CustomCommand]:
     """Try to get a command out of a message"""
-    # Search lowercase & without spaces, and strip the prefix
+    # Search lowercase & without spaces
     message = clean_name(message)
     return (await get_command_by_name(session, message)) or (await get_command_by_alias(session, message))
 
