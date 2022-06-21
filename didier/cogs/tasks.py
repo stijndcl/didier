@@ -29,11 +29,12 @@ class Tasks(commands.Cog):
         if settings.UFORA_RSS_TOKEN is None or settings.UFORA_ANNOUNCEMENTS_CHANNEL is None:
             return
 
-        announcements_channel = self.client.get_channel(settings.UFORA_ANNOUNCEMENTS_CHANNEL)
-        announcements = await fetch_ufora_announcements(self.client.db_session)
+        async with self.client.db_session as session:
+            announcements_channel = self.client.get_channel(settings.UFORA_ANNOUNCEMENTS_CHANNEL)
+            announcements = await fetch_ufora_announcements(session)
 
-        for announcement in announcements:
-            await announcements_channel.send(embed=announcement.to_embed())
+            for announcement in announcements:
+                await announcements_channel.send(embed=announcement.to_embed())
 
     @pull_ufora_announcements.before_loop
     async def _before_ufora_announcements(self):
@@ -48,7 +49,8 @@ class Tasks(commands.Cog):
     @tasks.loop(hours=24)
     async def remove_old_ufora_announcements(self):
         """Remove all announcements that are over 1 week old, once per day"""
-        await remove_old_announcements(self.client.db_session)
+        async with self.client.db_session as session:
+            await remove_old_announcements(session)
 
     @remove_old_ufora_announcements.before_loop
     async def _before_remove_old_ufora_announcements(self):
