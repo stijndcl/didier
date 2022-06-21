@@ -1,6 +1,6 @@
 import traceback
 
-from discord.ext import commands, tasks
+from discord.ext import commands, tasks  # type: ignore # Strange & incorrect Mypy error
 
 import settings
 from database.crud.ufora_announcements import remove_old_announcements
