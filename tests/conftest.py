@@ -1,5 +1,5 @@
-import os
 from typing import AsyncGenerator
+from unittest.mock import MagicMock
 
 import pytest
 
@@ -7,6 +7,7 @@ from alembic import command, config
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from database.engine import engine
+from didier import Didier
 
 
 @pytest.fixture(scope="session")
@@ -38,3 +39,16 @@ async def database_session(tables) -> AsyncGenerator[AsyncSession, None]:
         await transaction.rollback()
 
     await connection.close()
+
+
+@pytest.fixture
+def mock_client() -> Didier:
+    """Fixture to get a mock Didier instance
+    The mock uses 0 as the id
+    """
+    mock_client = MagicMock()
+    mock_user = MagicMock()
+    mock_user.id = 0
+    mock_client.user = mock_user
+
+    return mock_client
