@@ -45,13 +45,6 @@ class Didier(commands.Bot):
         await self._load_initial_extensions()
         await self._load_directory_extensions("didier/cogs")
 
-        # Sync application commands to the test guild
-        for guild in settings.DISCORD_TEST_GUILDS:
-            guild_object = discord.Object(id=guild)
-
-            self.tree.copy_global_to(guild=guild_object)
-            await self.tree.sync(guild=guild_object)
-
     async def _load_initial_extensions(self):
         """Load all extensions that should  be loaded before the others"""
         for extension in self.initial_extensions:
