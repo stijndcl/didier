@@ -3,7 +3,6 @@ import sys
 import traceback
 
 import discord
-from discord import Message
 from discord.ext import commands
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -35,6 +34,11 @@ class Didier(commands.Bot):
             command_prefix=get_prefix, case_insensitive=True, intents=intents, activity=activity, status=status
         )
 
+    @property
+    def db_session(self) -> AsyncSession:
+        """Obtain a database session"""
+        return DBSession()
+
     async def setup_hook(self) -> None:
         """Hook called once the bot is initialised"""
         # Load extensions
@@ -47,11 +51,6 @@ class Didier(commands.Bot):
 
             self.tree.copy_global_to(guild=guild_object)
             await self.tree.sync(guild=guild_object)
-
-    @property
-    def db_session(self) -> AsyncSession:
-        """Obtain a database session"""
-        return DBSession()
 
     async def _load_initial_extensions(self):
         """Load all extensions that should  be loaded before the others"""
@@ -86,11 +85,19 @@ class Didier(commands.Bot):
         channel = self.get_channel(reference.channel_id)
         return await channel.fetch_message(reference.message_id)
 
+    async def confirm_message(self, message: discord.Message):
+        """Add a checkmark to a message"""
+        await message.add_reaction("✅")
+
+    async def reject_message(self, message: discord.Message):
+        """Add an X to a message"""
+        await message.add_reaction("❌")
+
     async def on_ready(self):
         """Event triggered when the bot is ready"""
         print(settings.DISCORD_READY_MESSAGE)
 
-    async def on_message(self, message: Message, /) -> None:
+    async def on_message(self, message: discord.Message, /) -> None:
         """Event triggered when a message is sent"""
         # Ignore messages by bots
         if message.author.bot:
@@ -101,12 +108,12 @@ class Didier(commands.Bot):
             await message.add_reaction(settings.DISCORD_BOOS_REACT)
 
         # Potential custom command
-        if self._try_invoke_custom_command(message):
+        if await self._try_invoke_custom_command(message):
             return
 
         await self.process_commands(message)
 
-    async def _try_invoke_custom_command(self, message: Message) -> bool:
+    async def _try_invoke_custom_command(self, message: discord.Message) -> bool:
         """Check if the message tries to invoke a custom command
         If it does, send the reply associated with it
         """
