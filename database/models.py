@@ -8,6 +8,34 @@ from sqlalchemy.orm import declarative_base, relationship
 Base = declarative_base()
 
 
+class CustomCommand(Base):
+    """Custom commands to fill the hole Dyno couldn't"""
+
+    __tablename__ = "custom_commands"
+
+    command_id: int = Column(Integer, primary_key=True)
+    name: str = Column(Text, nullable=False, unique=True)
+    indexed_name: str = Column(Text, nullable=False, index=True)
+    response: str = Column(Text, nullable=False)
+
+    aliases: list[CustomCommandAlias] = relationship(
+        "CustomCommandAlias", back_populates="command", uselist=True, cascade="all, delete-orphan", lazy="selectin"
+    )
+
+
+class CustomCommandAlias(Base):
+    """Aliases for custom commands"""
+
+    __tablename__ = "custom_command_aliases"
+
+    alias_id: int = Column(Integer, primary_key=True)
+    alias: str = Column(Text, nullable=False, unique=True)
+    indexed_alias: str = Column(Text, nullable=False, index=True)
+    command_id: int = Column(Integer, ForeignKey("custom_commands.command_id"))
+
+    command: CustomCommand = relationship("CustomCommand", back_populates="aliases", uselist=False, lazy="selectin")
+
+
 class UforaCourse(Base):
     """A course on Ufora"""
 

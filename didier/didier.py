@@ -3,6 +3,7 @@ import sys
 import traceback
 
 import discord
+from discord import Message
 from discord.ext import commands
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -87,6 +88,29 @@ class Didier(commands.Bot):
     async def on_ready(self):
         """Event triggered when the bot is ready"""
         print(settings.DISCORD_READY_MESSAGE)
+
+    async def on_message(self, message: Message, /) -> None:
+        """Event triggered when a message is sent"""
+        # Ignore messages by bots
+        if message.author.bot:
+            return
+
+        # Boos react to people that say Dider
+        if "dider" in message.content.lower() and message.author.id != self.user.id:
+            await message.add_reaction(settings.DISCORD_BOOS_REACT)
+
+        # Potential custom command
+        if self._try_invoke_custom_command(message):
+            return
+
+        await self.process_commands(message)
+
+    async def _try_invoke_custom_command(self, message: Message) -> bool:
+        """Check if the message tries to invoke a custom command
+        If it does, send the reply associated with it
+        """
+        if not message.content.startswith(settings.DISCORD_CUSTOM_COMMAND_PREFIX):
+            return False
 
     async def on_command_error(self, context: commands.Context, exception: commands.CommandError, /) -> None:
         """Event triggered when a regular command errors"""
