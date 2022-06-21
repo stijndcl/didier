@@ -8,7 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 import settings
 from database.engine import DBSession
-from didier.utils.prefix import get_prefix
+from didier.utils.discord.prefix import get_prefix
 
 
 class Didier(commands.Bot):

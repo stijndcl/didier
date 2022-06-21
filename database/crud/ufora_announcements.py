@@ -13,7 +13,7 @@ async def get_courses_with_announcements(session: AsyncSession) -> list[UforaCou
 
 
 async def create_new_announcement(
-    session: AsyncSession, announcement_id: int, course: UforaCourse, publication_date: datetime
+    session: AsyncSession, announcement_id: int, course: UforaCourse, publication_date: datetime.datetime
 ) -> UforaAnnouncement:
     """Add a new announcement to the database"""
     new_announcement = UforaAnnouncement(

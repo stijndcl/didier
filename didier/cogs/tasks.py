@@ -13,7 +13,8 @@ class Tasks(commands.Cog):
 
     client: Didier
 
-    def __init__(self, client: Didier):  # pylint: disable=no-member
+    def __init__(self, client: Didier):
+        # pylint: disable=no-member
         self.client = client
 
         # Only pull announcements if a token was provided

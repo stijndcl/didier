@@ -12,6 +12,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 import settings
 from database.crud import ufora_announcements as crud
 from database.models import UforaCourse
+from didier.utils.types.datetime import int_to_weekday
+from didier.utils.types.string import leading
 
 
 @dataclass
@@ -88,8 +90,19 @@ class UforaNotification:
 
     def _get_published(self) -> str:
         """Get a formatted string that represents when this announcement was published"""
-        # TODO
-        return "Placeholder :) TODO make the functions to format this"
+        return (
+            f"{int_to_weekday(self.published_dt.weekday())} "
+            f"{leading('0', str(self.published_dt.day))}"
+            "/"
+            f"{leading('0', str(self.published_dt.month))}"
+            "/"
+            f"{self.published_dt.year} "
+            f"om {leading('0', str(self.published_dt.hour))}"
+            ":"
+            f"{leading('0', str(self.published_dt.minute))}"
+            ":"
+            f"{leading('0', str(self.published_dt.second))}"
+        )
 
 
 def parse_ids(url: str) -> Optional[tuple[int, int]]:
