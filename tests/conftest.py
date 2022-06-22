@@ -1,4 +1,5 @@
-from typing import AsyncGenerator
+import asyncio
+from typing import AsyncGenerator, Generator
 from unittest.mock import MagicMock
 
 import pytest
@@ -11,7 +12,14 @@ from didier import Didier
 
 
 @pytest.fixture(scope="session")
-def tables():
+def event_loop() -> Generator:
+    loop = asyncio.get_event_loop_policy().new_event_loop()
+    yield loop
+    loop.close()
+
+
+@pytest.fixture(scope="session")
+def tables(event_loop):
     """Initialize a database before the tests, and then tear it down again
     Starts from an empty database and runs through all the migrations to check those as well
     while we're at it
@@ -23,7 +31,7 @@ def tables():
 
 
 @pytest.fixture
-async def database_session(tables) -> AsyncGenerator[AsyncSession, None]:
+async def database_session(tables, event_loop) -> AsyncGenerator[AsyncSession, None]:
     """Fixture to create a session for every test
     Rollbacks the transaction afterwards so that the future tests start with a clean database
     """
