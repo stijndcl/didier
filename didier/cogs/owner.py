@@ -26,6 +26,7 @@ class Owner(commands.Cog):
         """Global check for every command in this cog, so we don't have to add
         is_owner() to every single command separately
         """
+        # pylint: disable=W0236 # Pylint thinks this can't be async, but it can
         return await self.client.is_owner(ctx.author)
 
     @commands.command(name="Sync")
