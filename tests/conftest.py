@@ -1,4 +1,5 @@
 import asyncio
+import os
 from typing import AsyncGenerator, Generator
 from unittest.mock import MagicMock
 
@@ -22,8 +23,6 @@ async def tables(event_loop):
     """Initialize a database before the tests, and then tear it down again"""
     async with engine.begin() as connection:
         await connection.run_sync(Base.metadata.create_all)
-        yield
-        await connection.run_sync(Base.metadata.drop_all)
 
 
 @pytest.fixture
