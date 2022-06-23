@@ -19,7 +19,7 @@ def event_loop() -> Generator:
 
 
 @pytest.fixture(scope="session")
-def tables(event_loop):
+def tables():
     """Initialize a database before the tests, and then tear it down again
     Starts from an empty database and runs through all the migrations to check those as well
     while we're at it

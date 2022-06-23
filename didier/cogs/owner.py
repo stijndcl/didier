@@ -36,7 +36,6 @@ class Owner(commands.Cog):
             self.client.tree.copy_global_to(guild=guild)
             await self.client.tree.sync(guild=guild)
         else:
-            # self.client.tree.clear_commands(guild=None)
             await self.client.tree.sync()
 
         await ctx.message.add_reaction("🔄")
