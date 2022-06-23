@@ -36,7 +36,7 @@ class Owner(commands.Cog):
             self.client.tree.copy_global_to(guild=guild)
             await self.client.tree.sync(guild=guild)
         else:
-            self.client.tree.clear_commands(guild=None)
+            # self.client.tree.clear_commands(guild=None)
             await self.client.tree.sync()
 
         await ctx.message.add_reaction("🔄")
@@ -73,14 +73,14 @@ class Owner(commands.Cog):
     @add_slash.command(name="custom", description="Add a custom command")
     async def add_custom_slash(self, interaction: discord.Interaction):
         """Slash command to add a custom command"""
-        if not self.client.is_owner(interaction.user):
+        if not await self.client.is_owner(interaction.user):
             return interaction.response.send_message(
                 "Je hebt geen toestemming om dit commando uit te voeren.", ephemeral=True
             )
 
-        await interaction.response.defer(ephemeral=True)
+        # await interaction.response.defer(ephemeral=True)
         modal = CreateCustomCommand()
-        await interaction.response.send_message(modal)
+        await interaction.response.send_modal(modal)
 
     @commands.group(name="Edit")
     async def edit(self, ctx: commands.Context):

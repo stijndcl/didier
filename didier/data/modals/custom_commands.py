@@ -6,10 +6,10 @@ import discord
 class CreateCustomCommand(discord.ui.Modal, title="Custom Command"):
     """Modal shown to visually create custom commands"""
 
-    name: discord.ui.TextInput = discord.ui.TextInput(label="Name", placeholder="Name of the command...")
+    name: discord.ui.TextInput = discord.ui.TextInput(label="Name", placeholder="Name of the command")
 
     response: discord.ui.TextInput = discord.ui.TextInput(
-        label="Response", style=discord.TextStyle.long, placeholder="Response of the command...", max_length=2000
+        label="Response", style=discord.TextStyle.long, placeholder="Response of the command", max_length=2000
     )
 
     async def on_submit(self, interaction: discord.Interaction) -> None:
