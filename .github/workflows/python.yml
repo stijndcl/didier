@@ -53,7 +53,7 @@ jobs:
       - name: Install dependencies
         run: pip3 install -r requirements.txt -r requirements-dev.txt
       - name: Run Pytest
-        run: pytest tests --test-alembic
+        run: pytest tests
         env:
           DB_TEST_SQLITE: false
           DB_NAME: didier_action

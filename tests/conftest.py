@@ -1,5 +1,4 @@
 import asyncio
-import os
 from typing import AsyncGenerator, Generator
 from unittest.mock import MagicMock
 
