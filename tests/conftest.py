@@ -3,11 +3,10 @@ from typing import AsyncGenerator, Generator
 from unittest.mock import MagicMock
 
 import pytest
-
-from alembic import command, config
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from database.engine import engine
+from database.models import Base
 from didier import Didier
 
 
@@ -19,15 +18,12 @@ def event_loop() -> Generator:
 
 
 @pytest.fixture(scope="session")
-def tables(event_loop):
-    """Initialize a database before the tests, and then tear it down again
-    Starts from an empty database and runs through all the migrations to check those as well
-    while we're at it
-    """
-    alembic_config = config.Config("alembic.ini")
-    command.upgrade(alembic_config, "head")
-    yield
-    command.downgrade(alembic_config, "base")
+async def tables(event_loop):
+    """Initialize a database before the tests, and then tear it down again"""
+    async with engine.begin() as connection:
+        await connection.run_sync(Base.metadata.create_all)
+        yield
+        await connection.run_sync(Base.metadata.drop_all)
 
 
 @pytest.fixture
