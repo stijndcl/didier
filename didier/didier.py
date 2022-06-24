@@ -129,8 +129,9 @@ class Didier(commands.Bot):
 
     async def on_command_error(self, context: commands.Context, exception: commands.CommandError, /) -> None:
         """Event triggered when a regular command errors"""
-        # If developing, print everything to stdout so you don't have to
-        # check the logs all the time
+        # Print everything to the logs/stderr
+        await super().on_command_error(context, exception)
+
+        # If developing, do nothing special
         if settings.SANDBOX:
-            print(traceback.format_exc(), file=sys.stderr)
             return

@@ -65,3 +65,23 @@ async def get_command_by_alias(session: AsyncSession, message: str) -> Optional[
         return None
 
     return alias.command
+
+
+async def edit_command(
+    session: AsyncSession, original_name: str, new_name: Optional[str] = None, new_response: Optional[str] = None
+) -> CustomCommand:
+    """Edit an existing command"""
+    # Check if the command exists
+    command = await get_command(session, original_name)
+    if command is None:
+        raise NoResultFoundException
+
+    if new_name is not None:
+        command.name = new_name
+    if new_response is not None:
+        command.response = new_response
+
+    session.add(command)
+    await session.commit()
+
+    return command

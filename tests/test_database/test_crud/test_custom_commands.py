@@ -4,7 +4,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from database.crud import custom_commands as crud
 from database.exceptions.constraints import DuplicateInsertException
-from database.models import CustomCommand, CustomCommandAlias
+from database.exceptions.not_found import NoResultFoundException
+from database.models import CustomCommand
 
 
 async def test_create_command_non_existing(database_session: AsyncSession):
@@ -33,7 +34,7 @@ async def test_create_command_name_is_alias(database_session: AsyncSession):
         await crud.create_command(database_session, "n", "other response")
 
 
-async def test_create_alias_non_existing(database_session: AsyncSession):
+async def test_create_alias(database_session: AsyncSession):
     """Test creating an alias when the name is still free"""
     command = await crud.create_command(database_session, "name", "response")
     await crud.create_alias(database_session, command.name, "n")
@@ -41,6 +42,12 @@ async def test_create_alias_non_existing(database_session: AsyncSession):
     await database_session.refresh(command)
     assert len(command.aliases) == 1
     assert command.aliases[0].alias == "n"
+
+
+async def test_create_alias_non_existing(database_session: AsyncSession):
+    """Test creating an alias when the command doesn't exist"""
+    with pytest.raises(NoResultFoundException):
+        await crud.create_alias(database_session, "name", "alias")
 
 
 async def test_create_alias_duplicate(database_session: AsyncSession):
@@ -96,3 +103,17 @@ async def test_get_command_by_alias(database_session: AsyncSession):
 async def test_get_command_non_existing(database_session: AsyncSession):
     """Test getting a command when it doesn't exist"""
     assert await crud.get_command(database_session, "name") is None
+
+
+async def test_edit_command(database_session: AsyncSession):
+    """Test editing an existing command"""
+    command = await crud.create_command(database_session, "name", "response")
+    await crud.edit_command(database_session, command.name, "new name", "new response")
+    assert command.name == "new name"
+    assert command.response == "new response"
+
+
+async def test_edit_command_non_existing(database_session: AsyncSession):
+    """Test editing a command that doesn't exist"""
+    with pytest.raises(NoResultFoundException):
+        await crud.edit_command(database_session, "name", "n", "r")

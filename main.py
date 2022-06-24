@@ -1,4 +1,5 @@
 import logging
+import sys
 from logging.handlers import RotatingFileHandler
 
 import asyncio
@@ -18,15 +19,26 @@ def setup_logging():
     """Configure custom loggers"""
     max_log_size = 32 * 1024 * 1024
 
+    # Configure Didier handler
     didier_log = logging.getLogger("didier")
 
-    handler = RotatingFileHandler(settings.LOGFILE, mode="a", maxBytes=max_log_size, backupCount=5)
-    handler.setFormatter(logging.Formatter("[%(asctime)s] [%(levelname)s]: %(message)s"))
+    didier_handler = RotatingFileHandler(settings.LOGFILE, mode="a", maxBytes=max_log_size, backupCount=5)
+    didier_handler.setFormatter(logging.Formatter("[%(asctime)s] [%(levelname)s]: %(message)s"))
 
-    didier_log.addHandler(handler)
+    didier_log.addHandler(didier_handler)
     didier_log.setLevel(logging.INFO)
 
-    logging.getLogger("discord").setLevel(logging.ERROR)
+    # Configure discord handler
+    discord_log = logging.getLogger("discord")
+
+    # Make dev print to stderr instead, so you don't have to watch the file
+    if settings.SANDBOX:
+        discord_handler = logging.StreamHandler(sys.stderr)
+    else:
+        discord_handler = RotatingFileHandler("discord.log", mode="a", maxBytes=max_log_size, backupCount=5)
+
+    discord_handler.setFormatter(logging.Formatter("[%(asctime)s] [%(levelname)s] %(name)s: %(message)s"))
+    discord_log.addHandler(discord_handler)
 
 
 async def main():

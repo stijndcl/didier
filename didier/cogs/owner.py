@@ -8,7 +8,8 @@ from database.crud import custom_commands
 from database.exceptions.constraints import DuplicateInsertException
 from database.exceptions.not_found import NoResultFoundException
 from didier import Didier
-from didier.data.modals.custom_commands import CreateCustomCommand
+from didier.data.modals.custom_commands import CreateCustomCommand, EditCustomCommand
+from didier.data.flags.owner import EditCustomFlags
 
 
 class Owner(commands.Cog):
@@ -18,6 +19,7 @@ class Owner(commands.Cog):
 
     # Slash groups
     add_slash = app_commands.Group(name="add", description="Add something new to the database")
+    edit_slash = app_commands.Group(name="edit", description="Edit an existing database entry")
 
     def __init__(self, client: Didier):
         self.client = client
@@ -28,6 +30,11 @@ class Owner(commands.Cog):
         """
         # pylint: disable=W0236 # Pylint thinks this can't be async, but it can
         return await self.client.is_owner(ctx.author)
+
+    @commands.command(name="Error")
+    async def _error(self, ctx: commands.Context):
+        """Raise an exception for debugging purposes"""
+        raise Exception("Debug")
 
     @commands.command(name="Sync")
     async def sync(self, ctx: commands.Context, guild: Optional[discord.Guild] = None):
@@ -77,13 +84,42 @@ class Owner(commands.Cog):
                 "Je hebt geen toestemming om dit commando uit te voeren.", ephemeral=True
             )
 
-        # await interaction.response.defer(ephemeral=True)
-        modal = CreateCustomCommand()
+        modal = CreateCustomCommand(self.client)
         await interaction.response.send_modal(modal)
 
-    @commands.group(name="Edit")
-    async def edit(self, ctx: commands.Context):
+    @commands.group(name="Edit", case_insensitive=True, invoke_without_command=False)
+    async def edit_msg(self, ctx: commands.Context):
         """Command group for [edit X] commands"""
+
+    @edit_msg.command(name="Custom")
+    async def edit_custom_msg(self, ctx: commands.Context, command: str, *, flags: EditCustomFlags):
+        """Edit an existing custom command"""
+        async with self.client.db_session as session:
+            try:
+                await custom_commands.edit_command(session, command, flags.name, flags.response)
+                return await self.client.confirm_message(ctx.message)
+            except NoResultFoundException:
+                await ctx.reply(f"Geen commando gevonden voor ``{command}``.")
+                return await self.client.reject_message(ctx.message)
+
+    @edit_slash.command(name="custom", description="Edit a custom command")
+    @app_commands.describe(command="The name of the command to edit")
+    async def edit_custom_slash(self, interaction: discord.Interaction, command: str):
+        """Slash command to edit a custom command"""
+        if not await self.client.is_owner(interaction.user):
+            return interaction.response.send_message(
+                "Je hebt geen toestemming om dit commando uit te voeren.", ephemeral=True
+            )
+
+        async with self.client.db_session as session:
+            _command = await custom_commands.get_command(session, command)
+            if _command is None:
+                return await interaction.response.send_message(
+                    f"Geen commando gevonden voor ``{command}``.", ephemeral=True
+                )
+
+            modal = EditCustomCommand(self.client, _command.name, _command.response)
+            await interaction.response.send_modal(modal)
 
 
 async def setup(client: Didier):
