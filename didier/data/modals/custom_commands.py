@@ -49,8 +49,9 @@ class EditCustomCommand(discord.ui.Modal, title="Edit Custom Command"):
         self.original_name = name
         self.client = client
 
-        self.name = self.add_item(discord.ui.TextInput(label="Name", placeholder="Didier", default=name))
-        self.response = self.add_item(
+        # TODO find a way to access these items
+        self.add_item(discord.ui.TextInput(label="Name", placeholder="Didier", default=name))
+        self.add_item(
             discord.ui.TextInput(
                 label="Response", placeholder="Hmm?", default=response, style=discord.TextStyle.long, max_length=2000
             )
