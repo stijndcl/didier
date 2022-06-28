@@ -34,6 +34,10 @@ jobs:
           --health-retries 5
         ports:
           - 5433:5432
+        env:
+          POSTGRES_DB: didier_pytest
+          POSTGRES_USER: pytest
+          POSTGRES_PASSWORD: pytest
     steps:
       - uses: actions/checkout@v3
       - name: Setup Python
