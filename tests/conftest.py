@@ -5,6 +5,7 @@ from unittest.mock import MagicMock
 import pytest
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from alembic import config, command
 from database.engine import engine
 from database.models import Base
 from didier import Didier
@@ -20,8 +21,10 @@ def event_loop() -> Generator:
 @pytest.fixture(scope="session")
 async def tables(event_loop):
     """Initialize a database before the tests, and then tear it down again"""
-    async with engine.begin() as connection:
-        await connection.run_sync(Base.metadata.create_all)
+    alembic_config: config.Config = config.Config("alembic.ini")
+    command.upgrade(alembic_config, "head")
+    yield
+    command.downgrade(alembic_config, "base")
 
 
 @pytest.fixture
