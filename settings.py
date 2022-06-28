@@ -9,7 +9,6 @@ env.read_env()
 """General config"""
 SANDBOX: bool = env.bool("SANDBOX", True)
 LOGFILE: str = env.str("LOGFILE", "didier.log")
-TESTING: bool = env.bool("TESTING", False)
 
 """Database"""
 DB_NAME: str = env.str("DB_NAME", "didier")
@@ -17,7 +16,6 @@ DB_USERNAME: str = env.str("DB_USERNAME", "postgres")
 DB_PASSWORD: str = env.str("DB_PASSWORD", "")
 DB_HOST: str = env.str("DB_HOST", "localhost")
 DB_PORT: int = env.int("DB_PORT", "5432")
-DB_TEST_SQLITE: bool = env.bool("DB_TEST_SQLITE", True)
 
 """Discord"""
 DISCORD_TOKEN: str = env.str("DISC_TOKEN")

@@ -24,9 +24,10 @@ good-names = ["i", "dt"]
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
 env = [
-    "TESTING = true",
-    "DB_NAME = didier_action",
-    "DB_USERNAME = postgres",
+    "DB_NAME = didier_pytest",
+    "DB_USERNAME = pytest",
+    "DB_PASSWORD = pytest",
     "DB_HOST = localhost",
+    "DB_PORT = 5433",
     "DISC_TOKEN = token"
 ]

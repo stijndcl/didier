@@ -27,16 +27,13 @@ jobs:
     services:
       postgres:
         image: postgres:14
-        env:
-          POSTGRES_DB: didier_action
-          POSTGRES_PASSWORD: postgres
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
         ports:
-          - 5432:5432
+          - 5433:5432
     steps:
       - uses: actions/checkout@v3
       - name: Setup Python
@@ -54,10 +51,6 @@ jobs:
         run: pip3 install -r requirements.txt -r requirements-dev.txt
       - name: Run Pytest
         run: pytest tests
-        env:
-          DB_TEST_SQLITE: false
-          DB_NAME: didier_action
-          DB_PASSWORD: postgres
   linting:
     needs: [dependencies]
     runs-on: ubuntu-latest
