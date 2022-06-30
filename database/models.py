@@ -17,6 +17,8 @@ class Bank(Base):
     bank_id: int = Column(Integer, primary_key=True)
     user_id: int = Column(BigInteger, ForeignKey("users.user_id"))
 
+    dinks: int = Column(BigInteger, default=0, nullable=False)
+
     # Interest rate
     interest_level: int = Column(Integer, default=1, nullable=False)
 
@@ -119,7 +121,6 @@ class User(Base):
     __tablename__ = "users"
 
     user_id: int = Column(BigInteger, primary_key=True)
-    dinks: int = Column(BigInteger, default=0, nullable=False)
 
     bank: Bank = relationship(
         "Bank", back_populates="user", uselist=False, lazy="selectin", cascade="all, delete-orphan"
