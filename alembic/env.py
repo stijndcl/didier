@@ -68,10 +68,4 @@ async def run_migrations_online() -> None:
 if context.is_offline_mode():
     run_migrations_offline()
 else:
-    # Wonky way to use the Pytest event loop instead of another one
-    try:
-        loop = asyncio.get_running_loop()
-        if loop and loop.is_running():
-            loop.create_task(run_migrations_online())
-    except RuntimeError:
-        asyncio.run(run_migrations_online())
+    asyncio.run(run_migrations_online())

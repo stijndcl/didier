@@ -17,6 +17,7 @@ engine = create_async_engine(
         database=settings.DB_NAME,
     ),
     pool_pre_ping=True,
+    future=True,
 )
 
 DBSession = sessionmaker(autocommit=False, autoflush=False, bind=engine, class_=AsyncSession, expire_on_commit=False)

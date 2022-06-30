@@ -5,7 +5,6 @@ from unittest.mock import MagicMock
 import pytest
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from alembic import config, command
 from database.engine import engine
 from database.models import Base
 from didier import Didier
@@ -19,16 +18,14 @@ def event_loop() -> Generator:
 
 
 @pytest.fixture(scope="session")
-async def tables(event_loop):
+async def tables():
     """Initialize a database before the tests, and then tear it down again"""
-    alembic_config: config.Config = config.Config("alembic.ini")
-    command.upgrade(alembic_config, "head")
-    yield
-    command.downgrade(alembic_config, "base")
+    async with engine.begin() as connection:
+        await connection.run_sync(Base.metadata.create_all)
 
 
 @pytest.fixture
-async def database_session(tables, event_loop) -> AsyncGenerator[AsyncSession, None]:
+async def database_session(tables) -> AsyncGenerator[AsyncSession, None]:
     """Fixture to create a session for every test
     Rollbacks the transaction afterwards so that the future tests start with a clean database
     """
