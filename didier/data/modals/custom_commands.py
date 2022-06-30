@@ -24,7 +24,7 @@ class CreateCustomCommand(discord.ui.Modal, title="Create Custom Command"):
 
     async def on_submit(self, interaction: discord.Interaction):
         async with self.client.db_session as session:
-            command = await create_command(session, self.name.value, self.response.value)
+            command = await create_command(session, str(self.name.value), str(self.response.value))
 
         await interaction.response.send_message(f"Successfully created ``{command.name}``.", ephemeral=True)
 
