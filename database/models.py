@@ -1,11 +1,32 @@
 from __future__ import annotations
 
 from datetime import datetime
+from typing import Optional
 
-from sqlalchemy import Column, Integer, Text, ForeignKey, Boolean, DateTime
+from sqlalchemy import BigInteger, Column, Integer, Text, ForeignKey, Boolean, DateTime
 from sqlalchemy.orm import declarative_base, relationship
 
 Base = declarative_base()
+
+
+class Bank(Base):
+    """A user's currency information"""
+
+    __tablename__ = "bank"
+
+    bank_id: int = Column(Integer, primary_key=True)
+    user_id: int = Column(BigInteger, ForeignKey("users.user_id"))
+
+    # Interest rate
+    interest_level: int = Column(Integer, default=1, nullable=False)
+
+    # Maximum amount that can be stored in the bank
+    capacity_level: int = Column(Integer, default=1, nullable=False)
+
+    # Maximum amount that can be robbed
+    rob_level: int = Column(Integer, default=1, nullable=False)
+
+    user: User = relationship("User", uselist=False, back_populates="bank", lazy="selectin")
 
 
 class CustomCommand(Base):
@@ -34,6 +55,19 @@ class CustomCommandAlias(Base):
     command_id: int = Column(Integer, ForeignKey("custom_commands.command_id"))
 
     command: CustomCommand = relationship("CustomCommand", back_populates="aliases", uselist=False, lazy="selectin")
+
+
+class NightlyData(Base):
+    """Data for a user's Nightly stats"""
+
+    __tablename__ = "nightly_data"
+
+    nightly_id: int = Column(Integer, primary_key=True)
+    user_id: int = Column(BigInteger, ForeignKey("users.user_id"))
+    last_nightly: Optional[datetime] = Column(DateTime(timezone=True), nullable=True)
+    count: int = Column(Integer, default=0, nullable=False)
+
+    user: User = relationship("User", back_populates="nightly_data", uselist=False, lazy="selectin")
 
 
 class UforaCourse(Base):
@@ -72,8 +106,24 @@ class UforaAnnouncement(Base):
 
     __tablename__ = "ufora_announcements"
 
-    announcement_id = Column(Integer, primary_key=True)
-    course_id = Column(Integer, ForeignKey("ufora_courses.course_id"))
+    announcement_id: int = Column(Integer, primary_key=True)
+    course_id: int = Column(Integer, ForeignKey("ufora_courses.course_id"))
     publication_date: datetime = Column(DateTime(timezone=True))
 
     course: UforaCourse = relationship("UforaCourse", back_populates="announcements", uselist=False, lazy="selectin")
+
+
+class User(Base):
+    """A Didier user"""
+
+    __tablename__ = "users"
+
+    user_id: int = Column(BigInteger, primary_key=True)
+    dinks: int = Column(BigInteger, default=0, nullable=False)
+
+    bank: Bank = relationship(
+        "Bank", back_populates="user", uselist=False, lazy="selectin", cascade="all, delete-orphan"
+    )
+    nightly_data: NightlyData = relationship(
+        "NightlyData", back_populates="user", uselist=False, lazy="selectin", cascade="all, delete-orphan"
+    )
