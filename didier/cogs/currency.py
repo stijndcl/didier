@@ -1,10 +1,9 @@
 import discord
 from discord.ext import commands
 
-from didier import Didier
-
 from database.crud import currency as crud
 from database.exceptions.currency import DoubleNightly
+from didier import Didier
 from didier.utils.discord.checks import is_owner
 from didier.utils.types.string import pluralize
 
@@ -21,8 +20,13 @@ class Currency(commands.Cog):
     @commands.command(name="Award")
     @commands.check(is_owner)
     async def award(self, ctx: commands.Context, user: discord.User, amount: int):
+        """Award a user a given amount of Didier Dinks"""
         async with self.client.db_session as session:
             await crud.add_dinks(session, user.id, amount)
+            plural = pluralize("Didier Dink", amount)
+            await ctx.reply(
+                f"**{ctx.author.display_name}** heeft **{user.display_name}** **{amount}** {plural} geschonken."
+            )
             await self.client.confirm_message(ctx.message)
 
     @commands.hybrid_command(name="bank")
@@ -51,4 +55,5 @@ class Currency(commands.Cog):
 
 
 async def setup(client: Didier):
+    """Load the cog"""
     await client.add_cog(Currency(client))
