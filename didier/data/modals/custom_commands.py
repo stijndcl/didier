@@ -1,4 +1,5 @@
 import traceback
+import typing
 
 import discord
 
@@ -23,7 +24,7 @@ class CreateCustomCommand(discord.ui.Modal, title="Create Custom Command"):
 
     async def on_submit(self, interaction: discord.Interaction):
         async with self.client.db_session as session:
-            command = await create_command(session, self.name.value, self.response.value)
+            command = await create_command(session, str(self.name.value), str(self.response.value))
 
         await interaction.response.send_message(f"Successfully created ``{command.name}``.", ephemeral=True)
 
@@ -49,7 +50,6 @@ class EditCustomCommand(discord.ui.Modal, title="Edit Custom Command"):
         self.original_name = name
         self.client = client
 
-        # TODO find a way to access these items
         self.add_item(discord.ui.TextInput(label="Name", placeholder="Didier", default=name))
         self.add_item(
             discord.ui.TextInput(
@@ -58,8 +58,11 @@ class EditCustomCommand(discord.ui.Modal, title="Edit Custom Command"):
         )
 
     async def on_submit(self, interaction: discord.Interaction):
+        name_field = typing.cast(discord.ui.TextInput, self.children[0])
+        response_field = typing.cast(discord.ui.TextInput, self.children[1])
+
         async with self.client.db_session as session:
-            await edit_command(session, self.original_name, self.name.value, self.response.value)
+            await edit_command(session, self.original_name, name_field.value, response_field.value)
 
         await interaction.response.send_message(f"Successfully edited ``{self.original_name}``.", ephemeral=True)
 

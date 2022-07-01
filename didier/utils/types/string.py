@@ -20,3 +20,11 @@ def leading(character: str, string: str, target_length: Optional[int] = 2) -> st
     frequency = math.ceil((target_length - len(string)) / len(character))
 
     return (frequency * character) + string
+
+
+def pluralize(word: str, amount: int, plural_form: Optional[str] = None) -> str:
+    """Turn a word into plural"""
+    if amount == 1:
+        return word
+
+    return plural_form or (word + "s")
