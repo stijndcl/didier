@@ -14,8 +14,7 @@ omit = [
     "./database/migrations.py",
     "./didier/cogs/*",
     "./didier/didier.py",
-    "./didier/data/flags/*",
-    "./didier/data/modals/*"
+    "./didier/data/*
 ]
 
 [tool.mypy]
