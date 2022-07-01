@@ -1,4 +1,4 @@
-from typing import Mapping, Optional, List, Any
+from typing import Mapping, Optional, List
 
 import discord
 from discord.ext import commands
@@ -11,12 +11,6 @@ class CustomHelpCommand(commands.MinimalHelpCommand):
     The default is ugly as hell
     """
 
-    client: Didier
-
-    def __init__(self, client: Didier, **kwargs):
-        super().__init__(**kwargs)
-        self.client = client
-
     def _help_embed_base(self, title: str) -> discord.Embed:
         """Create the base structure for the embeds that get sent with the Help commands"""
         embed = discord.Embed(colour=discord.Colour.blue())
@@ -24,20 +18,25 @@ class CustomHelpCommand(commands.MinimalHelpCommand):
         embed.set_footer(text="Syntax: Didier Help [Categorie] of Didier Help [Commando]")
         return embed
 
-    async def send_bot_help(self, mapping: Mapping[Optional[commands.Cog], List[commands.Command[Any, ..., Any]]], /):
+    async def _filter_cogs(self, cogs: List[commands.Cog]) -> List[commands.Cog]:
+        """Filter the list of cogs down to all those that the user can see"""
+        # Remove cogs that we never want to see in the help page because they
+        # don't contain commands
+        filtered_cogs = list(filter(lambda cog: cog is not None and cog.qualified_name.lower() not in ("tasks",), cogs))
+
+        # Remove owner-only cogs
+        if not await self.context.bot.is_owner(self.context.author):
+            filtered_cogs = list(filter(lambda cog: cog.qualified_name.lower() not in ("owner",), filtered_cogs))
+
+        return list(sorted(filtered_cogs, key=lambda cog: cog.qualified_name))
+
+    async def send_bot_help(self, mapping: Mapping[Optional[commands.Cog], List[commands.Command]], /):
         embed = self._help_embed_base("Categorieën")
+        filtered_cogs = await self._filter_cogs(list(mapping.keys()))
+        embed.description = "\n".join(list(map(lambda cog: cog.qualified_name, filtered_cogs)))
+        await self.get_destination().send(embed=embed)
 
-        categories = list(mapping.keys())
-        print(categories)
 
-
-class Help(commands.Cog):
-    """Cog housing the custom Help command"""
-
-    client: Didier
-
-    def __init__(self, client: Didier):
-        super().__init__()
-        self.client = client
-        self.client.help_command = CustomHelpCommand(self.client)
-        self.client.help_command.cog = self
+async def setup(client: Didier):
+    """Load the cog"""
+    client.help_command = CustomHelpCommand()
