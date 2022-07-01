@@ -1,6 +1,22 @@
 [tool.black]
 line-length = 120
 
+[tool.coverage.run]
+concurrency = [
+    "greenlet"
+]
+source = [
+    "didier",
+    "database"
+]
+omit = [
+    "./tests/*",
+    "./database/migrations.py",
+    "./didier/cogs/*",
+    "./didier/didier.py",
+    "./didier/data/*
+]
+
 [tool.mypy]
 plugins = [
     "sqlalchemy.ext.mypy.plugin"

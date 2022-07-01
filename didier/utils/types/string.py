@@ -1,9 +1,10 @@
+import math
 from typing import Optional
 
 
 def leading(character: str, string: str, target_length: Optional[int] = 2) -> str:
     """Add a leading [character] to [string] to make it length [target_length]
-    Pass None to target length to always do it, no matter the length
+    Pass None to target length to always do it (once), no matter the length
     """
     # Cast to string just in case
     string = str(string)
@@ -16,6 +17,6 @@ def leading(character: str, string: str, target_length: Optional[int] = 2) -> st
     if len(string) >= target_length:
         return string
 
-    frequency = (target_length - len(string)) // len(character)
+    frequency = math.ceil((target_length - len(string)) / len(character))
 
     return (frequency * character) + string
