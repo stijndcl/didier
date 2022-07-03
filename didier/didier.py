@@ -1,6 +1,7 @@
 import os
 
 import discord
+from aiohttp import ClientSession
 from discord.ext import commands
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -14,6 +15,7 @@ class Didier(commands.Bot):
     """DIDIER <3"""
 
     initial_extensions: tuple[str, ...] = ()
+    http_session: ClientSession
 
     def __init__(self):
         activity = discord.Activity(type=discord.ActivityType.playing, name=settings.DISCORD_STATUS_MESSAGE)
@@ -42,6 +44,9 @@ class Didier(commands.Bot):
         # Load extensions
         await self._load_initial_extensions()
         await self._load_directory_extensions("didier/cogs")
+
+        # Create aiohttp session
+        self.http_session = ClientSession()
 
     async def _load_initial_extensions(self):
         """Load all extensions that should  be loaded before the others"""

@@ -3,9 +3,11 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Optional
 
+import async_timeout
 import discord
 import feedparser
 import pytz
+from aiohttp import ClientSession
 from markdownify import markdownify as md
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -116,7 +118,9 @@ def parse_ids(url: str) -> Optional[tuple[int, int]]:
     return int(spl[0]), int(spl[1])
 
 
-async def fetch_ufora_announcements(session: AsyncSession) -> list[UforaNotification]:
+async def fetch_ufora_announcements(
+    http_session: ClientSession, database_session: AsyncSession
+) -> list[UforaNotification]:
     """Fetch all new announcements"""
     notifications: list[UforaNotification] = []
 
@@ -124,7 +128,7 @@ async def fetch_ufora_announcements(session: AsyncSession) -> list[UforaNotifica
     if settings.UFORA_RSS_TOKEN is None:
         return notifications
 
-    courses = await crud.get_courses_with_announcements(session)
+    courses = await crud.get_courses_with_announcements(database_session)
 
     for course in courses:
         course_announcement_ids = list(map(lambda announcement: announcement.announcement_id, course.announcements))
@@ -134,7 +138,9 @@ async def fetch_ufora_announcements(session: AsyncSession) -> list[UforaNotifica
         )
 
         # Get the updated feed
-        feed = feedparser.parse(course_url)
+        with async_timeout.timeout(10):
+            async with http_session.get(course_url) as response:
+                feed = feedparser.parse(await response.text())
 
         # Remove old notifications
         fresh_feed: list[dict] = []
@@ -161,6 +167,6 @@ async def fetch_ufora_announcements(session: AsyncSession) -> list[UforaNotifica
                 notifications.append(notification)
 
                 # Create new db entry
-                await crud.create_new_announcement(session, notification_id, course, notification.published_dt)
+                await crud.create_new_announcement(database_session, notification_id, course, notification.published_dt)
 
     return notifications

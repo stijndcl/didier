@@ -8,6 +8,7 @@ from database.exceptions.currency import DoubleNightly
 from didier import Didier
 from didier.utils.discord.checks import is_owner
 from didier.utils.discord.converters import abbreviated_number
+from didier.utils.math.currency import capacity_upgrade_price, interest_upgrade_price, rob_upgrade_price
 from didier.utils.types.string import pluralize
 
 
@@ -34,11 +35,42 @@ class Currency(commands.Cog):
                 mention_author=False,
             )
 
-    @commands.hybrid_group(name="bank", case_insensitive=True, invoke_without_command=True)
+    @commands.group(name="bank", aliases=["B"], case_insensitive=True, invoke_without_command=True)
     async def bank(self, ctx: commands.Context):
         """Show your Didier Bank information"""
         async with self.client.db_session as session:
-            await crud.get_bank(session, ctx.author.id)
+            bank = await crud.get_bank(session, ctx.author.id)
+
+        embed = discord.Embed(colour=discord.Colour.blue())
+        embed.set_author(name=f"Bank van {ctx.author.display_name}")
+        embed.set_thumbnail(url=ctx.author.avatar.url)
+
+        embed.add_field(name="Interest level", value=bank.interest_level)
+        embed.add_field(name="Capaciteit level", value=bank.capacity_level)
+        embed.add_field(name="Momenteel geïnvesteerd", value=bank.invested, inline=False)
+
+        await ctx.reply(embed=embed, mention_author=False)
+
+    @bank.group(name="Upgrade", aliases=["U", "Upgrades"], case_insensitive=True, invoke_without_command=True)
+    async def bank_upgrades(self, ctx: commands.Context):
+        """List the upgrades you can buy & their prices"""
+        async with self.client.db_session as session:
+            bank = await crud.get_bank(session, ctx.author.id)
+
+        embed = discord.Embed(colour=discord.Colour.blue())
+        embed.set_author(name="Bank upgrades")
+
+        embed.add_field(
+            name=f"Interest ({bank.interest_level})", value=str(interest_upgrade_price(bank.interest_level))
+        )
+        embed.add_field(
+            name=f"Capaciteit ({bank.capacity_level})", value=str(capacity_upgrade_price(bank.capacity_level))
+        )
+        embed.add_field(name=f"Rob ({bank.rob_level})", value=str(rob_upgrade_price(bank.rob_level)))
+
+        embed.set_footer(text="Didier Bank Upgrade [Categorie]")
+
+        await ctx.reply(embed=embed, mention_author=False)
 
     @commands.hybrid_command(name="dinks")
     async def dinks(self, ctx: commands.Context):

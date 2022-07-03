@@ -17,16 +17,17 @@ class Bank(Base):
     bank_id: int = Column(Integer, primary_key=True)
     user_id: int = Column(BigInteger, ForeignKey("users.user_id"))
 
-    dinks: int = Column(BigInteger, default=0, nullable=False)
+    dinks: int = Column(BigInteger, server_default="0", nullable=False)
+    invested: int = Column(BigInteger, server_default="0", nullable=False)
 
     # Interest rate
-    interest_level: int = Column(Integer, default=1, nullable=False)
+    interest_level: int = Column(Integer, server_default="1", nullable=False)
 
     # Maximum amount that can be stored in the bank
-    capacity_level: int = Column(Integer, default=1, nullable=False)
+    capacity_level: int = Column(Integer, server_default="1", nullable=False)
 
     # Maximum amount that can be robbed
-    rob_level: int = Column(Integer, default=1, nullable=False)
+    rob_level: int = Column(Integer, server_default="1", nullable=False)
 
     user: User = relationship("User", uselist=False, back_populates="bank", lazy="selectin")
 
@@ -67,7 +68,7 @@ class NightlyData(Base):
     nightly_id: int = Column(Integer, primary_key=True)
     user_id: int = Column(BigInteger, ForeignKey("users.user_id"))
     last_nightly: Optional[datetime] = Column(DateTime(timezone=True), nullable=True)
-    count: int = Column(Integer, default=0, nullable=False)
+    count: int = Column(Integer, server_default="0", nullable=False)
 
     user: User = relationship("User", back_populates="nightly_data", uselist=False, lazy="selectin")
 
@@ -81,7 +82,7 @@ class UforaCourse(Base):
     name: str = Column(Text, nullable=False, unique=True)
     code: str = Column(Text, nullable=False, unique=True)
     year: int = Column(Integer, nullable=False)
-    log_announcements: bool = Column(Boolean, default=False, nullable=False)
+    log_announcements: bool = Column(Boolean, server_default="0", nullable=False)
 
     announcements: list[UforaAnnouncement] = relationship(
         "UforaAnnouncement", back_populates="course", cascade="all, delete-orphan", lazy="selectin"

@@ -29,9 +29,9 @@ class Tasks(commands.Cog):
         if settings.UFORA_RSS_TOKEN is None or settings.UFORA_ANNOUNCEMENTS_CHANNEL is None:
             return
 
-        async with self.client.db_session as session:
+        async with self.client.db_session as db_session:
             announcements_channel = self.client.get_channel(settings.UFORA_ANNOUNCEMENTS_CHANNEL)
-            announcements = await fetch_ufora_announcements(session)
+            announcements = await fetch_ufora_announcements(self.client.http_session, db_session)
 
             for announcement in announcements:
                 await announcements_channel.send(embed=announcement.to_embed())
