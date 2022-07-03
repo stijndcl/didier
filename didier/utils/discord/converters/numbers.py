@@ -1,16 +1,18 @@
 import math
-from typing import Optional
-
+from typing import Optional, Union
 
 __all__ = ["abbreviated_number"]
 
 
-def abbreviated_number(argument: str) -> int:
+def abbreviated_number(argument: str) -> Union[str, int]:
     """Custom converter to allow numbers to be abbreviated
     Examples:
         515k
         4m
     """
+    if argument.lower() == "all":
+        return "all"
+
     if not argument:
         raise ValueError
 

@@ -113,9 +113,25 @@ class Currency(commands.Cog):
             plural = pluralize("Didier Dink", bank.dinks)
             await ctx.reply(f"**{ctx.author.display_name}** heeft **{bank.dinks}** {plural}.", mention_author=False)
 
+    @commands.command(name="Invest")
+    async def invest(self, ctx: commands.Context, amount: abbreviated_number):  # type: ignore
+        """Invest a given amount of Didier Dinks"""
+        amount = typing.cast(typing.Union[str, int], amount)
+
+        async with self.client.db_session as session:
+            invested = await crud.invest(session, ctx.author.id, amount)
+            plural = pluralize("Didier Dink", invested)
+
+            if invested == 0:
+                await ctx.reply("Je hebt geen Didier Dinks om te investeren.", mention_author=False)
+            else:
+                await ctx.reply(
+                    f"**{ctx.author.display_name}** heeft **{invested}** {plural} geïnvesteerd.", mention_author=False
+                )
+
     @commands.hybrid_command(name="nightly")
     async def nightly(self, ctx: commands.Context):
-        """Claim nightly Dinks"""
+        """Claim nightly Didier Dinks"""
         async with self.client.db_session as session:
             try:
                 await crud.claim_nightly(session, ctx.author.id)

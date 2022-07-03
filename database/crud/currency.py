@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Union
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -15,6 +16,23 @@ async def get_bank(session: AsyncSession, user_id: int) -> Bank:
     """Get a user's bank info"""
     user = await users.get_or_add(session, user_id)
     return user.bank
+
+
+async def invest(session: AsyncSession, user_id: int, amount: Union[str, int]) -> int:
+    """Invest all your Dinks"""
+    bank = await get_bank(session, user_id)
+    if amount == "all":
+        amount = bank.dinks
+
+    amount = int(amount)
+
+    bank.dinks -= amount
+    bank.invested += amount
+
+    session.add(bank)
+    await session.commit()
+
+    return amount
 
 
 async def add_dinks(session: AsyncSession, user_id: int, amount: int):
@@ -44,9 +62,9 @@ async def claim_nightly(session: AsyncSession, user_id: int):
     await session.commit()
 
 
-async def upgrade_capacity(database_session: AsyncSession, user_id: int) -> int:
+async def upgrade_capacity(session: AsyncSession, user_id: int) -> int:
     """Upgrade capacity level"""
-    bank = await get_bank(database_session, user_id)
+    bank = await get_bank(session, user_id)
     upgrade_price = capacity_upgrade_price(bank.capacity_level)
 
     # Can't afford this upgrade
@@ -56,15 +74,15 @@ async def upgrade_capacity(database_session: AsyncSession, user_id: int) -> int:
     bank.dinks -= upgrade_price
     bank.capacity_level += 1
 
-    database_session.add(bank)
-    await database_session.commit()
+    session.add(bank)
+    await session.commit()
 
     return bank.capacity_level
 
 
-async def upgrade_interest(database_session: AsyncSession, user_id: int) -> int:
+async def upgrade_interest(session: AsyncSession, user_id: int) -> int:
     """Upgrade interest level"""
-    bank = await get_bank(database_session, user_id)
+    bank = await get_bank(session, user_id)
     upgrade_price = interest_upgrade_price(bank.interest_level)
 
     # Can't afford this upgrade
@@ -74,15 +92,15 @@ async def upgrade_interest(database_session: AsyncSession, user_id: int) -> int:
     bank.dinks -= upgrade_price
     bank.interest_level += 1
 
-    database_session.add(bank)
-    await database_session.commit()
+    session.add(bank)
+    await session.commit()
 
     return bank.interest_level
 
 
-async def upgrade_rob(database_session: AsyncSession, user_id: int) -> int:
+async def upgrade_rob(session: AsyncSession, user_id: int) -> int:
     """Upgrade rob level"""
-    bank = await get_bank(database_session, user_id)
+    bank = await get_bank(session, user_id)
     upgrade_price = rob_upgrade_price(bank.rob_level)
 
     # Can't afford this upgrade
@@ -92,7 +110,7 @@ async def upgrade_rob(database_session: AsyncSession, user_id: int) -> int:
     bank.dinks -= upgrade_price
     bank.rob_level += 1
 
-    database_session.add(bank)
-    await database_session.commit()
+    session.add(bank)
+    await session.commit()
 
     return bank.rob_level
