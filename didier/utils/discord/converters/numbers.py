@@ -10,11 +10,11 @@ def abbreviated_number(argument: str) -> Union[str, int]:
         515k
         4m
     """
-    if argument.lower() == "all":
-        return "all"
-
     if not argument:
         raise ValueError
+
+    if argument.lower() == "all":
+        return "all"
 
     if argument.isdecimal():
         return int(argument)

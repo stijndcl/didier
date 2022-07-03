@@ -48,3 +48,18 @@ def test_abbreviated_float_floors():
         5.3k is 5300, but 5.3001k is 5300.1
     """
     assert numbers.abbreviated_number("5.3001k") == 5300
+
+
+def test_abbreviated_all():
+    """Test abbreviated_number for the 'all' argument"""
+    assert numbers.abbreviated_number("all") == "all"
+    assert numbers.abbreviated_number("ALL") == "all"
+
+
+def test_abbreviated_empty():
+    """Test abbreviated_number for empty arguments"""
+    with pytest.raises(ValueError):
+        numbers.abbreviated_number("")
+
+    with pytest.raises(ValueError):
+        numbers.abbreviated_number(None)

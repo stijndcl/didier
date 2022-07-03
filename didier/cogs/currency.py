@@ -5,10 +5,10 @@ from discord.ext import commands
 
 from database.crud import currency as crud
 from database.exceptions.currency import DoubleNightly, NotEnoughDinks
+from database.utils.math.currency import capacity_upgrade_price, interest_upgrade_price, rob_upgrade_price
 from didier import Didier
 from didier.utils.discord.checks import is_owner
 from didier.utils.discord.converters import abbreviated_number
-from database.utils.math.currency import capacity_upgrade_price, interest_upgrade_price, rob_upgrade_price
 from didier.utils.types.string import pluralize
 
 
@@ -113,7 +113,7 @@ class Currency(commands.Cog):
             plural = pluralize("Didier Dink", bank.dinks)
             await ctx.reply(f"**{ctx.author.display_name}** heeft **{bank.dinks}** {plural}.", mention_author=False)
 
-    @commands.command(name="Invest")
+    @commands.command(name="Invest", aliases=["Deposit", "Dep"])
     async def invest(self, ctx: commands.Context, amount: abbreviated_number):  # type: ignore
         """Invest a given amount of Didier Dinks"""
         amount = typing.cast(typing.Union[str, int], amount)

@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from database.crud import users
 from database.exceptions import currency as exceptions
-from database.models import Bank
+from database.models import Bank, NightlyData
 from database.utils.math.currency import rob_upgrade_price, interest_upgrade_price, capacity_upgrade_price
 
 
@@ -18,13 +18,20 @@ async def get_bank(session: AsyncSession, user_id: int) -> Bank:
     return user.bank
 
 
+async def get_nightly_data(session: AsyncSession, user_id: int) -> NightlyData:
+    """Get a user's nightly info"""
+    user = await users.get_or_add(session, user_id)
+    return user.nightly_data
+
+
 async def invest(session: AsyncSession, user_id: int, amount: Union[str, int]) -> int:
     """Invest all your Dinks"""
     bank = await get_bank(session, user_id)
     if amount == "all":
         amount = bank.dinks
 
-    amount = int(amount)
+    # Don't allow investing more dinks than you own
+    amount = min(bank.dinks, int(amount))
 
     bank.dinks -= amount
     bank.invested += amount
@@ -45,15 +52,14 @@ async def add_dinks(session: AsyncSession, user_id: int, amount: int):
 
 async def claim_nightly(session: AsyncSession, user_id: int):
     """Claim daily Dinks"""
-    user = await users.get_or_add(session, user_id)
-    nightly_data = user.nightly_data
+    nightly_data = await get_nightly_data(session, user_id)
 
     now = datetime.now()
 
     if nightly_data.last_nightly is not None and nightly_data.last_nightly.date() == now.date():
         raise exceptions.DoubleNightly
 
-    bank = user.bank
+    bank = await get_bank(session, user_id)
     bank.dinks += NIGHTLY_AMOUNT
     nightly_data.last_nightly = now
 
