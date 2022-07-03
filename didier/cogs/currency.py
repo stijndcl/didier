@@ -4,11 +4,11 @@ import discord
 from discord.ext import commands
 
 from database.crud import currency as crud
-from database.exceptions.currency import DoubleNightly
+from database.exceptions.currency import DoubleNightly, NotEnoughDinks
 from didier import Didier
 from didier.utils.discord.checks import is_owner
 from didier.utils.discord.converters import abbreviated_number
-from didier.utils.math.currency import capacity_upgrade_price, interest_upgrade_price, rob_upgrade_price
+from database.utils.math.currency import capacity_upgrade_price, interest_upgrade_price, rob_upgrade_price
 from didier.utils.types.string import pluralize
 
 
@@ -71,6 +71,39 @@ class Currency(commands.Cog):
         embed.set_footer(text="Didier Bank Upgrade [Categorie]")
 
         await ctx.reply(embed=embed, mention_author=False)
+
+    @bank_upgrades.command(name="Capacity", aliases=["C"])
+    async def bank_upgrade_capacity(self, ctx: commands.Context):
+        """Upgrade the capacity level of your bank"""
+        async with self.client.db_session as session:
+            try:
+                await crud.upgrade_capacity(session, ctx.author.id)
+                await ctx.message.add_reaction("⏫")
+            except NotEnoughDinks:
+                await ctx.reply("Je hebt niet genoeg Didier Dinks om dit te doen.", mention_author=False)
+                await self.client.reject_message(ctx.message)
+
+    @bank_upgrades.command(name="Interest", aliases=["I"])
+    async def bank_upgrade_interest(self, ctx: commands.Context):
+        """Upgrade the interest level of your bank"""
+        async with self.client.db_session as session:
+            try:
+                await crud.upgrade_interest(session, ctx.author.id)
+                await ctx.message.add_reaction("⏫")
+            except NotEnoughDinks:
+                await ctx.reply("Je hebt niet genoeg Didier Dinks om dit te doen.", mention_author=False)
+                await self.client.reject_message(ctx.message)
+
+    @bank_upgrades.command(name="Rob", aliases=["R"])
+    async def bank_upgrade_rob(self, ctx: commands.Context):
+        """Upgrade the rob level of your bank"""
+        async with self.client.db_session as session:
+            try:
+                await crud.upgrade_rob(session, ctx.author.id)
+                await ctx.message.add_reaction("⏫")
+            except NotEnoughDinks:
+                await ctx.reply("Je hebt niet genoeg Didier Dinks om dit te doen.", mention_author=False)
+                await self.client.reject_message(ctx.message)
 
     @commands.hybrid_command(name="dinks")
     async def dinks(self, ctx: commands.Context):
