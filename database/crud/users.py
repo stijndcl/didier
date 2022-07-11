@@ -3,7 +3,11 @@ from typing import Optional
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from database.models import User, Bank, NightlyData
+from database.models import Bank, NightlyData, User
+
+__all__ = [
+    "get_or_add",
+]
 
 
 async def get_or_add(session: AsyncSession, user_id: int) -> User:

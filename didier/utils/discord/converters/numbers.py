@@ -31,11 +31,11 @@ def abbreviated_number(argument: str) -> Union[str, int]:
         value = units.get(unit)
         argument = argument[:-1]
 
-    # [int][unit]
+    # [int][unit]  # noqa: E800
     if "." not in argument and value is not None:
         return int(argument) * (10**value)
 
-    # [float][unit]
+    # [float][unit]  # noqa: E800
     if "." in argument:
         # Floats themselves are not supported
         if value is None:

@@ -5,7 +5,11 @@ from discord.ext import commands
 
 from database.crud import currency as crud
 from database.exceptions.currency import DoubleNightly, NotEnoughDinks
-from database.utils.math.currency import capacity_upgrade_price, interest_upgrade_price, rob_upgrade_price
+from database.utils.math.currency import (
+    capacity_upgrade_price,
+    interest_upgrade_price,
+    rob_upgrade_price,
+)
 from didier import Didier
 from didier.utils.discord.checks import is_owner
 from didier.utils.discord.converters import abbreviated_number

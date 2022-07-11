@@ -17,6 +17,9 @@ omit = [
     "./didier/data/*"
 ]
 
+[tool.isort]
+profile = "black"
+
 [tool.mypy]
 plugins = [
     "sqlalchemy.ext.mypy.plugin"
@@ -24,19 +27,6 @@ plugins = [
 [[tool.mypy.overrides]]
 module = ["discord.*", "feedparser.*", "markdownify.*"]
 ignore_missing_imports = true
-
-[tool.pylint.master]
-disable = [
-    "missing-module-docstring",
-    "too-few-public-methods",
-    "too-many-arguments",
-    "too-many-instance-attributes",
-    "too-many-locals"
-]
-
-[tool.pylint.format]
-max-line-length = 120
-good-names = ["i", "dt"]
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"

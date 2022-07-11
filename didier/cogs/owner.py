@@ -8,8 +8,8 @@ from database.crud import custom_commands
 from database.exceptions.constraints import DuplicateInsertException
 from database.exceptions.not_found import NoResultFoundException
 from didier import Didier
-from didier.data.modals.custom_commands import CreateCustomCommand, EditCustomCommand
 from didier.data.flags.owner import EditCustomFlags
+from didier.data.modals.custom_commands import CreateCustomCommand, EditCustomCommand
 
 
 class Owner(commands.Cog):

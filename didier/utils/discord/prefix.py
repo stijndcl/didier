@@ -5,6 +5,8 @@ from discord.ext import commands
 
 from didier.data import constants
 
+__all__ = ["get_prefix"]
+
 
 def get_prefix(client: commands.Bot, message: Message) -> str:
     """Match a prefix against a message

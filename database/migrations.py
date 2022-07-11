@@ -2,8 +2,9 @@ import logging
 
 from alembic import config, script
 from alembic.runtime import migration
-
 from database.engine import engine
+
+__all__ = ["ensure_latest_migration"]
 
 
 async def ensure_latest_migration():

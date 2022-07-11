@@ -17,6 +17,12 @@ from database.models import UforaCourse
 from didier.utils.types.datetime import int_to_weekday
 from didier.utils.types.string import leading
 
+__all__ = [
+    "fetch_ufora_announcements",
+    "parse_ids",
+    "UforaNotification",
+]
+
 
 @dataclass
 class UforaNotification:

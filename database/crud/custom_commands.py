@@ -7,6 +7,16 @@ from database.exceptions.constraints import DuplicateInsertException
 from database.exceptions.not_found import NoResultFoundException
 from database.models import CustomCommand, CustomCommandAlias
 
+__all__ = [
+    "clean_name",
+    "create_alias",
+    "create_command",
+    "edit_command",
+    "get_command",
+    "get_command_by_alias",
+    "get_command_by_name",
+]
+
 
 def clean_name(name: str) -> str:
     """Convert a name to lowercase & remove spaces to allow easier matching"""

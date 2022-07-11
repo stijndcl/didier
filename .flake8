@@ -1,0 +1,18 @@
+[flake8]
+exclude =
+    .git,
+    .github,
+    .mypy_cache,
+    .pytest_cache,
+    __pycache__,
+    alembic,
+    htmlcov,
+    tests,
+    venv
+ignore=E203
+max-line-length = 120
+per-file-ignores =
+    # Missing __all__, main isn't supposed to be imported
+    main.py: DALL000,
+    # Missing __all__, Cogs aren't modules
+    ./didier/cogs/*: DALL000

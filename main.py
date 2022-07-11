@@ -1,8 +1,7 @@
+import asyncio
 import logging
 import sys
 from logging.handlers import RotatingFileHandler
-
-import asyncio
 
 import settings
 from database.migrations import ensure_latest_migration

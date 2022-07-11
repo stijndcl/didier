@@ -1,4 +1,4 @@
-from typing import Mapping, Optional, List
+from typing import List, Mapping, Optional
 
 import discord
 from discord.ext import commands

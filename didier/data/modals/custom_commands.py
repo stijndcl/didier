@@ -6,6 +6,8 @@ import discord
 from database.crud.custom_commands import create_command, edit_command
 from didier import Didier
 
+__all__ = ["CreateCustomCommand", "EditCustomCommand"]
+
 
 class CreateCustomCommand(discord.ui.Modal, title="Create Custom Command"):
     """Modal to create new custom commands"""

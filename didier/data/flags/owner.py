@@ -2,6 +2,8 @@ from typing import Optional
 
 from didier.data.flags import PosixFlags
 
+__all__ = ["EditCustomFlags"]
+
 
 class EditCustomFlags(PosixFlags):
     """Flags for the edit custom command"""

@@ -1,5 +1,7 @@
 from discord.ext import commands
 
+__all__ = ["PosixFlags"]
+
 
 class PosixFlags(commands.FlagConverter, delimiter=" ", prefix="--"):  # type: ignore
     """Base class to add POSIX-like flags to commands

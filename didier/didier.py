@@ -10,6 +10,8 @@ from database.crud import custom_commands
 from database.engine import DBSession
 from didier.utils.discord.prefix import get_prefix
 
+__all__ = ["Didier"]
+
 
 class Didier(commands.Bot):
     """DIDIER <3"""

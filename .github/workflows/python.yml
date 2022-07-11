@@ -78,7 +78,7 @@ jobs:
       - name: Install dependencies
         run: pip3 install -r requirements.txt -r requirements-dev.txt
       - name: Linting
-        run: pylint didier database
+        run: flake8
   typing:
     needs: [dependencies]
     runs-on: ubuntu-latest

@@ -3,10 +3,23 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Optional
 
-from sqlalchemy import BigInteger, Column, Integer, Text, ForeignKey, Boolean, DateTime
+from sqlalchemy import BigInteger, Boolean, Column, DateTime, ForeignKey, Integer, Text
 from sqlalchemy.orm import declarative_base, relationship
 
 Base = declarative_base()
+
+
+__all__ = [
+    "Base",
+    "Bank",
+    "CustomCommand",
+    "CustomCommandAlias",
+    "NightlyData",
+    "UforaAnnouncement",
+    "UforaCourse",
+    "UforaCourseAlias",
+    "User",
+]
 
 
 class Bank(Base):
