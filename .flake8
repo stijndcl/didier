@@ -1,4 +1,5 @@
 [flake8]
+# Don't lint non-Python files
 exclude =
     .git,
     .github,
@@ -9,10 +10,30 @@ exclude =
     htmlcov,
     tests,
     venv
-ignore=E203
+# Disable rules that we don't care about (or conflict with others)
+extend-ignore =
+    # Missing docstring in public module
+    D100, D104,
+    # Missing docstring in magic method
+    D105,
+    # Missing docstring in __init__
+    D107,
+    # First line of docstrings should end with a period
+    D400,
+    # First line of docstrings should be in imperative mood
+    D401,
+    # Whitespace before ":"
+    E203,
+# Don't require docstrings when overriding a method,
+# the base method should have a docstring but the rest not
+ignore-decorator=overrides
 max-line-length = 120
+# Disable some rules for entire files
 per-file-ignores =
     # Missing __all__, main isn't supposed to be imported
     main.py: DALL000,
     # Missing __all__, Cogs aren't modules
-    ./didier/cogs/*: DALL000
+    ./didier/cogs/*: DALL000,
+    # All of the colours methods are just oneliners to create a colour,
+    # there's no point adding docstrings (function names are enough)
+    ./didier/utils/discord/colours.py: D103

@@ -10,6 +10,7 @@ __all__ = ["get_prefix"]
 
 def get_prefix(client: commands.Bot, message: Message) -> str:
     """Match a prefix against a message
+
     This is done dynamically to allow variable amounts of whitespace,
     and through regexes to allow case-insensitivity among other things.
     """

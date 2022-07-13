@@ -42,7 +42,10 @@ class Didier(commands.Bot):
         return DBSession()
 
     async def setup_hook(self) -> None:
-        """Hook called once the bot is initialised"""
+        """Do some initial setup
+
+        This hook is called once the bot is initialised
+        """
         # Load extensions
         await self._load_initial_extensions()
         await self._load_directory_extensions("didier/cogs")
@@ -113,7 +116,9 @@ class Didier(commands.Bot):
 
     async def _try_invoke_custom_command(self, message: discord.Message) -> bool:
         """Check if the message tries to invoke a custom command
+
         If it does, send the reply associated with it
+        Returns a boolean indicating if a message invoked a command or not
         """
         # Doesn't start with the custom command prefix
         if not message.content.startswith(settings.DISCORD_CUSTOM_COMMAND_PREFIX):

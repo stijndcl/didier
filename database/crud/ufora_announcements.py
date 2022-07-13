@@ -28,6 +28,7 @@ async def create_new_announcement(
 
 async def remove_old_announcements(session: AsyncSession):
     """Delete all announcements that are > 8 days old
+
     The RSS feed only goes back 7 days, so all of these old announcements never have to
     be checked again when checking if an announcement is fresh or not.
     """

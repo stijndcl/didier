@@ -14,6 +14,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 import settings
 from database.crud import ufora_announcements as crud
 from database.models import UforaCourse
+from didier.data.embeds.base import EmbedBaseModel
 from didier.utils.types.datetime import int_to_weekday
 from didier.utils.types.string import leading
 
@@ -25,7 +26,7 @@ __all__ = [
 
 
 @dataclass
-class UforaNotification:
+class UforaNotification(EmbedBaseModel):
     """A single notification from Ufora"""
 
     content: dict

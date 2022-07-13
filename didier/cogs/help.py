@@ -2,13 +2,15 @@ from typing import List, Mapping, Optional
 
 import discord
 from discord.ext import commands
+from overrides import overrides
 
 from didier import Didier
 
 
 class CustomHelpCommand(commands.MinimalHelpCommand):
     """Customised Help command to override the default implementation
-    The default is ugly as hell
+
+    The default is ugly as hell so we do some fiddling with it
     """
 
     def _help_embed_base(self, title: str) -> discord.Embed:
@@ -30,6 +32,7 @@ class CustomHelpCommand(commands.MinimalHelpCommand):
 
         return list(sorted(filtered_cogs, key=lambda cog: cog.qualified_name))
 
+    @overrides
     async def send_bot_help(self, mapping: Mapping[Optional[commands.Cog], List[commands.Command]], /):
         embed = self._help_embed_base("Categorieën")
         filtered_cogs = await self._filter_cogs(list(mapping.keys()))

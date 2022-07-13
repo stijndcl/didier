@@ -6,6 +6,26 @@ from environs import Env
 env = Env()
 env.read_env()
 
+__all__ = [
+    "SANDBOX",
+    "LOGFILE",
+    "DB_NAME",
+    "DB_USERNAME",
+    "DB_PASSWORD",
+    "DB_HOST",
+    "DB_PORT",
+    "DISCORD_TOKEN",
+    "DISCORD_READY_MESSAGE",
+    "DISCORD_STATUS_MESSAGE",
+    "DISCORD_TEST_GUILDS",
+    "DISCORD_BOOS_REACT",
+    "DISCORD_CUSTOM_COMMAND_PREFIX",
+    "UFORA_ANNOUNCEMENTS_CHANNEL",
+    "UFORA_RSS_TOKEN",
+    "URBAN_DICTIONARY_TOKEN",
+]
+
+
 """General config"""
 SANDBOX: bool = env.bool("SANDBOX", True)
 LOGFILE: str = env.str("LOGFILE", "didier.log")
@@ -18,13 +38,14 @@ DB_HOST: str = env.str("DB_HOST", "localhost")
 DB_PORT: int = env.int("DB_PORT", "5432")
 
 """Discord"""
-DISCORD_TOKEN: str = env.str("DISC_TOKEN")
-DISCORD_READY_MESSAGE: str = env.str("DISC_READY_MESSAGE", "I'M READY I'M READY I'M READY")
-DISCORD_STATUS_MESSAGE: str = env.str("DISC_STATUS_MESSAGE", "with your Didier Dinks.")
-DISCORD_TEST_GUILDS: list[int] = env.list("DISC_TEST_GUILDS", [], subcast=int)
-DISCORD_BOOS_REACT: str = env.str("DISC_BOOS_REACT", "<:boos:629603785840263179>")
-DISCORD_CUSTOM_COMMAND_PREFIX: str = env.str("DISC_CUSTOM_COMMAND_PREFIX", "?")
+DISCORD_TOKEN: str = env.str("DISCORD_TOKEN")
+DISCORD_READY_MESSAGE: str = env.str("DISCORD_READY_MESSAGE", "I'M READY I'M READY I'M READY")
+DISCORD_STATUS_MESSAGE: str = env.str("DISCORD_STATUS_MESSAGE", "with your Didier Dinks.")
+DISCORD_TEST_GUILDS: list[int] = env.list("DISCORD_TEST_GUILDS", [], subcast=int)
+DISCORD_BOOS_REACT: str = env.str("DISCORD_BOOS_REACT", "<:boos:629603785840263179>")
+DISCORD_CUSTOM_COMMAND_PREFIX: str = env.str("DISCORD_CUSTOM_COMMAND_PREFIX", "?")
 UFORA_ANNOUNCEMENTS_CHANNEL: Optional[int] = env.int("UFORA_ANNOUNCEMENTS_CHANNEL", None)
 
 """API Keys"""
 UFORA_RSS_TOKEN: Optional[str] = env.str("UFORA_RSS_TOKEN", None)
+URBAN_DICTIONARY_TOKEN: Optional[str] = env.str("URBAN_DICTIONARY_TOKEN", None)

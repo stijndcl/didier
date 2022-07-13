@@ -6,6 +6,7 @@ __all__ = ["leading", "pluralize"]
 
 def leading(character: str, string: str, target_length: Optional[int] = 2) -> str:
     """Add a leading [character] to [string] to make it length [target_length]
+
     Pass None to target length to always do it (once), no matter the length
     """
     # Cast to string just in case

@@ -6,6 +6,7 @@ __all__ = ["abbreviated_number"]
 
 def abbreviated_number(argument: str) -> Union[str, int]:
     """Custom converter to allow numbers to be abbreviated
+
     Examples:
         515k
         4m
