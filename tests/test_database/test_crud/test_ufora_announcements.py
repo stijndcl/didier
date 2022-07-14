@@ -7,24 +7,6 @@ from database.crud import ufora_announcements as crud
 from database.models import UforaAnnouncement, UforaCourse
 
 
-@pytest.fixture
-async def course(database_session: AsyncSession) -> UforaCourse:
-    """Fixture to create a course"""
-    course = UforaCourse(name="test", code="code", year=1, log_announcements=True)
-    database_session.add(course)
-    await database_session.commit()
-    return course
-
-
-@pytest.fixture
-async def announcement(course: UforaCourse, database_session: AsyncSession) -> UforaAnnouncement:
-    """Fixture to create an announcement"""
-    announcement = UforaAnnouncement(course_id=course.course_id, publication_date=datetime.datetime.now())
-    database_session.add(announcement)
-    await database_session.commit()
-    return announcement
-
-
 async def test_get_courses_with_announcements_none(database_session: AsyncSession):
     """Test getting all courses with announcements when there are none"""
     results = await crud.get_courses_with_announcements(database_session)
