@@ -9,7 +9,7 @@ from database.models import UforaCourse, UforaCourseAlias
 async def get_all_courses(session: AsyncSession) -> list[UforaCourse]:
     """Get a list of all courses in the database"""
     statement = select(UforaCourse)
-    return (await session.execute(statement)).scalars().all()
+    return list((await session.execute(statement)).scalars().all())
 
 
 async def get_course_by_name(session: AsyncSession, query: str) -> Optional[UforaCourse]:
