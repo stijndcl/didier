@@ -25,19 +25,21 @@ async def test_get_courses_with_announcements(database_session: AsyncSession):
     assert results[0] == course_1
 
 
-async def test_create_new_announcement(course: UforaCourse, database_session: AsyncSession):
+async def test_create_new_announcement(ufora_course: UforaCourse, database_session: AsyncSession):
     """Test creating a new announcement"""
-    await crud.create_new_announcement(database_session, 1, course=course, publication_date=datetime.datetime.now())
-    await database_session.refresh(course)
-    assert len(course.announcements) == 1
+    await crud.create_new_announcement(
+        database_session, 1, course=ufora_course, publication_date=datetime.datetime.now()
+    )
+    await database_session.refresh(ufora_course)
+    assert len(ufora_course.announcements) == 1
 
 
-async def test_remove_old_announcements(announcement: UforaAnnouncement, database_session: AsyncSession):
+async def test_remove_old_announcements(ufora_announcement: UforaAnnouncement, database_session: AsyncSession):
     """Test removing all stale announcements"""
-    course = announcement.course
-    announcement.publication_date -= datetime.timedelta(weeks=2)
-    announcement_2 = UforaAnnouncement(course_id=announcement.course_id, publication_date=datetime.datetime.now())
-    database_session.add_all([announcement, announcement_2])
+    course = ufora_announcement.course
+    ufora_announcement.publication_date -= datetime.timedelta(weeks=2)
+    announcement_2 = UforaAnnouncement(course_id=ufora_announcement.course_id, publication_date=datetime.datetime.now())
+    database_session.add_all([ufora_announcement, announcement_2])
     await database_session.commit()
     await database_session.refresh(course)
     assert len(course.announcements) == 2

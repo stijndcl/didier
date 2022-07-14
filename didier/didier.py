@@ -8,6 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 import settings
 from database.crud import custom_commands
 from database.engine import DBSession
+from database.utils.caches import CacheManager
 from didier.utils.discord.prefix import get_prefix
 
 __all__ = ["Didier"]
@@ -16,6 +17,7 @@ __all__ = ["Didier"]
 class Didier(commands.Bot):
     """DIDIER <3"""
 
+    database_caches: CacheManager
     initial_extensions: tuple[str, ...] = ()
     http_session: ClientSession
 
@@ -49,6 +51,11 @@ class Didier(commands.Bot):
         # Load extensions
         await self._load_initial_extensions()
         await self._load_directory_extensions("didier/cogs")
+
+        # Initialize caches
+        self.database_caches = CacheManager()
+        async with self.db_session as session:
+            await self.database_caches.initialize_caches(session)
 
         # Create aiohttp session
         self.http_session = ClientSession()

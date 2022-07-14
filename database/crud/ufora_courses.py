@@ -5,6 +5,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from database.models import UforaCourse, UforaCourseAlias
 
+__all__ = ["get_all_courses", "get_course_by_name"]
+
 
 async def get_all_courses(session: AsyncSession) -> list[UforaCourse]:
     """Get a list of all courses in the database"""
