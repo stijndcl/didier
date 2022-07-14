@@ -1,7 +1,19 @@
 import math
 from typing import Optional
 
-__all__ = ["leading", "pluralize"]
+__all__ = ["abbreviate", "leading", "pluralize"]
+
+
+def abbreviate(text: str, max_length: int) -> str:
+    """Abbreviate a string to a maximum length
+
+    If the string is longer, add an ellipsis (...) at the end
+    """
+    if len(text) <= max_length:
+        return text
+
+    # Strip to avoid ending on random double newlines
+    return text[: max_length - 1].strip() + "…"
 
 
 def leading(character: str, string: str, target_length: Optional[int] = 2) -> str:

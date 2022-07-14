@@ -59,6 +59,8 @@ jobs:
           coverage xml
       - name: Upload coverage report to CodeCov
         uses: codecov/codecov-action@v3
+        with:
+          token: ${{ secrets.CODECOV }}
   linting:
     needs: [dependencies]
     runs-on: ubuntu-latest

@@ -1,5 +1,7 @@
 # Didier
 
+[![wakatime](https://wakatime.com/badge/user/3543d4ec-ec93-4b43-abd6-2bc2e310f3c4/project/100156e4-2fb5-40b4-b808-e47ef687905c.svg)](https://wakatime.com/badge/user/3543d4ec-ec93-4b43-abd6-2bc2e310f3c4/project/100156e4-2fb5-40b4-b808-e47ef687905c)
+
 You bet. The time has come.
 
 ### Discord Documentation

@@ -18,5 +18,5 @@ class EmbedBaseModel(ABC):
         raise NotImplementedError
 
 
-class EmbedPydantic(ABC, EmbedBaseModel, BaseModel):
+class EmbedPydantic(EmbedBaseModel, BaseModel, ABC):
     """Pydantic version of EmbedModel"""

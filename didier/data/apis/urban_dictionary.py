@@ -2,7 +2,10 @@ from aiohttp import ClientSession
 
 from didier.data.embeds.urban_dictionary import Definition
 
-__all__ = ["lookup"]
+__all__ = ["lookup", "PER_PAGE"]
+
+
+PER_PAGE = 10
 
 
 async def lookup(http_session: ClientSession, query: str) -> list[Definition]:

@@ -10,5 +10,5 @@ coverage:
   precision: 5
 
 ignore:
-  - "./tests/*"
   - "./didier/cogs/*"     # Cogs can't really be tested properly
+  - "./tests/*"
