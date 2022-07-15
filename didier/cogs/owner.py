@@ -9,7 +9,7 @@ from database.exceptions.constraints import DuplicateInsertException
 from database.exceptions.not_found import NoResultFoundException
 from didier import Didier
 from didier.data.flags.owner import EditCustomFlags
-from didier.data.modals.custom_commands import CreateCustomCommand, EditCustomCommand
+from didier.views.modals import AddDadJoke, CreateCustomCommand, EditCustomCommand
 
 
 class Owner(commands.Cog):
@@ -29,7 +29,6 @@ class Owner(commands.Cog):
 
         This means that we don't have to add is_owner() to every single command separately
         """
-        # pylint: disable=W0236 # Pylint thinks this can't be async, but it can
         return await self.client.is_owner(ctx.author)
 
     @commands.command(name="Error")
@@ -48,7 +47,7 @@ class Owner(commands.Cog):
 
         await ctx.message.add_reaction("🔄")
 
-    @commands.group(name="Add", case_insensitive=True, invoke_without_command=False)
+    @commands.group(name="Add", aliases=["Create"], case_insensitive=True, invoke_without_command=False)
     async def add_msg(self, ctx: commands.Context):
         """Command group for [add X] message commands"""
 
@@ -86,6 +85,17 @@ class Owner(commands.Cog):
             )
 
         modal = CreateCustomCommand(self.client)
+        await interaction.response.send_modal(modal)
+
+    @add_slash.command(name="dadjoke", description="Add a dad joke")
+    async def add_dad_joke_slash(self, interaction: discord.Interaction):
+        """Slash command to add a dad joke"""
+        if not await self.client.is_owner(interaction.user):
+            return interaction.response.send_message(
+                "Je hebt geen toestemming om dit commando uit te voeren.", ephemeral=True
+            )
+
+        modal = AddDadJoke(self.client)
         await interaction.response.send_modal(modal)
 
     @commands.group(name="Edit", case_insensitive=True, invoke_without_command=False)

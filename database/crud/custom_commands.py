@@ -33,6 +33,7 @@ async def create_command(session: AsyncSession, name: str, response: str) -> Cus
     command = CustomCommand(name=name, indexed_name=clean_name(name), response=response)
     session.add(command)
     await session.commit()
+
     return command
 
 

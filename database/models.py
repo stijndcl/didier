@@ -14,6 +14,7 @@ __all__ = [
     "Bank",
     "CustomCommand",
     "CustomCommandAlias",
+    "DadJoke",
     "NightlyData",
     "UforaAnnouncement",
     "UforaCourse",
@@ -71,6 +72,15 @@ class CustomCommandAlias(Base):
     command_id: int = Column(Integer, ForeignKey("custom_commands.command_id"))
 
     command: CustomCommand = relationship("CustomCommand", back_populates="aliases", uselist=False, lazy="selectin")
+
+
+class DadJoke(Base):
+    """When I finally understood asymptotic notation, it was a big "oh" moment"""
+
+    __tablename__ = "dad_jokes"
+
+    dad_joke_id: int = Column(Integer, primary_key=True)
+    joke: str = Column(Text, nullable=False)
 
 
 class NightlyData(Base):
