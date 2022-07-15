@@ -27,7 +27,7 @@ class AddDadJoke(discord.ui.Modal, title="Add Dad Joke"):
     @overrides
     async def on_submit(self, interaction: discord.Interaction):
         async with self.client.db_session as session:
-            joke = await add_dad_joke(session, self.name.value)
+            joke = await add_dad_joke(session, str(self.name.value))
 
         await interaction.response.send_message(f"Successfully added joke #{joke.dad_joke_id}", ephemeral=True)
 

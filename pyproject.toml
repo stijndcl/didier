@@ -39,5 +39,5 @@ env = [
     "DB_PASSWORD = pytest",
     "DB_HOST = localhost",
     "DB_PORT = 5433",
-    "DISC_TOKEN = token"
+    "DISCORD_TOKEN = token"
 ]

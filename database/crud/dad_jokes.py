@@ -35,4 +35,8 @@ async def edit_dad_joke(session: AsyncSession, joke_id: int, new_joke: str) -> D
 async def get_random_dad_joke(session: AsyncSession) -> DadJoke:
     """Return a random database entry"""
     statement = select(DadJoke).order_by(func.random())
-    return (await session.execute(statement)).first()
+    row = (await session.execute(statement)).first()
+    if row is None:
+        raise NoResultFoundException
+
+    return row[0]
