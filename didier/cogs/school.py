@@ -6,6 +6,7 @@ from discord.ext import commands
 
 from database.crud import ufora_courses
 from didier import Didier
+from didier.data import constants
 
 
 class School(commands.Cog):
@@ -70,10 +71,9 @@ class School(commands.Cog):
         if ufora_course is None:
             return await ctx.reply(f"Geen vak gevonden voor ``{course}``", ephemeral=True)
 
-        # TODO load from config
-        year = 2018 + 3
         return await ctx.reply(
-            f"https://studiekiezer.ugent.be/studiefiche/nl/{ufora_course.code}/{year}", mention_author=False
+            f"https://studiekiezer.ugent.be/studiefiche/nl/{ufora_course.code}/{constants.CURRENT_YEAR}",
+            mention_author=False,
         )
 
     @study_guide.autocomplete("course")

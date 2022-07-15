@@ -29,6 +29,8 @@ __all__ = [
 """General config"""
 SANDBOX: bool = env.bool("SANDBOX", True)
 LOGFILE: str = env.str("LOGFILE", "didier.log")
+SEMESTER: int = env.int("SEMESTER", 2)
+YEAR: int = env.int("YEAR", 3)
 
 """Database"""
 DB_NAME: str = env.str("DB_NAME", "didier")
