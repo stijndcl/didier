@@ -26,7 +26,7 @@ extend-ignore =
     E203,
 # Don't require docstrings when overriding a method,
 # the base method should have a docstring but the rest not
-ignore-decorator=overrides
+ignore-decorators=overrides
 max-line-length = 120
 # Disable some rules for entire files
 per-file-ignores =

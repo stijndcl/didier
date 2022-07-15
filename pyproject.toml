@@ -15,7 +15,8 @@ omit = [
     "./didier/cogs/*",
     "./didier/didier.py",
     "./didier/data/*",
-    "./didier/utils/discord/colours.py"
+    "./didier/utils/discord/colours.py",
+    "./didier/utils/discord/constants.py"
 ]
 
 [tool.isort]

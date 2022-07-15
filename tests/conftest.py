@@ -1,5 +1,4 @@
 import asyncio
-import datetime
 from typing import AsyncGenerator, Generator
 from unittest.mock import MagicMock
 
@@ -7,10 +6,8 @@ import pytest
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from database.engine import engine
-from database.models import Base, UforaAnnouncement, UforaCourse, UforaCourseAlias
+from database.models import Base
 from didier import Didier
-
-"""General fixtures"""
 
 
 @pytest.fixture(scope="session")
@@ -57,34 +54,3 @@ def mock_client() -> Didier:
     mock_client.user = mock_user
 
     return mock_client
-
-
-"""Fixtures to put fake data in the database"""
-
-
-@pytest.fixture
-async def ufora_course(database_session: AsyncSession) -> UforaCourse:
-    """Fixture to create a course"""
-    course = UforaCourse(name="test", code="code", year=1, log_announcements=True)
-    database_session.add(course)
-    await database_session.commit()
-    return course
-
-
-@pytest.fixture
-async def ufora_course_with_alias(database_session: AsyncSession, ufora_course: UforaCourse) -> UforaCourse:
-    """Fixture to create a course with an alias"""
-    alias = UforaCourseAlias(course_id=ufora_course.course_id, alias="alias")
-    database_session.add(alias)
-    await database_session.commit()
-    await database_session.refresh(ufora_course)
-    return ufora_course
-
-
-@pytest.fixture
-async def ufora_announcement(ufora_course: UforaCourse, database_session: AsyncSession) -> UforaAnnouncement:
-    """Fixture to create an announcement"""
-    announcement = UforaAnnouncement(course_id=ufora_course.course_id, publication_date=datetime.datetime.now())
-    database_session.add(announcement)
-    await database_session.commit()
-    return announcement

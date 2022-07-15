@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 
+from overrides import overrides
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from database.crud import ufora_courses
@@ -47,18 +48,46 @@ class DatabaseCache(ABC):
 class UforaCourseCache(DatabaseCache):
     """Cache to store the names of Ufora courses"""
 
+    # Also store the aliases to add additional support
+    aliases: dict[str, str] = {}
+
+    @overrides
+    def clear(self):
+        self.aliases.clear()
+        super().clear()
+
+    @overrides
     async def refresh(self, database_session: AsyncSession):
         self.clear()
 
         courses = await ufora_courses.get_all_courses(database_session)
 
-        # Load the course names + all the aliases
+        self.data = list(map(lambda c: c.name, courses))
+
+        # Load the aliases
         for course in courses:
-            aliases = list(map(lambda x: x.alias, course.aliases))
-            self.data.extend([course.name, *aliases])
+            for alias in course.aliases:
+                # Store aliases in lowercase
+                self.aliases[alias.alias.lower()] = course.name
 
         self.data.sort()
         self.data_transformed = list(map(str.lower, self.data))
+
+    @overrides
+    def get_autocomplete_suggestions(self, query: str):
+        query = query.lower()
+        results = set()
+
+        # Return the original (not-lowercase) version
+        for index, course in enumerate(self.data_transformed):
+            if query in course:
+                results.add(self.data[index])
+
+        for alias, course in self.aliases.items():
+            if query in alias:
+                results.add(course)
+
+        return sorted(list(results))
 
 
 class CacheManager:

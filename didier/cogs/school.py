@@ -4,6 +4,7 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
+from database.crud import ufora_courses
 from didier import Didier
 
 
@@ -56,6 +57,32 @@ class School(commands.Cog):
         await message.pin(reason=f"Didier Pin door {interaction.user.display_name}")
         await message.add_reaction("📌")
         return await interaction.response.send_message("📌", ephemeral=True)
+
+    @commands.hybrid_command(
+        name="fiche", description="Stuurt de link naar de studiefiche voor [Vak]", aliases=["guide", "studiefiche"]
+    )
+    @app_commands.describe(course="vak")
+    async def study_guide(self, ctx: commands.Context, course: str):
+        """Create links to study guides"""
+        async with self.client.db_session as session:
+            ufora_course = await ufora_courses.get_course_by_name(session, course)
+
+        if ufora_course is None:
+            return await ctx.reply(f"Geen vak gevonden voor ``{course}``", ephemeral=True)
+
+        # TODO load from config
+        year = 2018 + 3
+        return await ctx.reply(
+            f"https://studiekiezer.ugent.be/studiefiche/nl/{ufora_course.code}/{year}", mention_author=False
+        )
+
+    @study_guide.autocomplete("course")
+    async def study_guide_autocomplete(self, _: discord.Interaction, current: str) -> list[app_commands.Choice[str]]:
+        """Autocompletion for the 'course'-parameter"""
+        return [
+            app_commands.Choice(name=course, value=course)
+            for course in self.client.database_caches.ufora_courses.get_autocomplete_suggestions(current)
+        ]
 
 
 async def setup(client: Didier):
