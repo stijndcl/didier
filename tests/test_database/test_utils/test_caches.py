@@ -9,8 +9,9 @@ async def test_ufora_course_cache_refresh_empty(database_session: AsyncSession, 
     cache = UforaCourseCache()
     await cache.refresh(database_session)
 
-    assert len(cache.data) == 2
-    assert cache.data == ["alias", "test"]
+    assert len(cache.data) == 1
+    assert cache.data == ["test"]
+    assert cache.aliases == {"alias": "test"}
 
 
 async def test_ufora_course_cache_refresh_not_empty(
@@ -23,5 +24,6 @@ async def test_ufora_course_cache_refresh_not_empty(
 
     await cache.refresh(database_session)
 
-    assert len(cache.data) == 2
-    assert cache.data == ["alias", "test"]
+    assert len(cache.data) == 1
+    assert cache.data == ["test"]
+    assert cache.aliases == {"alias": "test"}
