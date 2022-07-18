@@ -1,4 +1,5 @@
 import http
+import typing
 from dataclasses import dataclass, field
 from typing import Optional
 from urllib.parse import unquote_plus, urlencode
@@ -28,19 +29,25 @@ def get_result_stats(bs: BeautifulSoup) -> Optional[str]:
 
     Example result: "About 16.570.000 results (0,84 seconds)"
     """
-    stats = bs.find("div", id="result-stats").text
-    return stats and stats.removesuffix("\xa0")
+    stats = bs.find("div", id="result-stats")
+    if stats is None:
+        return None
+
+    return stats.text.removesuffix("\xa0")
 
 
 def parse_result(element: Tag) -> Optional[str]:
     """Parse 1 wrapper into a link"""
     a_tag = element.find("a", href=True)
-    url = a_tag["href"]
-    title = a_tag.find("h3")
+    if a_tag is None:
+        return None
+
+    url = a_tag["href"]  # type: ignore
+    title = typing.cast(Tag, a_tag.find("h3"))
 
     if (
         url is None
-        or not url.startswith(
+        or not str(url).startswith(
             (
                 "http://",
                 "https://",
@@ -57,7 +64,8 @@ def parse_result(element: Tag) -> Optional[str]:
 def get_search_results(bs: BeautifulSoup) -> list[str]:
     """Parse the search results"""
     result_wrappers = bs.find_all("div", class_="g")
-    results = filter(lambda x: x is not None, map(parse_result, result_wrappers))
+
+    results: list[str] = list(result for result in map(parse_result, result_wrappers) if result is not None)
 
     # Remove duplicates
     # (sets don't preserve the order!)
@@ -67,7 +75,8 @@ def get_search_results(bs: BeautifulSoup) -> list[str]:
 async def google_search(http_client: ClientSession, query: str):
     """Get the first 10 Google search results"""
     headers = {
-        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.97 Safari/537.36"
+        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/537.36 (KHTML, like Gecko) "
+        "Chrome/83.0.4103.97 Safari/537.36"
     }
 
     query = urlencode({"q": query})
@@ -82,4 +91,4 @@ async def google_search(http_client: ClientSession, query: str):
         result_stats = get_result_stats(bs)
         results = get_search_results(bs)
 
-        return SearchData(query, 200, results[:10], result_stats)
+        return SearchData(query, 200, results[:10], result_stats or "")

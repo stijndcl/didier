@@ -1,6 +1,7 @@
 from http import HTTPStatus
 
 import discord
+from overrides import overrides
 
 from didier.data.embeds.base import EmbedBaseModel
 from didier.data.scrapers.google import SearchData
@@ -31,6 +32,7 @@ class GoogleSearch(EmbedBaseModel):
 
         return embed
 
+    @overrides
     def to_embed(self) -> discord.Embed:
         if not self.data.results or self.data.status_code != HTTPStatus.OK:
             return self._error_embed()
