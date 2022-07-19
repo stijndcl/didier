@@ -1,16 +1,27 @@
 import logging
 
-from alembic import config, script
-from alembic.runtime import migration
-from database.engine import engine
+from sqlalchemy.ext.asyncio import create_async_engine
+from sqlalchemy.orm import Session
 
-__all__ = ["ensure_latest_migration"]
+from alembic import command, config, script
+from alembic.config import Config
+from alembic.runtime import migration
+from database.engine import engine, url
+
+__config_path__ = "alembic.ini"
+__migrations_path__ = "alembic/"
+
+
+cfg = Config(__config_path__)
+cfg.set_main_option("script_location", __migrations_path__)
+
+
+__all__ = ["ensure_latest_migration", "migrate"]
 
 
 async def ensure_latest_migration():
     """Make sure we are currently on the latest revision, otherwise raise an exception"""
-    alembic_config = config.Config("alembic.ini")
-    alembic_script = script.ScriptDirectory.from_config(alembic_config)
+    alembic_script = script.ScriptDirectory.from_config(cfg)
 
     async with engine.begin() as connection:
         current_revision = await connection.run_sync(
@@ -25,3 +36,20 @@ async def ensure_latest_migration():
             )
             logging.error(error_message)
             raise RuntimeError(error_message)
+
+
+def __execute_upgrade(connection: Session):
+    cfg.attributes["connection"] = connection
+    command.upgrade(cfg, "head")
+
+
+def __execute_downgrade(connection: Session):
+    cfg.attributes["connection"] = connection
+    command.downgrade(cfg, "base")
+
+
+async def migrate(up: bool):
+    """Migrate the database upwards or downwards"""
+    async_engine = create_async_engine(url, echo=True)
+    async with async_engine.begin() as connection:
+        await connection.run_sync(__execute_upgrade if up else __execute_downgrade)

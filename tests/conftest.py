@@ -6,11 +6,11 @@ import pytest
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from database.engine import engine
-from database.models import Base
+from database.migrations import ensure_latest_migration, migrate
 from didier import Didier
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="session", autouse=True)
 def event_loop() -> Generator:
     loop = asyncio.get_event_loop_policy().new_event_loop()
     yield loop
@@ -19,9 +19,15 @@ def event_loop() -> Generator:
 
 @pytest.fixture(scope="session")
 async def tables():
-    """Initialize a database before the tests, and then tear it down again"""
-    async with engine.begin() as connection:
-        await connection.run_sync(Base.metadata.create_all)
+    """Initialize a database before the tests, and then tear it down again
+
+    Checks that the migrations were successful by asserting that we are currently
+    on the latest migration
+    """
+    await migrate(up=True)
+    await ensure_latest_migration()
+    yield
+    await migrate(up=False)
 
 
 @pytest.fixture
