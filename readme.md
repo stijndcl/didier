@@ -42,6 +42,12 @@ docker-compose up -d db-pytest
 # Starting Didier
 python3 main.py
 
+# Running database migrations
+alembic upgrade head
+
+# Creating a new database migration
+alembic revision --autogenerate -m "Revision message here"
+
 # Running tests
 pytest
 

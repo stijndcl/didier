@@ -12,6 +12,7 @@ Base = declarative_base()
 __all__ = [
     "Base",
     "Bank",
+    "Birthday",
     "CustomCommand",
     "CustomCommandAlias",
     "DadJoke",
@@ -44,6 +45,18 @@ class Bank(Base):
     rob_level: int = Column(Integer, server_default="1", nullable=False)
 
     user: User = relationship("User", uselist=False, back_populates="bank", lazy="selectin")
+
+
+class Birthday(Base):
+    """A user's birthday"""
+
+    __tablename__ = "birthdays"
+
+    birthday_id: int = Column(Integer, primary_key=True)
+    user_id: int = Column(BigInteger, ForeignKey("users.user_id"))
+    birthday: datetime = Column(DateTime, nullable=False)
+
+    user: User = relationship("User", uselist=False, back_populates="birthday", lazy="selectin")
 
 
 class CustomCommand(Base):
@@ -148,6 +161,9 @@ class User(Base):
 
     bank: Bank = relationship(
         "Bank", back_populates="user", uselist=False, lazy="selectin", cascade="all, delete-orphan"
+    )
+    birthday: Birthday = relationship(
+        "Birthday", back_populates="user", uselist=False, lazy="selectin", cascade="all, delete-orphan"
     )
     nightly_data: NightlyData = relationship(
         "NightlyData", back_populates="user", uselist=False, lazy="selectin", cascade="all, delete-orphan"
