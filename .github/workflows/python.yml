@@ -62,7 +62,7 @@ jobs:
         with:
           token: ${{ secrets.CODECOV }}
   linting:
-    needs: [dependencies]
+    needs: [tests]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -82,7 +82,7 @@ jobs:
       - name: Linting
         run: flake8
   typing:
-    needs: [dependencies]
+    needs: [tests]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -100,9 +100,9 @@ jobs:
       - name: Install dependencies
         run: pip3 install -r requirements.txt -r requirements-dev.txt
       - name: Typing
-        run: mypy didier database
+        run: mypy
   formatting:
-    needs: [dependencies]
+    needs: [tests]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
