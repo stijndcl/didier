@@ -12,6 +12,10 @@ from didier import Didier
 
 @pytest.fixture(scope="session", autouse=True)
 def event_loop() -> Generator:
+    """Fixture to change the event loop
+
+    This fixes a lot of headaches during async tests
+    """
     loop = asyncio.get_event_loop_policy().new_event_loop()
     yield loop
     loop.close()
@@ -33,6 +37,7 @@ async def tables():
 @pytest.fixture
 async def database_session(tables) -> AsyncGenerator[AsyncSession, None]:
     """Fixture to create a session for every test
+
     Rollbacks the transaction afterwards so that the future tests start with a clean database
     """
     connection = await engine.connect()
@@ -52,6 +57,7 @@ async def database_session(tables) -> AsyncGenerator[AsyncSession, None]:
 @pytest.fixture
 def mock_client() -> Didier:
     """Fixture to get a mock Didier instance
+
     The mock uses 0 as the id
     """
     mock_client = MagicMock()

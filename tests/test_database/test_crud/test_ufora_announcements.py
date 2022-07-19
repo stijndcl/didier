@@ -1,6 +1,5 @@
 import datetime
 
-import pytest
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from database.crud import ufora_announcements as crud

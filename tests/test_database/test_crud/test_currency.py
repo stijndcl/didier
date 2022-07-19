@@ -6,16 +6,6 @@ from database.exceptions import currency as exceptions
 from database.models import Bank
 
 
-DEBUG_USER_ID = 1
-
-
-@pytest.fixture
-async def bank(database_session: AsyncSession) -> Bank:
-    _bank = await crud.get_bank(database_session, DEBUG_USER_ID)
-    await database_session.refresh(_bank)
-    return _bank
-
-
 async def test_add_dinks(database_session: AsyncSession, bank: Bank):
     """Test adding dinks to an account"""
     assert bank.dinks == 0

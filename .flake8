@@ -8,7 +8,6 @@ exclude =
     __pycache__,
     alembic,
     htmlcov,
-    tests,
     venv
 # Disable rules that we don't care about (or conflict with others)
 extend-ignore =
@@ -30,10 +29,14 @@ ignore-decorators=overrides
 max-line-length = 120
 # Disable some rules for entire files
 per-file-ignores =
-    # Missing __all__, main isn't supposed to be imported
+    # DALL000: Missing __all__, main isn't supposed to be imported
     main.py: DALL000,
-    # Missing __all__, Cogs aren't modules
+    # DALL000: Missing __all__, Cogs aren't modules
     ./didier/cogs/*: DALL000,
+    # DALL000: Missing __all__, tests aren't supposed to be imported
+    # S101: Use of assert, this is the point of tests
+    ./tests/*: DALL000 S101,
+    # D103: Missing docstring in public function
     # All of the colours methods are just oneliners to create a colour,
     # there's no point adding docstrings (function names are enough)
-    ./didier/utils/discord/colours.py: D103
+    ./didier/utils/discord/colours.py: D103,

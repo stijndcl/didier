@@ -3,7 +3,33 @@ import datetime
 import pytest
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from database.models import UforaAnnouncement, UforaCourse, UforaCourseAlias
+from database.crud import users
+from database.models import Bank, UforaAnnouncement, UforaCourse, UforaCourseAlias, User
+
+
+@pytest.fixture(scope="session")
+def test_user_id() -> int:
+    """User id used when creating the debug user
+
+    Fixture is useful when comparing, fetching data, ...
+    """
+    return 1
+
+
+@pytest.fixture
+async def user(database_session: AsyncSession, test_user_id) -> User:
+    """Fixture to create a user"""
+    _user = await users.get_or_add(database_session, test_user_id)
+    await database_session.refresh(_user)
+    return _user
+
+
+@pytest.fixture
+async def bank(database_session: AsyncSession, user: User) -> Bank:
+    """Fixture to fetch the test user's bank"""
+    _bank = user.bank
+    await database_session.refresh(_bank)
+    return _bank
 
 
 @pytest.fixture

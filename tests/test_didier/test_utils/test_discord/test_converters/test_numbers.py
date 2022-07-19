@@ -44,6 +44,7 @@ def test_abbreviated_no_number():
 
 def test_abbreviated_float_floors():
     """Test abbreviated_number for a float that is longer than the unit
+
     Example:
         5.3k is 5300, but 5.3001k is 5300.1
     """

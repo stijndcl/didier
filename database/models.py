@@ -162,7 +162,7 @@ class User(Base):
     bank: Bank = relationship(
         "Bank", back_populates="user", uselist=False, lazy="selectin", cascade="all, delete-orphan"
     )
-    birthday: Birthday = relationship(
+    birthday: Optional[Birthday] = relationship(
         "Birthday", back_populates="user", uselist=False, lazy="selectin", cascade="all, delete-orphan"
     )
     nightly_data: NightlyData = relationship(
