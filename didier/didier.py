@@ -1,3 +1,4 @@
+import logging
 import os
 
 import discord
@@ -14,10 +15,14 @@ from didier.utils.discord.prefix import get_prefix
 __all__ = ["Didier"]
 
 
+logger = logging.getLogger(__name__)
+
+
 class Didier(commands.Bot):
     """DIDIER <3"""
 
     database_caches: CacheManager
+    error_channel: discord.abc.Messageable
     initial_extensions: tuple[str, ...] = ()
     http_session: ClientSession
 
@@ -60,6 +65,12 @@ class Didier(commands.Bot):
         # Create aiohttp session
         self.http_session = ClientSession()
 
+        # Configure channel to send errors to
+        if settings.ERRORS_CHANNEL is not None:
+            self.error_channel = self.get_channel(settings.ERRORS_CHANNEL)
+        else:
+            self.error_channel = self.get_user(self.owner_id)
+
     async def _load_initial_extensions(self):
         """Load all extensions that should  be loaded before the others"""
         for extension in self.initial_extensions:
@@ -100,6 +111,13 @@ class Didier(commands.Bot):
     async def reject_message(self, message: discord.Message):
         """Add an X to a message"""
         await message.add_reaction("❌")
+
+    async def log_error(self, message: str, log_to_discord: bool = True):
+        """Send an error message to the logs, and optionally the configured channel"""
+        logger.error(message)
+        if log_to_discord:
+            # TODO pretty embed
+            await self.error_channel.send(message)
 
     async def on_ready(self):
         """Event triggered when the bot is ready"""

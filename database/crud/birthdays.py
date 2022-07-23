@@ -2,7 +2,7 @@ import datetime
 from datetime import date
 from typing import Optional
 
-from sqlalchemy import select
+from sqlalchemy import extract, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
@@ -38,5 +38,8 @@ async def get_birthday_for_user(session: AsyncSession, user_id: int) -> Optional
 
 async def get_birthdays_on_day(session: AsyncSession, day: datetime.date) -> list[Birthday]:
     """Get all birthdays that happen on a given day"""
-    statement = select(Birthday).where(Birthday.birthday == day)
+    days = extract("day", Birthday.birthday)
+    months = extract("month", Birthday.birthday)
+
+    statement = select(Birthday).where((days == day.day) & (months == day.month))
     return list((await session.execute(statement)).scalars())

@@ -52,7 +52,7 @@ async def test_get_birthday_not_exists(database_session: AsyncSession, user: Use
 @freeze_time("2022/07/23")
 async def test_get_birthdays_on_day(database_session: AsyncSession, user: User):
     """Test getting all birthdays on a given day"""
-    await crud.add_birthday(database_session, user.user_id, datetime.today())
+    await crud.add_birthday(database_session, user.user_id, datetime.today().replace(year=2001))
 
     user_2 = await users.get_or_add(database_session, user.user_id + 1)
     await crud.add_birthday(database_session, user_2.user_id, datetime.today() + timedelta(weeks=1))

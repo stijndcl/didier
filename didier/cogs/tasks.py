@@ -5,12 +5,13 @@ from discord.ext import commands, tasks  # type: ignore # Strange & incorrect My
 
 import settings
 from database import enums
+from database.crud.birthdays import get_birthdays_on_day
 from database.crud.ufora_announcements import remove_old_announcements
 from didier import Didier
 from didier.data.embeds.ufora.announcements import fetch_ufora_announcements
 from didier.decorators.tasks import timed_task
 from didier.utils.discord.checks import is_owner
-from didier.utils.types.datetime import LOCAL_TIMEZONE
+from didier.utils.types.datetime import LOCAL_TIMEZONE, tz_aware_now
 
 # datetime.time()-instances for when every task should run
 DAILY_RESET_TIME = datetime.time(hour=0, minute=0, tzinfo=LOCAL_TIMEZONE)
@@ -31,17 +32,18 @@ class Tasks(commands.Cog):
     def __init__(self, client: Didier):
         self.client = client
 
+        # Only check birthdays if there's a channel to send it to
+        if settings.BIRTHDAY_ANNOUNCEMENT_CHANNEL is not None:
+            self.check_birthdays.start()
+
         # Only pull announcements if a token was provided
         if settings.UFORA_RSS_TOKEN is not None and settings.UFORA_ANNOUNCEMENTS_CHANNEL is not None:
             self.pull_ufora_announcements.start()
             self.remove_old_ufora_announcements.start()
 
-        # Start all tasks
-        self.check_birthdays.start()
-
         self._tasks = {"birthdays": self.check_birthdays, "ufora": self.pull_ufora_announcements}
 
-    @commands.group(name="Tasks", case_insensitive=True, invoke_without_command=True)
+    @commands.group(name="Tasks", aliases=["Task"], case_insensitive=True, invoke_without_command=True)
     @commands.check(is_owner)
     async def tasks_group(self, ctx: commands.Context):
         """Command group for Task-related commands
@@ -64,6 +66,18 @@ class Tasks(commands.Cog):
     @timed_task(enums.TaskType.BIRTHDAYS)
     async def check_birthdays(self):
         """Check if it's currently anyone's birthday"""
+        now = tz_aware_now().date()
+        async with self.client.db_session as session:
+            birthdays = await get_birthdays_on_day(session, now)
+
+        channel = self.client.get_channel(settings.BIRTHDAY_ANNOUNCEMENT_CHANNEL)
+        if channel is None:
+            return await self.client.log_error("Unable to find channel for birthday announcements")
+
+        for birthday in birthdays:
+            user = self.client.get_user(birthday.user_id)
+            # TODO more messages?
+            await channel.send(f"Gelukkig verjaardag {user.mention}!")
 
     @check_birthdays.before_loop
     async def _before_check_birthdays(self):

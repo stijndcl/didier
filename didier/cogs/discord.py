@@ -35,7 +35,13 @@ class Discord(commands.Cog):
     async def birthday_set(self, ctx: commands.Context, date_str: str):
         """Command to set your birthday"""
         try:
-            date = str_to_date(date_str)
+            default_year = 2001
+            date = str_to_date(date_str, formats=["%d/%m/%Y", "%d/%m/%y", "%d/%m"])
+
+            # If no year was passed, make it 2001 by default
+            if date_str.count("/") == 1:
+                date.replace(year=default_year)
+
         except ValueError:
             return await ctx.reply(f"`{date_str}` is geen geldige datum.", mention_author=False)
 
