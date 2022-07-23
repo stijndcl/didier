@@ -1,6 +1,6 @@
 from typing import Optional
 
-from didier.data.flags import PosixFlags
+from didier.utils.discord.flags import PosixFlags
 
 __all__ = ["EditCustomFlags"]
 

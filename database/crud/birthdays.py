@@ -1,3 +1,4 @@
+import datetime
 from datetime import date
 from typing import Optional
 
@@ -32,3 +33,7 @@ async def get_birthday_for_user(session: AsyncSession, user_id: int) -> Optional
     """Find a user's birthday"""
     statement = select(Birthday).where(Birthday.user_id == user_id)
     return (await session.execute(statement)).scalar_one_or_none()
+
+
+async def get_birthdays_on_day(session: AsyncSession, day: datetime.datetime) -> list[Birthday]:
+    """Get all birthdays that happen on a given day"""

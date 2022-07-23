@@ -22,7 +22,7 @@ def upgrade() -> None:
         "birthdays",
         sa.Column("birthday_id", sa.Integer(), nullable=False),
         sa.Column("user_id", sa.BigInteger(), nullable=True),
-        sa.Column("birthday", sa.DateTime(), nullable=False),
+        sa.Column("birthday", sa.Date, nullable=False),
         sa.ForeignKeyConstraint(
             ["user_id"],
             ["users.user_id"],

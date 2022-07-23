@@ -1,10 +1,22 @@
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import date, datetime
 from typing import Optional
 
-from sqlalchemy import BigInteger, Boolean, Column, DateTime, ForeignKey, Integer, Text
+from sqlalchemy import (
+    BigInteger,
+    Boolean,
+    Column,
+    Date,
+    DateTime,
+    Enum,
+    ForeignKey,
+    Integer,
+    Text,
+)
 from sqlalchemy.orm import declarative_base, relationship
+
+from database import enums
 
 Base = declarative_base()
 
@@ -17,6 +29,7 @@ __all__ = [
     "CustomCommandAlias",
     "DadJoke",
     "NightlyData",
+    "Task",
     "UforaAnnouncement",
     "UforaCourse",
     "UforaCourseAlias",
@@ -54,7 +67,7 @@ class Birthday(Base):
 
     birthday_id: int = Column(Integer, primary_key=True)
     user_id: int = Column(BigInteger, ForeignKey("users.user_id"))
-    birthday: datetime = Column(DateTime, nullable=False)
+    birthday: date = Column(Date, nullable=False)
 
     user: User = relationship("User", uselist=False, back_populates="birthday", lazy="selectin")
 
@@ -103,10 +116,20 @@ class NightlyData(Base):
 
     nightly_id: int = Column(Integer, primary_key=True)
     user_id: int = Column(BigInteger, ForeignKey("users.user_id"))
-    last_nightly: Optional[datetime] = Column(DateTime(timezone=True), nullable=True)
+    last_nightly: Optional[date] = Column(Date, nullable=True)
     count: int = Column(Integer, server_default="0", nullable=False)
 
     user: User = relationship("User", back_populates="nightly_data", uselist=False, lazy="selectin")
+
+
+class Task(Base):
+    """A Didier task"""
+
+    __tablename__ = "tasks"
+
+    task_id: int = Column(Integer, primary_key=True)
+    task: enums.TaskType = Column(Enum(enums.TaskType), nullable=False, unique=True)
+    previous_run: datetime = Column(DateTime(timezone=True), nullable=True)
 
 
 class UforaCourse(Base):
@@ -147,7 +170,7 @@ class UforaAnnouncement(Base):
 
     announcement_id: int = Column(Integer, primary_key=True)
     course_id: int = Column(Integer, ForeignKey("ufora_courses.course_id"))
-    publication_date: datetime = Column(DateTime(timezone=True))
+    publication_date: date = Column(Date)
 
     course: UforaCourse = relationship("UforaCourse", back_populates="announcements", uselist=False, lazy="selectin")
 

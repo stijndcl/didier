@@ -8,7 +8,7 @@ from database.crud import custom_commands
 from database.exceptions.constraints import DuplicateInsertException
 from database.exceptions.not_found import NoResultFoundException
 from didier import Didier
-from didier.data.flags.owner import EditCustomFlags
+from didier.utils.discord.flags.owner import EditCustomFlags
 from didier.views.modals import AddDadJoke, CreateCustomCommand, EditCustomCommand
 
 

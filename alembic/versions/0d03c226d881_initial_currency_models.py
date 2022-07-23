@@ -37,7 +37,7 @@ def upgrade() -> None:
         "nightly_data",
         sa.Column("nightly_id", sa.Integer(), nullable=False),
         sa.Column("user_id", sa.BigInteger(), nullable=True),
-        sa.Column("last_nightly", sa.DateTime(timezone=True), nullable=True),
+        sa.Column("last_nightly", sa.Date, nullable=True),
         sa.Column("count", sa.Integer(), server_default="0", nullable=False),
         sa.ForeignKeyConstraint(
             ["user_id"],

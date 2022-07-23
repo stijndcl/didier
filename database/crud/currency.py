@@ -71,7 +71,7 @@ async def claim_nightly(session: AsyncSession, user_id: int):
 
     now = datetime.now()
 
-    if nightly_data.last_nightly is not None and nightly_data.last_nightly.date() == now.date():
+    if nightly_data.last_nightly is not None and nightly_data.last_nightly == now.date():
         raise exceptions.DoubleNightly
 
     bank = await get_bank(session, user_id)

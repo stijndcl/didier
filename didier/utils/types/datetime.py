@@ -1,6 +1,10 @@
 import datetime
+import zoneinfo
 
-__all__ = ["int_to_weekday", "str_to_date"]
+__all__ = ["LOCAL_TIMEZONE", "int_to_weekday", "str_to_date"]
+
+
+LOCAL_TIMEZONE = zoneinfo.ZoneInfo("Europe/Brussels")
 
 
 def int_to_weekday(number: int) -> str:  # pragma: no cover # it's useless to write a test for this
