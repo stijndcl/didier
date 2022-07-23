@@ -42,4 +42,4 @@ async def get_birthdays_on_day(session: AsyncSession, day: datetime.date) -> lis
     months = extract("month", Birthday.birthday)
 
     statement = select(Birthday).where((days == day.day) & (months == day.month))
-    return list((await session.execute(statement)).scalars())
+    return list((await session.execute(statement)).scalars().all())
