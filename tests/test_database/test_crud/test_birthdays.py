@@ -1,8 +1,10 @@
 from datetime import datetime, timedelta
 
+from freezegun import freeze_time
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from database.crud import birthdays as crud
+from database.crud import users
 from database.models import User
 
 
@@ -45,3 +47,28 @@ async def test_get_birthday_not_exists(database_session: AsyncSession, user: Use
     """Test getting a user's birthday when it doesn't exist"""
     bd = await crud.get_birthday_for_user(database_session, user.user_id)
     assert bd is None
+
+
+@freeze_time("2022/07/23")
+async def test_get_birthdays_on_day(database_session: AsyncSession, user: User):
+    """Test getting all birthdays on a given day"""
+    await crud.add_birthday(database_session, user.user_id, datetime.today())
+
+    user_2 = await users.get_or_add(database_session, user.user_id + 1)
+    await crud.add_birthday(database_session, user_2.user_id, datetime.today() + timedelta(weeks=1))
+    birthdays = await crud.get_birthdays_on_day(database_session, datetime.today())
+    assert len(birthdays) == 1
+    assert birthdays[0].user_id == user.user_id
+
+
+@freeze_time("2022/07/23")
+async def test_get_birthdays_none_present(database_session: AsyncSession):
+    """Test getting all birthdays when there are none"""
+    birthdays = await crud.get_birthdays_on_day(database_session, datetime.today())
+    assert len(birthdays) == 0
+
+    # Add a random birthday that is not today
+    await crud.add_birthday(database_session, 1, datetime.today() + timedelta(days=1))
+
+    birthdays = await crud.get_birthdays_on_day(database_session, datetime.today())
+    assert len(birthdays) == 0

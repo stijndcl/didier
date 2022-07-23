@@ -10,12 +10,16 @@ __all__ = [
 ]
 
 
-async def get_or_add(session: AsyncSession, user_id: int) -> User:
+async def get_or_add(session: AsyncSession, user_id: int, *, options: Optional[list] = None) -> User:
     """Get a user's profile
 
     If it doesn't exist yet, create it (along with all linked datastructures)
     """
-    statement = select(User).where(User.user_id == user_id)
+    if options is None:
+        options = []
+
+    statement = select(User).where(User.user_id == user_id).options(*options)
+
     user: Optional[User] = (await session.execute(statement)).scalar_one_or_none()
 
     # User exists
@@ -38,5 +42,6 @@ async def get_or_add(session: AsyncSession, user_id: int) -> User:
     session.add(user)
 
     await session.commit()
+    await session.refresh(user)
 
     return user

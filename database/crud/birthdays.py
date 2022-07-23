@@ -4,11 +4,12 @@ from typing import Optional
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 from database.crud import users
-from database.models import Birthday
+from database.models import Birthday, User
 
-__all__ = ["add_birthday", "get_birthday_for_user"]
+__all__ = ["add_birthday", "get_birthday_for_user", "get_birthdays_on_day"]
 
 
 async def add_birthday(session: AsyncSession, user_id: int, birthday: date):
@@ -16,7 +17,7 @@ async def add_birthday(session: AsyncSession, user_id: int, birthday: date):
 
     If already present, overwrites the existing one
     """
-    user = await users.get_or_add(session, user_id)
+    user = await users.get_or_add(session, user_id, options=[selectinload(User.birthday)])
 
     if user.birthday is not None:
         bd = user.birthday
@@ -35,5 +36,7 @@ async def get_birthday_for_user(session: AsyncSession, user_id: int) -> Optional
     return (await session.execute(statement)).scalar_one_or_none()
 
 
-async def get_birthdays_on_day(session: AsyncSession, day: datetime.datetime) -> list[Birthday]:
+async def get_birthdays_on_day(session: AsyncSession, day: datetime.date) -> list[Birthday]:
     """Get all birthdays that happen on a given day"""
+    statement = select(Birthday).where(Birthday.birthday == day)
+    return list((await session.execute(statement)).scalars())
