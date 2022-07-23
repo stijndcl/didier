@@ -14,7 +14,7 @@ async def test_add_birthday_not_present(database_session: AsyncSession, user: Us
     await crud.add_birthday(database_session, user.user_id, bd_date)
     await database_session.refresh(user)
     assert user.birthday is not None
-    assert user.birthday.birthday.date() == bd_date
+    assert user.birthday.birthday == bd_date
 
 
 async def test_add_birthday_overwrite(database_session: AsyncSession, user: User):
@@ -27,7 +27,7 @@ async def test_add_birthday_overwrite(database_session: AsyncSession, user: User
     new_bd_date = bd_date + timedelta(weeks=1)
     await crud.add_birthday(database_session, user.user_id, new_bd_date)
     await database_session.refresh(user)
-    assert user.birthday.birthday.date() == new_bd_date
+    assert user.birthday.birthday == new_bd_date
 
 
 async def test_get_birthday_exists(database_session: AsyncSession, user: User):
@@ -38,7 +38,7 @@ async def test_get_birthday_exists(database_session: AsyncSession, user: User):
 
     bd = await crud.get_birthday_for_user(database_session, user.user_id)
     assert bd is not None
-    assert bd.birthday.date() == bd_date
+    assert bd.birthday == bd_date
 
 
 async def test_get_birthday_not_exists(database_session: AsyncSession, user: User):

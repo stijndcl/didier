@@ -1,4 +1,7 @@
+import datetime
+
 import pytest
+from freezegun import freeze_time
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from database.crud import currency as crud
@@ -14,13 +17,18 @@ async def test_add_dinks(database_session: AsyncSession, bank: Bank):
     assert bank.dinks == 10
 
 
+@freeze_time("2022/07/23")
 async def test_claim_nightly_available(database_session: AsyncSession, bank: Bank):
     """Test claiming nightlies when it hasn't been done yet"""
     await crud.claim_nightly(database_session, bank.user_id)
     await database_session.refresh(bank)
     assert bank.dinks == crud.NIGHTLY_AMOUNT
 
+    nightly_data = await crud.get_nightly_data(database_session, bank.user_id)
+    assert nightly_data.last_nightly == datetime.date(year=2022, month=7, day=23)
 
+
+@freeze_time("2022/07/23")
 async def test_claim_nightly_unavailable(database_session: AsyncSession, bank: Bank):
     """Test claiming nightlies twice in a day"""
     await crud.claim_nightly(database_session, bank.user_id)

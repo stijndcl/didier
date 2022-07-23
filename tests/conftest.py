@@ -23,7 +23,7 @@ def event_loop() -> Generator:
 
 @pytest.fixture(scope="session")
 async def tables():
-    """Initialize a database before the tests, and then tear it down again
+    """Fixture to initialize a database before the tests, and then tear it down again
 
     Checks that the migrations were successful by asserting that we are currently
     on the latest migration

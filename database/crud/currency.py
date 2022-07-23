@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import date
 from typing import Union
 
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -69,9 +69,9 @@ async def claim_nightly(session: AsyncSession, user_id: int):
     """Claim daily Dinks"""
     nightly_data = await get_nightly_data(session, user_id)
 
-    now = datetime.now()
+    now = date.today()
 
-    if nightly_data.last_nightly is not None and nightly_data.last_nightly == now.date():
+    if nightly_data.last_nightly is not None and nightly_data.last_nightly == now:
         raise exceptions.DoubleNightly
 
     bank = await get_bank(session, user_id)
