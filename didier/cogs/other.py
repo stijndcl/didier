@@ -19,7 +19,10 @@ class Other(commands.Cog):
     async def define(self, ctx: commands.Context, *, query: str):
         """Look up the definition of a word on the Urban Dictionary"""
         async with ctx.typing():
-            definitions = await urban_dictionary.lookup(self.client.http_session, query)
+            status_code, definitions = await urban_dictionary.lookup(self.client.http_session, query)
+            if not definitions:
+                return await ctx.reply(f"Something went wrong (status {status_code})")
+
             await ctx.reply(embed=definitions[0].to_embed(), mention_author=False)
 
     @commands.hybrid_command(name="google", description="Google search", usage="[Query]")

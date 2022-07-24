@@ -4,11 +4,12 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
+import settings
 from database.crud import custom_commands
 from database.exceptions.constraints import DuplicateInsertException
 from database.exceptions.not_found import NoResultFoundException
 from didier import Didier
-from didier.utils.discord.flags.owner import EditCustomFlags
+from didier.utils.discord.flags.owner import EditCustomFlags, SyncOptionFlags
 from didier.views.modals import AddDadJoke, CreateCustomCommand, EditCustomCommand
 
 
@@ -18,8 +19,18 @@ class Owner(commands.Cog):
     client: Didier
 
     # Slash groups
-    add_slash = app_commands.Group(name="add", description="Add something new to the database")
-    edit_slash = app_commands.Group(name="edit", description="Edit an existing database entry")
+    add_slash = app_commands.Group(
+        name="add",
+        description="Add something new to the database",
+        guild_ids=settings.DISCORD_OWNER_GUILDS,
+        guild_only=True,
+    )
+    edit_slash = app_commands.Group(
+        name="edit",
+        description="Edit an existing database entry",
+        guild_ids=settings.DISCORD_OWNER_GUILDS,
+        guild_only=True,
+    )
 
     def __init__(self, client: Didier):
         self.client = client
@@ -31,16 +42,21 @@ class Owner(commands.Cog):
         """
         return await self.client.is_owner(ctx.author)
 
-    @commands.command(name="Error")
-    async def _error(self, ctx: commands.Context):
+    @commands.command(name="Error", aliases=["Raise"])
+    async def _error(self, ctx: commands.Context, message: str = "Debug"):
         """Raise an exception for debugging purposes"""
-        raise Exception("Debug")
+        raise Exception(message)
 
     @commands.command(name="Sync")
-    async def sync(self, ctx: commands.Context, guild: Optional[discord.Guild] = None):
+    async def sync(self, ctx: commands.Context, guild: Optional[discord.Guild] = None, *, flags: SyncOptionFlags):
         """Sync all application-commands in Discord"""
         if guild is not None:
-            self.client.tree.copy_global_to(guild=guild)
+            if flags.clear:
+                self.client.tree.clear_commands(guild=guild)
+
+            if flags.copy_globals:
+                self.client.tree.copy_global_to(guild=guild)
+
             await self.client.tree.sync(guild=guild)
         else:
             await self.client.tree.sync()
@@ -52,7 +68,7 @@ class Owner(commands.Cog):
         """Command group for [add X] message commands"""
 
     @add_msg.command(name="Custom")
-    async def add_custom(self, ctx: commands.Context, name: str, *, response: str):
+    async def add_custom_msg(self, ctx: commands.Context, name: str, *, response: str):
         """Add a new custom command"""
         async with self.client.db_session as session:
             try:
@@ -63,7 +79,7 @@ class Owner(commands.Cog):
                 await self.client.reject_message(ctx.message)
 
     @add_msg.command(name="Alias")
-    async def add_alias(self, ctx: commands.Context, command: str, alias: str):
+    async def add_alias_msg(self, ctx: commands.Context, command: str, alias: str):
         """Add a new alias for a custom command"""
         async with self.client.db_session as session:
             try:
