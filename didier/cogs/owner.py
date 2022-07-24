@@ -43,7 +43,7 @@ class Owner(commands.Cog):
         return await self.client.is_owner(ctx.author)
 
     @commands.command(name="Error", aliases=["Raise"])
-    async def _error(self, ctx: commands.Context, message: str = "Debug"):
+    async def _error(self, ctx: commands.Context, *, message: str = "Debug"):
         """Raise an exception for debugging purposes"""
         raise Exception(message)
 

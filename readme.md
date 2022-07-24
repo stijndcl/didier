@@ -61,3 +61,5 @@ black
 flake8
 mypy
 ```
+
+It's also convenient to have code-formatting happen automatically on-save. The [`Black documentation`](https://black.readthedocs.io/en/stable/integrations/editors.html) explains how to set this up for different types of editors.

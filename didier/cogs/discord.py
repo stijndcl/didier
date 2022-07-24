@@ -49,6 +49,12 @@ class Discord(commands.Cog):
             await birthdays.add_birthday(session, ctx.author.id, date)
             await self.client.confirm_message(ctx.message)
 
+    @commands.command(name="Join", usage="[Thread]")
+    async def join(self, ctx: commands.Context, thread: discord.Thread):
+        """Make Didier join a thread"""
+        if thread.me is not None:
+            return await ctx.reply()
+
 
 async def setup(client: Didier):
     """Load the cog"""

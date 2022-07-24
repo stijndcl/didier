@@ -10,6 +10,7 @@ import settings
 from database.crud import custom_commands
 from database.engine import DBSession
 from database.utils.caches import CacheManager
+from didier.data.embeds.error_embed import create_error_embed
 from didier.utils.discord.prefix import get_prefix
 
 __all__ = ["Didier"]
@@ -139,6 +140,9 @@ class Didier(commands.Bot):
 
         await self.process_commands(message)
 
+        # TODO easter eggs
+        # TODO stats
+
     async def _try_invoke_custom_command(self, message: discord.Message) -> bool:
         """Check if the message tries to invoke a custom command
 
@@ -162,11 +166,50 @@ class Didier(commands.Bot):
         # Nothing found
         return False
 
-    async def on_command_error(self, context: commands.Context, exception: commands.CommandError, /) -> None:
-        """Event triggered when a regular command errors"""
-        # Print everything to the logs/stderr
-        await super().on_command_error(context, exception)
+    async def on_thread_create(self, thread: discord.Thread):
+        """Event triggered when a new thread is created"""
+        await thread.join()
 
-        # If developing, do nothing special
+    async def on_command_error(self, ctx: commands.Context, exception: commands.CommandError, /):
+        """Event triggered when a regular command errors"""
+        # If working locally, print everything to your console
         if settings.SANDBOX:
+            await super().on_command_error(ctx, exception)
             return
+
+        # If commands have their own error handler, let it handle the error instead
+        if hasattr(ctx.command, "on_error"):
+            return
+
+        # Ignore exceptions that aren't important
+        if isinstance(
+            exception,
+            (
+                commands.CommandNotFound,
+                commands.CheckFailure,
+                commands.TooManyArguments,
+            ),
+        ):
+            return
+
+        # Print everything that we care about to the logs/stderr
+        await super().on_command_error(ctx, exception)
+
+        if isinstance(exception, commands.MessageNotFound):
+            return await ctx.reply("This message could not be found.", ephemeral=True, delete_after=10)
+
+        if isinstance(
+            exception,
+            (
+                commands.BadArgument,
+                commands.MissingRequiredArgument,
+                commands.UnexpectedQuoteError,
+                commands.ExpectedClosingQuoteError,
+            ),
+        ):
+            return await ctx.reply("Invalid arguments.", ephemeral=True, delete_after=10)
+
+        if settings.ERRORS_CHANNEL is not None:
+            embed = create_error_embed(ctx, exception)
+            channel = self.get_channel(settings.ERRORS_CHANNEL)
+            await channel.send(embed=embed)
