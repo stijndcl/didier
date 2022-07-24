@@ -24,11 +24,11 @@ class GoogleSearch(EmbedBaseModel):
 
         # Empty embed
         if not self.data.results:
-            embed.description = "Geen resultaten gevonden"
+            embed.description = "Found no results"
             return embed
 
         # Error embed
-        embed.description = f"Status {self.data.status_code}"
+        embed.description = f"Something went wrong (status {self.data.status_code})"
 
         return embed
 

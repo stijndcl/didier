@@ -50,10 +50,10 @@ class Definition(EmbedPydantic):
         embed = discord.Embed(colour=colours.urban_dictionary_green())
         embed.set_author(name="Urban Dictionary")
 
-        embed.add_field(name="Woord", value=self.word, inline=True)
-        embed.add_field(name="Auteur", value=self.author, inline=True)
-        embed.add_field(name="Definitie", value=self.definition, inline=False)
-        embed.add_field(name="Voorbeeld", value=self.example or "\u200B", inline=False)
+        embed.add_field(name="Term", value=self.word, inline=True)
+        embed.add_field(name="Author", value=self.author, inline=True)
+        embed.add_field(name="Definition", value=self.definition, inline=False)
+        embed.add_field(name="Example", value=self.example or "\u200B", inline=False)
         embed.add_field(
             name="Rating", value=f"{self.ratio}% ({self.thumbs_up}/{self.thumbs_up + self.thumbs_down})", inline=True
         )

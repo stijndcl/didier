@@ -23,6 +23,8 @@ extend-ignore =
     D401,
     # Whitespace before ":"
     E203,
+    # Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+    S311,
 # Don't require docstrings when overriding a method,
 # the base method should have a docstring but the rest not
 ignore-decorators=overrides

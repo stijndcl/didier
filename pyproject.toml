@@ -18,7 +18,8 @@ omit = [
     "./didier/data/embeds/*",
     "./didier/data/flags/*",
     "./didier/utils/discord/colours.py",
-    "./didier/utils/discord/constants.py"
+    "./didier/utils/discord/constants.py",
+    "./didier/utils/discord/flags/*",
 ]
 
 [tool.isort]

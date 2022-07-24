@@ -15,7 +15,7 @@ class Other(commands.Cog):
     def __init__(self, client: Didier):
         self.client = client
 
-    @commands.hybrid_command(name="define", description="Urban Dictionary", aliases=["Ud", "Urban"], usage="[Woord]")
+    @commands.hybrid_command(name="define", description="Urban Dictionary", aliases=["Ud", "Urban"], usage="[Term]")
     async def define(self, ctx: commands.Context, *, query: str):
         """Look up the definition of a word on the Urban Dictionary"""
         async with ctx.typing():

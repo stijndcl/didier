@@ -6,7 +6,7 @@ from discord.ext import commands
 
 from database.crud import ufora_courses
 from didier import Didier
-from didier.data import constants
+from didier.utils.discord.flags.school import StudyGuideFlags
 
 
 class School(commands.Cog):
@@ -36,43 +36,46 @@ class School(commands.Cog):
 
         # Didn't fix it, sad
         if message is None:
-            return await ctx.reply("Er is geen bericht om te pinnen.", delete_after=10)
+            return await ctx.reply("Found no message to pin.", delete_after=10)
+
+        if message.pinned:
+            return await ctx.reply("This message is already pinned.", delete_after=10)
 
         if message.is_system():
             return await ctx.reply("Dus jij wil system messages pinnen?\nMag niet.")
 
-        await message.pin(reason=f"Didier Pin door {ctx.author.display_name}")
+        await message.pin(reason=f"Didier Pin by {ctx.author.display_name}")
         await message.add_reaction("📌")
 
     async def pin_ctx(self, interaction: discord.Interaction, message: discord.Message):
         """Pin a message in the current channel"""
         # Is already pinned
         if message.pinned:
-            return await interaction.response.send_message("Dit bericht staat al gepind.", ephemeral=True)
+            return await interaction.response.send_message("This message is already pinned.", ephemeral=True)
 
         if message.is_system():
             return await interaction.response.send_message(
                 "Dus jij wil system messages pinnen?\nMag niet.", ephemeral=True
             )
 
-        await message.pin(reason=f"Didier Pin door {interaction.user.display_name}")
+        await message.pin(reason=f"Didier Pin by {interaction.user.display_name}")
         await message.add_reaction("📌")
         return await interaction.response.send_message("📌", ephemeral=True)
 
     @commands.hybrid_command(
-        name="fiche", description="Stuurt de link naar de studiefiche voor [Vak]", aliases=["guide", "studiefiche"]
+        name="fiche", description="Sends the link to the study guide for [Course]", aliases=["guide", "studiefiche"]
     )
     @app_commands.describe(course="vak")
-    async def study_guide(self, ctx: commands.Context, course: str):
+    async def study_guide(self, ctx: commands.Context, course: str, *, flags: StudyGuideFlags):
         """Create links to study guides"""
         async with self.client.db_session as session:
             ufora_course = await ufora_courses.get_course_by_name(session, course)
 
         if ufora_course is None:
-            return await ctx.reply(f"Geen vak gevonden voor ``{course}``", ephemeral=True)
+            return await ctx.reply(f"Found no course matching ``{course}``", ephemeral=True)
 
         return await ctx.reply(
-            f"https://studiekiezer.ugent.be/studiefiche/nl/{ufora_course.code}/{constants.CURRENT_YEAR}",
+            f"https://studiekiezer.ugent.be/studiefiche/nl/{ufora_course.code}/{flags.year}",
             mention_author=False,
         )
 

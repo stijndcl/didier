@@ -1,4 +1,5 @@
 import datetime
+import random
 import traceback
 
 from discord.ext import commands, tasks  # type: ignore # Strange & incorrect Mypy error
@@ -16,6 +17,10 @@ from didier.utils.types.datetime import LOCAL_TIMEZONE, tz_aware_now
 # datetime.time()-instances for when every task should run
 DAILY_RESET_TIME = datetime.time(hour=0, minute=0, tzinfo=LOCAL_TIMEZONE)
 SOCIALLY_ACCEPTABLE_TIME = datetime.time(hour=7, minute=0, tzinfo=LOCAL_TIMEZONE)
+
+
+# TODO more messages?
+BIRTHDAY_MESSAGES = ["Gelukkige verjaardag {mention}!", "Happy birthday {mention}!"]
 
 
 class Tasks(commands.Cog):
@@ -52,12 +57,12 @@ class Tasks(commands.Cog):
         """
         raise NotImplementedError()
 
-    @tasks_group.command(name="Force", case_insensitive=True)
+    @tasks_group.command(name="Force", case_insensitive=True, usage="[Task]")
     async def force_task(self, ctx: commands.Context, name: str):
-        """Command to force-run a task without waiting for the run time"""
+        """Command to force-run a task without waiting for the specified run time"""
         name = name.lower()
         if name not in self._tasks:
-            return await ctx.reply(f"Geen task gevonden voor `{name}`.", mention_author=False)
+            return await ctx.reply(f"Found no tasks matching `{name}`.", mention_author=False)
 
         task = self._tasks[name]
         await task()
@@ -76,8 +81,8 @@ class Tasks(commands.Cog):
 
         for birthday in birthdays:
             user = self.client.get_user(birthday.user_id)
-            # TODO more messages?
-            await channel.send(f"Gelukkig verjaardag {user.mention}!")
+
+            await channel.send(random.choice(BIRTHDAY_MESSAGES).format(mention=user.mention))
 
     @check_birthdays.before_loop
     async def _before_check_birthdays(self):
@@ -114,6 +119,7 @@ class Tasks(commands.Cog):
     async def _on_tasks_error(self, error: BaseException):
         """Error handler for all tasks"""
         print("".join(traceback.format_exception(type(error), error, error.__traceback__)))
+        self.client.dispatch("task_error")
 
 
 async def setup(client: Didier):

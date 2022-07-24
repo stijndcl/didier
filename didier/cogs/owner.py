@@ -75,7 +75,7 @@ class Owner(commands.Cog):
                 await custom_commands.create_command(session, name, response)
                 await self.client.confirm_message(ctx.message)
             except DuplicateInsertException:
-                await ctx.reply("Er bestaat al een commando met deze naam.")
+                await ctx.reply("There is already a command with this name.")
                 await self.client.reject_message(ctx.message)
 
     @add_msg.command(name="Alias")
@@ -86,19 +86,17 @@ class Owner(commands.Cog):
                 await custom_commands.create_alias(session, command, alias)
                 await self.client.confirm_message(ctx.message)
             except NoResultFoundException:
-                await ctx.reply(f'Geen commando gevonden voor "{command}".')
+                await ctx.reply(f"No command found matching `{command}`.")
                 await self.client.reject_message(ctx.message)
             except DuplicateInsertException:
-                await ctx.reply("Er bestaat al een commando met deze naam.")
+                await ctx.reply("There is already a command with this name.")
                 await self.client.reject_message(ctx.message)
 
     @add_slash.command(name="custom", description="Add a custom command")
     async def add_custom_slash(self, interaction: discord.Interaction):
         """Slash command to add a custom command"""
         if not await self.client.is_owner(interaction.user):
-            return interaction.response.send_message(
-                "Je hebt geen toestemming om dit commando uit te voeren.", ephemeral=True
-            )
+            return interaction.response.send_message("You don't have permission to run this command.", ephemeral=True)
 
         modal = CreateCustomCommand(self.client)
         await interaction.response.send_modal(modal)
@@ -107,9 +105,7 @@ class Owner(commands.Cog):
     async def add_dad_joke_slash(self, interaction: discord.Interaction):
         """Slash command to add a dad joke"""
         if not await self.client.is_owner(interaction.user):
-            return interaction.response.send_message(
-                "Je hebt geen toestemming om dit commando uit te voeren.", ephemeral=True
-            )
+            return interaction.response.send_message("You don't have permission to run this command.", ephemeral=True)
 
         modal = AddDadJoke(self.client)
         await interaction.response.send_modal(modal)
@@ -126,7 +122,7 @@ class Owner(commands.Cog):
                 await custom_commands.edit_command(session, command, flags.name, flags.response)
                 return await self.client.confirm_message(ctx.message)
             except NoResultFoundException:
-                await ctx.reply(f"Geen commando gevonden voor ``{command}``.")
+                await ctx.reply(f"No command found matching ``{command}``.")
                 return await self.client.reject_message(ctx.message)
 
     @edit_slash.command(name="custom", description="Edit a custom command")
