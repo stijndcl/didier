@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Literal, Optional
 
 import discord
 from discord import app_commands
@@ -48,8 +48,21 @@ class Owner(commands.Cog):
         raise Exception(message)
 
     @commands.command(name="Sync")
-    async def sync(self, ctx: commands.Context, guild: Optional[discord.Guild] = None, *, flags: SyncOptionFlags):
+    async def sync(
+        self,
+        ctx: commands.Context,
+        guild: Optional[discord.Guild] = None,
+        symbol: Optional[Literal["."]] = None,
+        *,
+        flags: SyncOptionFlags,
+    ):
         """Sync all application-commands in Discord"""
+        # Allow using "." to specify the current guild
+        # When passing flags, and no guild was specified, default to the current guild as well
+        # because these don't work on global syncs
+        if guild is None and (symbol == "." or flags.clear or flags.copy_globals):
+            guild = ctx.guild
+
         if guild is not None:
             if flags.clear:
                 self.client.tree.clear_commands(guild=guild)
