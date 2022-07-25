@@ -5,7 +5,7 @@ from unittest.mock import MagicMock
 import pytest
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from database.engine import engine
+from database.engine import postgres_engine
 from database.migrations import ensure_latest_migration, migrate
 from didier import Didier
 
@@ -40,7 +40,7 @@ async def postgres(tables) -> AsyncGenerator[AsyncSession, None]:
 
     Rollbacks the transaction afterwards so that the future tests start with a clean database
     """
-    connection = await engine.connect()
+    connection = await postgres_engine.connect()
     transaction = await connection.begin()
     session = AsyncSession(bind=connection, expire_on_commit=False)
 

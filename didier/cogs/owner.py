@@ -83,7 +83,7 @@ class Owner(commands.Cog):
     @add_msg.command(name="Custom")
     async def add_custom_msg(self, ctx: commands.Context, name: str, *, response: str):
         """Add a new custom command"""
-        async with self.client.db_session as session:
+        async with self.client.postgres_session as session:
             try:
                 await custom_commands.create_command(session, name, response)
                 await self.client.confirm_message(ctx.message)
@@ -94,7 +94,7 @@ class Owner(commands.Cog):
     @add_msg.command(name="Alias")
     async def add_alias_msg(self, ctx: commands.Context, command: str, alias: str):
         """Add a new alias for a custom command"""
-        async with self.client.db_session as session:
+        async with self.client.postgres_session as session:
             try:
                 await custom_commands.create_alias(session, command, alias)
                 await self.client.confirm_message(ctx.message)
@@ -130,7 +130,7 @@ class Owner(commands.Cog):
     @edit_msg.command(name="Custom")
     async def edit_custom_msg(self, ctx: commands.Context, command: str, *, flags: EditCustomFlags):
         """Edit an existing custom command"""
-        async with self.client.db_session as session:
+        async with self.client.postgres_session as session:
             try:
                 await custom_commands.edit_command(session, command, flags.name, flags.response)
                 return await self.client.confirm_message(ctx.message)
@@ -147,7 +147,7 @@ class Owner(commands.Cog):
                 "Je hebt geen toestemming om dit commando uit te voeren.", ephemeral=True
             )
 
-        async with self.client.db_session as session:
+        async with self.client.postgres_session as session:
             _command = await custom_commands.get_command(session, command)
             if _command is None:
                 return await interaction.response.send_message(

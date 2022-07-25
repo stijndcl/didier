@@ -2,13 +2,14 @@ import logging
 import os
 
 import discord
+import motor.motor_asyncio
 from aiohttp import ClientSession
 from discord.ext import commands
 from sqlalchemy.ext.asyncio import AsyncSession
 
 import settings
 from database.crud import custom_commands
-from database.engine import DBSession
+from database.engine import DBSession, mongo_client
 from database.utils.caches import CacheManager
 from didier.data.embeds.error_embed import create_error_embed
 from didier.utils.discord.prefix import get_prefix
@@ -45,9 +46,14 @@ class Didier(commands.Bot):
         )
 
     @property
-    def db_session(self) -> AsyncSession:
-        """Obtain a database session"""
+    def postgres_session(self) -> AsyncSession:
+        """Obtain a session for the PostgreSQL database"""
         return DBSession()
+
+    @property
+    def mongo_db(self) -> motor.motor_asyncio.AsyncIOMotorDatabase:
+        """Obtain a reference to the MongoDB database"""
+        return mongo_client[settings.MONGO_DB]
 
     async def setup_hook(self) -> None:
         """Do some initial setup
@@ -60,7 +66,7 @@ class Didier(commands.Bot):
 
         # Initialize caches
         self.database_caches = CacheManager()
-        async with self.db_session as session:
+        async with self.postgres_session as session:
             await self.database_caches.initialize_caches(session)
 
         # Create aiohttp session
@@ -153,7 +159,7 @@ class Didier(commands.Bot):
         if not message.content.startswith(settings.DISCORD_CUSTOM_COMMAND_PREFIX):
             return False
 
-        async with self.db_session as session:
+        async with self.postgres_session as session:
             # Remove the prefix
             content = message.content[len(settings.DISCORD_CUSTOM_COMMAND_PREFIX) :]
             command = await custom_commands.get_command(session, content)

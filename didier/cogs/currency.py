@@ -31,7 +31,7 @@ class Currency(commands.Cog):
         """Award a user a given amount of Didier Dinks"""
         amount = typing.cast(int, amount)
 
-        async with self.client.db_session as session:
+        async with self.client.postgres_session as session:
             await crud.add_dinks(session, user.id, amount)
             plural = pluralize("Didier Dink", amount)
             await ctx.reply(
@@ -42,7 +42,7 @@ class Currency(commands.Cog):
     @commands.group(name="bank", aliases=["B"], case_insensitive=True, invoke_without_command=True)
     async def bank(self, ctx: commands.Context):
         """Show your Didier Bank information"""
-        async with self.client.db_session as session:
+        async with self.client.postgres_session as session:
             bank = await crud.get_bank(session, ctx.author.id)
 
         embed = discord.Embed(colour=discord.Colour.blue())
@@ -58,7 +58,7 @@ class Currency(commands.Cog):
     @bank.group(name="Upgrade", aliases=["U", "Upgrades"], case_insensitive=True, invoke_without_command=True)
     async def bank_upgrades(self, ctx: commands.Context):
         """List the upgrades you can buy & their prices"""
-        async with self.client.db_session as session:
+        async with self.client.postgres_session as session:
             bank = await crud.get_bank(session, ctx.author.id)
 
         embed = discord.Embed(colour=discord.Colour.blue())
@@ -79,7 +79,7 @@ class Currency(commands.Cog):
     @bank_upgrades.command(name="Capacity", aliases=["C"])
     async def bank_upgrade_capacity(self, ctx: commands.Context):
         """Upgrade the capacity level of your bank"""
-        async with self.client.db_session as session:
+        async with self.client.postgres_session as session:
             try:
                 await crud.upgrade_capacity(session, ctx.author.id)
                 await ctx.message.add_reaction("⏫")
@@ -90,7 +90,7 @@ class Currency(commands.Cog):
     @bank_upgrades.command(name="Interest", aliases=["I"])
     async def bank_upgrade_interest(self, ctx: commands.Context):
         """Upgrade the interest level of your bank"""
-        async with self.client.db_session as session:
+        async with self.client.postgres_session as session:
             try:
                 await crud.upgrade_interest(session, ctx.author.id)
                 await ctx.message.add_reaction("⏫")
@@ -101,7 +101,7 @@ class Currency(commands.Cog):
     @bank_upgrades.command(name="Rob", aliases=["R"])
     async def bank_upgrade_rob(self, ctx: commands.Context):
         """Upgrade the rob level of your bank"""
-        async with self.client.db_session as session:
+        async with self.client.postgres_session as session:
             try:
                 await crud.upgrade_rob(session, ctx.author.id)
                 await ctx.message.add_reaction("⏫")
@@ -112,7 +112,7 @@ class Currency(commands.Cog):
     @commands.hybrid_command(name="dinks")
     async def dinks(self, ctx: commands.Context):
         """Check your Didier Dinks"""
-        async with self.client.db_session as session:
+        async with self.client.postgres_session as session:
             bank = await crud.get_bank(session, ctx.author.id)
             plural = pluralize("Didier Dink", bank.dinks)
             await ctx.reply(f"**{ctx.author.display_name}** heeft **{bank.dinks}** {plural}.", mention_author=False)
@@ -122,7 +122,7 @@ class Currency(commands.Cog):
         """Invest a given amount of Didier Dinks"""
         amount = typing.cast(typing.Union[str, int], amount)
 
-        async with self.client.db_session as session:
+        async with self.client.postgres_session as session:
             invested = await crud.invest(session, ctx.author.id, amount)
             plural = pluralize("Didier Dink", invested)
 
@@ -136,7 +136,7 @@ class Currency(commands.Cog):
     @commands.hybrid_command(name="nightly")
     async def nightly(self, ctx: commands.Context):
         """Claim nightly Didier Dinks"""
-        async with self.client.db_session as session:
+        async with self.client.postgres_session as session:
             try:
                 await crud.claim_nightly(session, ctx.author.id)
                 await ctx.reply(f"Je hebt je dagelijkse **{crud.NIGHTLY_AMOUNT}** Didier Dinks geclaimd.")

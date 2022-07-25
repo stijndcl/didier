@@ -19,7 +19,7 @@ class Fun(commands.Cog):
     )
     async def dad_joke(self, ctx: commands.Context):
         """Get a random dad joke"""
-        async with self.client.db_session as session:
+        async with self.client.postgres_session as session:
             joke = await get_random_dad_joke(session)
             return await ctx.reply(joke.joke, mention_author=False)
 
