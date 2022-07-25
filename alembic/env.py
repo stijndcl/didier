@@ -4,8 +4,8 @@ from logging.config import fileConfig
 from sqlalchemy.ext.asyncio import AsyncEngine
 
 from alembic import context
-from database.engine import engine
-from database.models import Base
+from database.engine import postgres_engine
+from database.schemas.relational import Base
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -40,7 +40,7 @@ def run_migrations_online() -> None:
     and associate a connection with the context.
 
     """
-    connectable = context.config.attributes.get("connection", None) or engine
+    connectable = context.config.attributes.get("connection", None) or postgres_engine
 
     if isinstance(connectable, AsyncEngine):
         asyncio.run(run_async_migrations(connectable))

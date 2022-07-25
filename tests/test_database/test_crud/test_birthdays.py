@@ -1,74 +1,73 @@
 from datetime import datetime, timedelta
 
 from freezegun import freeze_time
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from database.crud import birthdays as crud
 from database.crud import users
-from database.models import User
+from database.schemas.relational import User
 
 
-async def test_add_birthday_not_present(database_session: AsyncSession, user: User):
+async def test_add_birthday_not_present(postgres, user: User):
     """Test setting a user's birthday when it doesn't exist yet"""
     assert user.birthday is None
 
     bd_date = datetime.today().date()
-    await crud.add_birthday(database_session, user.user_id, bd_date)
-    await database_session.refresh(user)
+    await crud.add_birthday(postgres, user.user_id, bd_date)
+    await postgres.refresh(user)
     assert user.birthday is not None
     assert user.birthday.birthday == bd_date
 
 
-async def test_add_birthday_overwrite(database_session: AsyncSession, user: User):
+async def test_add_birthday_overwrite(postgres, user: User):
     """Test that setting a user's birthday when it already exists overwrites it"""
     bd_date = datetime.today().date()
-    await crud.add_birthday(database_session, user.user_id, bd_date)
-    await database_session.refresh(user)
+    await crud.add_birthday(postgres, user.user_id, bd_date)
+    await postgres.refresh(user)
     assert user.birthday is not None
 
     new_bd_date = bd_date + timedelta(weeks=1)
-    await crud.add_birthday(database_session, user.user_id, new_bd_date)
-    await database_session.refresh(user)
+    await crud.add_birthday(postgres, user.user_id, new_bd_date)
+    await postgres.refresh(user)
     assert user.birthday.birthday == new_bd_date
 
 
-async def test_get_birthday_exists(database_session: AsyncSession, user: User):
+async def test_get_birthday_exists(postgres, user: User):
     """Test getting a user's birthday when it exists"""
     bd_date = datetime.today().date()
-    await crud.add_birthday(database_session, user.user_id, bd_date)
-    await database_session.refresh(user)
+    await crud.add_birthday(postgres, user.user_id, bd_date)
+    await postgres.refresh(user)
 
-    bd = await crud.get_birthday_for_user(database_session, user.user_id)
+    bd = await crud.get_birthday_for_user(postgres, user.user_id)
     assert bd is not None
     assert bd.birthday == bd_date
 
 
-async def test_get_birthday_not_exists(database_session: AsyncSession, user: User):
+async def test_get_birthday_not_exists(postgres, user: User):
     """Test getting a user's birthday when it doesn't exist"""
-    bd = await crud.get_birthday_for_user(database_session, user.user_id)
+    bd = await crud.get_birthday_for_user(postgres, user.user_id)
     assert bd is None
 
 
 @freeze_time("2022/07/23")
-async def test_get_birthdays_on_day(database_session: AsyncSession, user: User):
+async def test_get_birthdays_on_day(postgres, user: User):
     """Test getting all birthdays on a given day"""
-    await crud.add_birthday(database_session, user.user_id, datetime.today().replace(year=2001))
+    await crud.add_birthday(postgres, user.user_id, datetime.today().replace(year=2001))
 
-    user_2 = await users.get_or_add(database_session, user.user_id + 1)
-    await crud.add_birthday(database_session, user_2.user_id, datetime.today() + timedelta(weeks=1))
-    birthdays = await crud.get_birthdays_on_day(database_session, datetime.today())
+    user_2 = await users.get_or_add(postgres, user.user_id + 1)
+    await crud.add_birthday(postgres, user_2.user_id, datetime.today() + timedelta(weeks=1))
+    birthdays = await crud.get_birthdays_on_day(postgres, datetime.today())
     assert len(birthdays) == 1
     assert birthdays[0].user_id == user.user_id
 
 
 @freeze_time("2022/07/23")
-async def test_get_birthdays_none_present(database_session: AsyncSession):
+async def test_get_birthdays_none_present(postgres):
     """Test getting all birthdays when there are none"""
-    birthdays = await crud.get_birthdays_on_day(database_session, datetime.today())
+    birthdays = await crud.get_birthdays_on_day(postgres, datetime.today())
     assert len(birthdays) == 0
 
     # Add a random birthday that is not today
-    await crud.add_birthday(database_session, 1, datetime.today() + timedelta(days=1))
+    await crud.add_birthday(postgres, 1, datetime.today() + timedelta(days=1))
 
-    birthdays = await crud.get_birthdays_on_day(database_session, datetime.today())
+    birthdays = await crud.get_birthdays_on_day(postgres, datetime.today())
     assert len(birthdays) == 0

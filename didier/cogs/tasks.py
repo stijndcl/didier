@@ -72,7 +72,7 @@ class Tasks(commands.Cog):
     async def check_birthdays(self):
         """Check if it's currently anyone's birthday"""
         now = tz_aware_now().date()
-        async with self.client.db_session as session:
+        async with self.client.postgres_session as session:
             birthdays = await get_birthdays_on_day(session, now)
 
         channel = self.client.get_channel(settings.BIRTHDAY_ANNOUNCEMENT_CHANNEL)
@@ -96,7 +96,7 @@ class Tasks(commands.Cog):
         if settings.UFORA_RSS_TOKEN is None or settings.UFORA_ANNOUNCEMENTS_CHANNEL is None:
             return
 
-        async with self.client.db_session as db_session:
+        async with self.client.postgres_session as db_session:
             announcements_channel = self.client.get_channel(settings.UFORA_ANNOUNCEMENTS_CHANNEL)
             announcements = await fetch_ufora_announcements(self.client.http_session, db_session)
 
@@ -110,7 +110,7 @@ class Tasks(commands.Cog):
     @tasks.loop(hours=24)
     async def remove_old_ufora_announcements(self):
         """Remove all announcements that are over 1 week old, once per day"""
-        async with self.client.db_session as session:
+        async with self.client.postgres_session as session:
             await remove_old_announcements(session)
 
     @check_birthdays.error

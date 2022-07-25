@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from database.crud import users
 from database.exceptions import currency as exceptions
-from database.models import Bank, NightlyData
+from database.schemas.relational import Bank, NightlyData
 from database.utils.math.currency import (
     capacity_upgrade_price,
     interest_upgrade_price,

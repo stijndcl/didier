@@ -20,7 +20,7 @@ def timed_task(task: enums.TaskType):
         async def _wrapper(tasks_cog: Tasks, *args, **kwargs):
             await func(tasks_cog, *args, **kwargs)
 
-            async with tasks_cog.client.db_session as session:
+            async with tasks_cog.client.postgres_session as session:
                 await set_last_task_execution_time(session, task)
 
         return _wrapper

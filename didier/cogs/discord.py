@@ -19,7 +19,7 @@ class Discord(commands.Cog):
     async def birthday(self, ctx: commands.Context, user: discord.User = None):
         """Command to check the birthday of a user"""
         user_id = (user and user.id) or ctx.author.id
-        async with self.client.db_session as session:
+        async with self.client.postgres_session as session:
             birthday = await birthdays.get_birthday_for_user(session, user_id)
 
         name = "Jouw" if user is None else f"{user.display_name}'s"
@@ -45,7 +45,7 @@ class Discord(commands.Cog):
         except ValueError:
             return await ctx.reply(f"`{date_str}` is geen geldige datum.", mention_author=False)
 
-        async with self.client.db_session as session:
+        async with self.client.postgres_session as session:
             await birthdays.add_birthday(session, ctx.author.id, date)
             await self.client.confirm_message(ctx.message)
 

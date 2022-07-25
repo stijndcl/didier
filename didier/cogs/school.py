@@ -68,7 +68,7 @@ class School(commands.Cog):
     @app_commands.describe(course="vak")
     async def study_guide(self, ctx: commands.Context, course: str, *, flags: StudyGuideFlags):
         """Create links to study guides"""
-        async with self.client.db_session as session:
+        async with self.client.postgres_session as session:
             ufora_course = await ufora_courses.get_course_by_name(session, course)
 
         if ufora_course is None:
