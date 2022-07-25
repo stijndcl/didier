@@ -1,7 +1,12 @@
-from bson import ObjectId
-from pydantic import BaseModel, Field
+import datetime
+from abc import ABC, abstractmethod
+from typing import Optional
 
-__all__ = ["MongoBase"]
+from bson import ObjectId
+from overrides import overrides
+from pydantic import BaseModel, Field, conlist
+
+__all__ = ["MongoBase", "WordleGame"]
 
 
 class PyObjectId(str):
@@ -36,3 +41,50 @@ class MongoBase(BaseModel):
         arbitrary_types_allowed = True
         json_encoders = {ObjectId: str, PyObjectId: str}
         use_enum_values = True
+
+
+class MongoCollection(MongoBase, ABC):
+    """Base model for the 'main class' in a collection
+
+    This field stores the name of the collection to avoid making typos against it
+    """
+
+    @staticmethod
+    @abstractmethod
+    def collection() -> str:
+        raise NotImplementedError
+
+
+class WordleStats(BaseModel):
+    """Model that holds stats about a player's Wordle performance"""
+
+    guess_distribution: conlist(int, min_items=6, max_items=6) = Field(default_factory=lambda: [0, 0, 0, 0, 0, 0])
+    last_guess: Optional[datetime.date] = None
+    win_rate: float = 0
+    current_streak: int = 0
+    max_streak: int = 0
+
+
+class GameStats(MongoCollection):
+    """Collection that holds stats about how well a user has performed in games"""
+
+    user_id: int
+    wordle: Optional[WordleStats] = None
+
+    @staticmethod
+    @overrides
+    def collection() -> str:
+        return "game_stats"
+
+
+class WordleGame(MongoCollection):
+    """Collection that holds people's active Wordle games"""
+
+    user_id: int
+    word: str
+    guesses: conlist(str, min_items=0, max_items=6) = Field(default_factory=list)
+
+    @staticmethod
+    @overrides
+    def collection() -> str:
+        return "wordle"
