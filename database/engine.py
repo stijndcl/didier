@@ -6,16 +6,16 @@ from sqlalchemy.orm import sessionmaker
 
 import settings
 
-encoded_password = quote_plus(settings.DB_PASSWORD)
+encoded_password = quote_plus(settings.POSTGRES_PASS)
 
 engine = create_async_engine(
     URL.create(
         drivername="postgresql+asyncpg",
-        username=settings.DB_USERNAME,
+        username=settings.POSTGRES_USER,
         password=encoded_password,
-        host=settings.DB_HOST,
-        port=settings.DB_PORT,
-        database=settings.DB_NAME,
+        host=settings.POSTGRES_HOST,
+        port=settings.POSTGRES_PORT,
+        database=settings.POSTGRES_DB,
     ),
     pool_pre_ping=True,
     future=True,

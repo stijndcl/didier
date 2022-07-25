@@ -1,0 +1,21 @@
+version: '3.9'
+services:
+  postgres-pytest:
+    image: postgres:14
+    container_name: didier-pytest
+    restart: always
+    environment:
+      - POSTGRES_DB=didier_pytest
+      - POSTGRES_USER=pytest
+      - POSTGRES_PASSWORD=pytest
+    ports:
+      - "5433:5432"
+  mongo-pytest:
+    image: mongo:5.0
+    restart: always
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=pytest
+      - MONGO_INITDB_ROOT_PASSWORD=pytest
+      - MONGO_INITDB_DATABASE=didier_pytest
+    ports:
+      - "27018:27017"

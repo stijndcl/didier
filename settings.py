@@ -9,11 +9,11 @@ env.read_env()
 __all__ = [
     "SANDBOX",
     "LOGFILE",
-    "DB_NAME",
-    "DB_USERNAME",
-    "DB_PASSWORD",
-    "DB_HOST",
-    "DB_PORT",
+    "POSTGRES_DB",
+    "POSTGRES_USER",
+    "POSTGRES_PASS",
+    "POSTGRES_HOST",
+    "POSTGRES_PORT",
     "DISCORD_TOKEN",
     "DISCORD_READY_MESSAGE",
     "DISCORD_STATUS_MESSAGE",
@@ -33,11 +33,19 @@ SEMESTER: int = env.int("SEMESTER", 2)
 YEAR: int = env.int("YEAR", 3)
 
 """Database"""
-DB_NAME: str = env.str("DB_NAME", "didier")
-DB_USERNAME: str = env.str("DB_USERNAME", "postgres")
-DB_PASSWORD: str = env.str("DB_PASSWORD", "")
-DB_HOST: str = env.str("DB_HOST", "localhost")
-DB_PORT: int = env.int("DB_PORT", "5432")
+# MongoDB
+MONGO_DB: str = env.str("MONGO_DB", "didier")
+MONGO_USER: str = env.str("MONGO_USER", "root")
+MONGO_PASS: str = env.str("MONGO_PASS", "root")
+MONGO_HOST: str = env.str("MONGO_HOST", "localhost")
+MONGO_PORT: int = env.int("MONGO_PORT", "27017")
+
+# PostgreSQL
+POSTGRES_DB: str = env.str("POSTGRES_DB", "didier")
+POSTGRES_USER: str = env.str("POSTGRES_USER", "postgres")
+POSTGRES_PASS: str = env.str("POSTGRES_PASS", "")
+POSTGRES_HOST: str = env.str("POSTGRES_HOST", "localhost")
+POSTGRES_PORT: int = env.int("POSTGRES_PORT", "5432")
 
 """Discord"""
 DISCORD_TOKEN: str = env.str("DISCORD_TOKEN")

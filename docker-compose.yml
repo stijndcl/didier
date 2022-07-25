@@ -1,26 +1,28 @@
 version: '3.9'
 services:
-  db:
+  postgres:
     image: postgres:14
     container_name: didier
     restart: always
     environment:
-      - POSTGRES_DB=${DB_NAME:-didier_dev}
-      - POSTGRES_USER=${DB_USERNAME:-postgres}
-      - POSTGRES_PASSWORD=${DB_PASSWORD:-postgres}
+      - POSTGRES_DB=${POSTGRES_DB:-didier_dev}
+      - POSTGRES_USER=${POSTGRES_USER:-postgres}
+      - POSTGRES_PASSWORD=${POSTGRES_PASS:-postgres}
     ports:
-      - "${DB_PORT:-5432}:${DB_PORT:-5432}"
+      - "${POSTGRES_PORT:-5432}:${POSTGRES_PORT:-5432}"
     volumes:
-      - db:/var/lib/postgresql/data
-  db-pytest:
-    image: postgres:14
-    container_name: didier-pytest
+      - postgres:/var/lib/postgresql/data
+  mongo:
+    image: mongo:5.0
     restart: always
     environment:
-      - POSTGRES_DB=didier_pytest
-      - POSTGRES_USER=pytest
-      - POSTGRES_PASSWORD=pytest
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_USER:-root}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_PASS:-root}
+      - MONGO_INITDB_DATABASE=${MONGO_DB:-didier_dev}
     ports:
-      - "5433:5432"
+      - "${MONGO_PORT:-27017}:${MONGO_PORT:-27017}"
+    volumes:
+      - mongo:/data/db
 volumes:
-  db:
+  postgres:
+  mongo:

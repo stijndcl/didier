@@ -38,6 +38,19 @@ jobs:
           POSTGRES_DB: didier_pytest
           POSTGRES_USER: pytest
           POSTGRES_PASSWORD: pytest
+      mongo:
+        image: mongo:5.0
+        options: >-
+          --health-cmd mongo
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 27018:27017
+        env:
+          MONGO_DB: didier_pytest
+          MONGO_USER: pytest
+          MONGO_PASSWORD: pytest
     steps:
       - uses: actions/checkout@v3
       - name: Setup Python
