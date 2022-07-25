@@ -1,7 +1,7 @@
 from bson import ObjectId
 from pydantic import BaseModel, Field
 
-__all__ = []
+__all__ = ["MongoBase"]
 
 
 class PyObjectId(str):

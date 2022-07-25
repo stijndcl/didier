@@ -36,7 +36,7 @@ plugins = [
     "sqlalchemy.ext.mypy.plugin"
 ]
 [[tool.mypy.overrides]]
-module = ["discord.*", "feedparser.*", "markdownify.*"]
+module = ["discord.*", "feedparser.*", "markdownify.*", "motor.*"]
 ignore_missing_imports = true
 
 [tool.pytest.ini_options]
