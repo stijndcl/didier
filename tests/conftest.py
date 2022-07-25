@@ -35,7 +35,7 @@ async def tables():
 
 
 @pytest.fixture
-async def database_session(tables) -> AsyncGenerator[AsyncSession, None]:
+async def postgres(tables) -> AsyncGenerator[AsyncSession, None]:
     """Fixture to create a session for every test
 
     Rollbacks the transaction afterwards so that the future tests start with a clean database
