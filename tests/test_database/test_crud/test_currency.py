@@ -5,7 +5,7 @@ from freezegun import freeze_time
 
 from database.crud import currency as crud
 from database.exceptions import currency as exceptions
-from database.models import Bank
+from database.schemas.relational import Bank
 
 
 async def test_add_dinks(postgres, bank: Bank):

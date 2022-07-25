@@ -13,7 +13,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 import settings
 from database.crud import ufora_announcements as crud
-from database.models import UforaCourse
+from database.schemas.relational import UforaCourse
 from didier.data.embeds.base import EmbedBaseModel
 from didier.utils.types.datetime import int_to_weekday
 from didier.utils.types.string import leading

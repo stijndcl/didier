@@ -4,7 +4,7 @@ from freezegun import freeze_time
 
 from database.crud import birthdays as crud
 from database.crud import users
-from database.models import User
+from database.schemas.relational import User
 
 
 async def test_add_birthday_not_present(postgres, user: User):

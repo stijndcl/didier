@@ -2,7 +2,7 @@ from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from database.exceptions.not_found import NoResultFoundException
-from database.models import DadJoke
+from database.schemas.relational import DadJoke
 
 __all__ = ["add_dad_joke", "get_random_dad_joke"]
 

@@ -1,5 +1,5 @@
 from database.crud import ufora_courses as crud
-from database.models import UforaCourse
+from database.schemas.relational import UforaCourse
 
 
 async def test_get_course_by_name_exact(postgres, ufora_course: UforaCourse):

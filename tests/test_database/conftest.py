@@ -3,7 +3,13 @@ import datetime
 import pytest
 
 from database.crud import users
-from database.models import Bank, UforaAnnouncement, UforaCourse, UforaCourseAlias, User
+from database.schemas.relational import (
+    Bank,
+    UforaAnnouncement,
+    UforaCourse,
+    UforaCourseAlias,
+    User,
+)
 
 
 @pytest.fixture(scope="session")

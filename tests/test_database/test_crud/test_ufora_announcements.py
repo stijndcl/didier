@@ -1,7 +1,7 @@
 import datetime
 
 from database.crud import ufora_announcements as crud
-from database.models import UforaAnnouncement, UforaCourse
+from database.schemas.relational import UforaAnnouncement, UforaCourse
 
 
 async def test_get_courses_with_announcements_none(postgres):

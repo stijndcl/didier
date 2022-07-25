@@ -4,7 +4,7 @@ from sqlalchemy import select
 from database.crud import custom_commands as crud
 from database.exceptions.constraints import DuplicateInsertException
 from database.exceptions.not_found import NoResultFoundException
-from database.models import CustomCommand
+from database.schemas.relational import CustomCommand
 
 
 async def test_create_command_non_existing(postgres):

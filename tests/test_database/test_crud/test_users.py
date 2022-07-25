@@ -1,7 +1,7 @@
 from sqlalchemy import select
 
 from database.crud import users as crud
-from database.models import User
+from database.schemas.relational import User
 
 
 async def test_get_or_add_non_existing(postgres):

@@ -1,7 +1,7 @@
 from sqlalchemy import select
 
 from database.crud import dad_jokes as crud
-from database.models import DadJoke
+from database.schemas.relational import DadJoke
 
 
 async def test_add_dad_joke(postgres):

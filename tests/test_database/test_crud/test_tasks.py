@@ -6,7 +6,7 @@ from sqlalchemy import select
 
 from database.crud import tasks as crud
 from database.enums import TaskType
-from database.models import Task
+from database.schemas.relational import Task
 
 
 @pytest.fixture

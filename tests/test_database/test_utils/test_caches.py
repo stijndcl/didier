@@ -1,4 +1,4 @@
-from database.models import UforaCourse
+from database.schemas.relational import UforaCourse
 from database.utils.caches import UforaCourseCache
 
 
