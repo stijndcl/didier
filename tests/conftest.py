@@ -2,10 +2,12 @@ import asyncio
 from typing import AsyncGenerator, Generator
 from unittest.mock import MagicMock
 
+import motor.motor_asyncio
 import pytest
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from database.engine import postgres_engine
+import settings
+from database.engine import mongo_client, postgres_engine
 from database.migrations import ensure_latest_migration, migrate
 from didier import Didier
 
@@ -52,6 +54,14 @@ async def postgres(tables) -> AsyncGenerator[AsyncSession, None]:
         await transaction.rollback()
 
     await connection.close()
+
+
+@pytest.fixture
+async def mongodb() -> motor.motor_asyncio.AsyncIOMotorDatabase:
+    """Fixture to get a MongoDB connection"""
+    database = mongo_client[settings.MONGO_DB]
+    yield database
+    mongo_client.drop_database(settings.MONGO_DB)
 
 
 @pytest.fixture
