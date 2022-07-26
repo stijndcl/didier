@@ -14,7 +14,7 @@ async def wordle_collection(mongodb: MongoDatabase) -> MongoCollection:
 @pytest.fixture
 async def wordle_game(wordle_collection: MongoCollection, test_user_id: int) -> WordleGame:
     """Fixture to create a new game"""
-    game = WordleGame(user_id=test_user_id, word="test")
+    game = WordleGame(user_id=test_user_id)
     await wordle_collection.insert_one(game.dict(by_alias=True))
     yield game
 
@@ -24,7 +24,7 @@ async def test_start_new_game(wordle_collection: MongoCollection, test_user_id: 
     result = await wordle_collection.find_one({"user_id": test_user_id})
     assert result is None
 
-    await crud.start_new_wordle_game(wordle_collection, test_user_id, "test")
+    await crud.start_new_wordle_game(wordle_collection, test_user_id)
 
     result = await wordle_collection.find_one({"user_id": test_user_id})
     assert result is not None

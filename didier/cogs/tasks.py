@@ -8,6 +8,8 @@ import settings
 from database import enums
 from database.crud.birthdays import get_birthdays_on_day
 from database.crud.ufora_announcements import remove_old_announcements
+from database.crud.wordle import set_daily_word
+from database.schemas.mongo import TemporaryStorage
 from didier import Didier
 from didier.data.embeds.ufora.announcements import fetch_ufora_announcements
 from didier.decorators.tasks import timed_task
@@ -46,7 +48,14 @@ class Tasks(commands.Cog):
             self.pull_ufora_announcements.start()
             self.remove_old_ufora_announcements.start()
 
-        self._tasks = {"birthdays": self.check_birthdays, "ufora": self.pull_ufora_announcements}
+        # Start other tasks
+        self.reset_wordle_word.start()
+
+        self._tasks = {
+            "birthdays": self.check_birthdays,
+            "ufora": self.pull_ufora_announcements,
+            "wordle": self.reset_wordle_word,
+        }
 
     @commands.group(name="Tasks", aliases=["Task"], case_insensitive=True, invoke_without_command=True)
     @commands.check(is_owner)
@@ -113,6 +122,17 @@ class Tasks(commands.Cog):
         async with self.client.postgres_session as session:
             await remove_old_announcements(session)
 
+    @tasks.loop(time=DAILY_RESET_TIME)
+    async def reset_wordle_word(self):
+        """Reset the daily Wordle word"""
+        db = self.client.mongo_db
+        collection = db[TemporaryStorage.collection()]
+        await set_daily_word(collection, random.choice(self.client.wordle_words))
+
+    @reset_wordle_word.before_loop
+    async def _before_reset_wordle_word(self):
+        await self.client.wait_until_ready()
+
     @check_birthdays.error
     @pull_ufora_announcements.error
     @remove_old_ufora_announcements.error
@@ -123,5 +143,10 @@ class Tasks(commands.Cog):
 
 
 async def setup(client: Didier):
-    """Load the cog"""
-    await client.add_cog(Tasks(client))
+    """Load the cog
+
+    Initially reset the Wordle word
+    """
+    cog = Tasks(client)
+    await client.add_cog(cog)
+    await cog.reset_wordle_word()

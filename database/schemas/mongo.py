@@ -6,7 +6,9 @@ from bson import ObjectId
 from overrides import overrides
 from pydantic import BaseModel, Field, conlist
 
-__all__ = ["MongoBase", "WordleGame"]
+__all__ = ["MongoBase", "TemporaryStorage", "WordleGame"]
+
+from database.utils.datetime import today_only_date
 
 
 class PyObjectId(str):
@@ -55,6 +57,17 @@ class MongoCollection(MongoBase, ABC):
         raise NotImplementedError
 
 
+class TemporaryStorage(MongoCollection):
+    """Collection for lots of random things that don't belong in a full-blown collection"""
+
+    key: str
+
+    @staticmethod
+    @overrides
+    def collection() -> str:
+        return "temporary"
+
+
 class WordleStats(BaseModel):
     """Model that holds stats about a player's Wordle performance"""
 
@@ -80,9 +93,9 @@ class GameStats(MongoCollection):
 class WordleGame(MongoCollection):
     """Collection that holds people's active Wordle games"""
 
-    user_id: int
-    word: str
+    day: datetime.date = Field(default_factory=lambda: today_only_date())
     guesses: conlist(str, min_items=0, max_items=6) = Field(default_factory=list)
+    user_id: int
 
     @staticmethod
     @overrides

@@ -27,6 +27,7 @@ class Didier(commands.Bot):
     error_channel: discord.abc.Messageable
     initial_extensions: tuple[str, ...] = ()
     http_session: ClientSession
+    wordle_words: tuple[str] = tuple()
 
     def __init__(self):
         activity = discord.Activity(type=discord.ActivityType.playing, name=settings.DISCORD_STATUS_MESSAGE)
@@ -60,6 +61,9 @@ class Didier(commands.Bot):
 
         This hook is called once the bot is initialised
         """
+        # Load the Wordle dictionary
+        self._load_wordle_words()
+
         # Load extensions
         await self._load_initial_extensions()
         await self._load_directory_extensions("didier/cogs")
@@ -100,6 +104,16 @@ class Didier(commands.Bot):
                 await self.load_extension(f"{load_path}.{file[:-3]}")
             elif os.path.isdir(new_path := f"{path}/{file}"):
                 await self._load_directory_extensions(new_path)
+
+    def _load_wordle_words(self):
+        """Load the dictionary of Wordle words"""
+        words = []
+
+        with open("files/dictionaries/words-english-wordle.txt", "r") as fp:
+            for line in fp:
+                words.append(line.strip())
+
+        self.wordle_words = tuple(words)
 
     async def resolve_message(self, reference: discord.MessageReference) -> discord.Message:
         """Fetch a message from a reference"""
