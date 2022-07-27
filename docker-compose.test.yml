@@ -17,5 +17,6 @@ services:
       - MONGO_INITDB_ROOT_USERNAME=pytest
       - MONGO_INITDB_ROOT_PASSWORD=pytest
       - MONGO_INITDB_DATABASE=didier_pytest
+    command: [--auth]
     ports:
       - "27018:27017"

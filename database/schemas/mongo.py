@@ -103,7 +103,7 @@ class GameStats(MongoCollection):
 class WordleGame(MongoCollection):
     """Collection that holds people's active Wordle games"""
 
-    day: datetime.date = Field(default_factory=lambda: today_only_date())
+    day: datetime.datetime = Field(default_factory=lambda: today_only_date())
     guesses: list[str] = Field(default_factory=list)
     user_id: int
 
