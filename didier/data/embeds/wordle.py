@@ -94,7 +94,9 @@ class WordleEmbed(EmbedBaseModel):
         return emojis
 
     @overrides
-    def to_embed(self) -> discord.Embed:
+    def to_embed(self, **kwargs) -> discord.Embed:
+        only_colours = kwargs.get("only_colours", False)
+
         colours = self.colour_code_game()
 
         embed = discord.Embed(colour=discord.Colour.blue(), title="Wordle")
@@ -102,15 +104,16 @@ class WordleEmbed(EmbedBaseModel):
 
         rows = [" ".join(row) for row in emojis]
 
-        for i, guess in enumerate(self.game.guesses):
-            rows[i] += f"   ||{guess.upper()}||"
+        # Don't reveal anything if we only want to show the colours
+        if not only_colours:
+            for i, guess in enumerate(self.game.guesses):
+                rows[i] += f"   ||{guess.upper()}||"
+
+            # If the game is over, reveal the word
+            if self.game.is_game_over(self.word):
+                rows.append(f"\n\nThe word was **{self.word.upper()}**!")
 
         embed.description = "\n\n".join(rows)
-
-        # If the game is over, reveal the word
-        if self.game.is_game_over(self.word):
-            embed.description += f"\n\nThe word was **{self.word.upper()}**!"
-
         embed.set_footer(text=footer())
 
         return embed
