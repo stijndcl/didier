@@ -27,7 +27,7 @@ class Didier(commands.Bot):
     error_channel: discord.abc.Messageable
     initial_extensions: tuple[str, ...] = ()
     http_session: ClientSession
-    wordle_words: set[str, ...] = set()
+    wordle_words: set[str] = set()
 
     def __init__(self):
         activity = discord.Activity(type=discord.ActivityType.playing, name=settings.DISCORD_STATUS_MESSAGE)
