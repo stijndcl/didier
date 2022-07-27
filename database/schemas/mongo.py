@@ -6,6 +6,8 @@ from bson import ObjectId
 from overrides import overrides
 from pydantic import BaseModel, Field, validator
 
+from database.constants import WORDLE_GUESS_COUNT
+
 __all__ = ["MongoBase", "TemporaryStorage", "WordleGame"]
 
 from database.utils.datetime import today_only_date
@@ -117,3 +119,16 @@ class WordleGame(MongoCollection):
             raise ValueError(f"guess_distribution must be no longer than 6 elements, found {len(value)}")
 
         return value
+
+    def is_game_over(self, word: str) -> bool:
+        """Check if the current game is over"""
+        # No guesses yet
+        if not self.guesses:
+            return False
+
+        # Max amount of guesses allowed
+        if len(self.guesses) == WORDLE_GUESS_COUNT:
+            return True
+
+        # Found the correct word
+        return self.guesses[-1] == word

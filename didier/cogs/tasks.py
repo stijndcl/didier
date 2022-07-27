@@ -130,7 +130,7 @@ class Tasks(commands.Cog):
     async def reset_wordle_word(self, forced: bool = False):
         """Reset the daily Wordle word"""
         db = self.client.mongo_db
-        word = await set_daily_word(db, random.choice(tuple(self.client.wordle_words)))
+        word = await set_daily_word(db, random.choice(tuple(self.client.wordle_words)), forced=forced)
         self.client.database_caches.wordle_word.data = [word]
 
     @reset_wordle_word.before_loop

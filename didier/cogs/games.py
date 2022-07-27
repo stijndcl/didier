@@ -47,9 +47,11 @@ class Games(commands.Cog):
         # Make a guess
         if guess:
             # The guess is not a real word
-            if guess not in self.client.wordle_words:
+            if guess.lower() not in self.client.wordle_words:
                 embed = WordleErrorEmbed(message=f"`{guess}` is not a valid word.").to_embed()
                 return await interaction.followup.send(embed=embed)
+
+            guess = guess.lower()
 
             await make_wordle_guess(self.client.mongo_db, interaction.user.id, guess)
 

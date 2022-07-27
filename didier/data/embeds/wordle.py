@@ -108,7 +108,7 @@ class WordleEmbed(EmbedBaseModel):
         embed.description = "\n\n".join(rows)
 
         # If the game is over, reveal the word
-        if len(self.game.guesses) == WORDLE_GUESS_COUNT or (self.game.guesses and self.game.guesses[-1] == self.word):
+        if self.game.is_game_over(self.word):
             embed.description += f"\n\nThe word was **{self.word.upper()}**!"
 
         embed.set_footer(text=footer())
