@@ -4,14 +4,14 @@ from typing import Optional
 
 from bson import ObjectId
 from overrides import overrides
-from pydantic import BaseModel, Field, conlist
+from pydantic import BaseModel, Field, validator
 
 __all__ = ["MongoBase", "TemporaryStorage", "WordleGame"]
 
 from database.utils.datetime import today_only_date
 
 
-class PyObjectId(str):
+class PyObjectId(ObjectId):
     """Custom type for bson ObjectIds"""
 
     @classmethod
@@ -71,11 +71,19 @@ class TemporaryStorage(MongoCollection):
 class WordleStats(BaseModel):
     """Model that holds stats about a player's Wordle performance"""
 
-    guess_distribution: conlist(int, min_items=6, max_items=6) = Field(default_factory=lambda: [0, 0, 0, 0, 0, 0])
+    guess_distribution: list[int] = Field(default_factory=lambda: [0, 0, 0, 0, 0, 0])
     last_guess: Optional[datetime.date] = None
     win_rate: float = 0
     current_streak: int = 0
     max_streak: int = 0
+
+    @validator("guess_distribution")
+    def validate_guesses_length(cls, value: list[int]):
+        """Check that the distribution of guesses is of the correct length"""
+        if len(value) != 6:
+            raise ValueError(f"guess_distribution must be length 6, found {len(value)}")
+
+        return value
 
 
 class GameStats(MongoCollection):
@@ -94,10 +102,18 @@ class WordleGame(MongoCollection):
     """Collection that holds people's active Wordle games"""
 
     day: datetime.date = Field(default_factory=lambda: today_only_date())
-    guesses: conlist(str, min_items=0, max_items=6) = Field(default_factory=list)
+    guesses: list[str] = Field(default_factory=list)
     user_id: int
 
     @staticmethod
     @overrides
     def collection() -> str:
         return "wordle"
+
+    @validator("guesses")
+    def validate_guesses_length(cls, value: list[int]):
+        """Check that the amount of guesses is of the correct length"""
+        if len(value) > 6:
+            raise ValueError(f"guess_distribution must be no longer than 6 elements, found {len(value)}")
+
+        return value

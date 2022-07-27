@@ -2,13 +2,14 @@ import datetime
 
 import pytest
 from freezegun import freeze_time
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from database.crud import currency as crud
 from database.exceptions import currency as exceptions
 from database.schemas.relational import Bank
 
 
-async def test_add_dinks(postgres, bank: Bank):
+async def test_add_dinks(postgres: AsyncSession, bank: Bank):
     """Test adding dinks to an account"""
     assert bank.dinks == 0
     await crud.add_dinks(postgres, bank.user_id, 10)
@@ -17,7 +18,7 @@ async def test_add_dinks(postgres, bank: Bank):
 
 
 @freeze_time("2022/07/23")
-async def test_claim_nightly_available(postgres, bank: Bank):
+async def test_claim_nightly_available(postgres: AsyncSession, bank: Bank):
     """Test claiming nightlies when it hasn't been done yet"""
     await crud.claim_nightly(postgres, bank.user_id)
     await postgres.refresh(bank)
@@ -28,7 +29,7 @@ async def test_claim_nightly_available(postgres, bank: Bank):
 
 
 @freeze_time("2022/07/23")
-async def test_claim_nightly_unavailable(postgres, bank: Bank):
+async def test_claim_nightly_unavailable(postgres: AsyncSession, bank: Bank):
     """Test claiming nightlies twice in a day"""
     await crud.claim_nightly(postgres, bank.user_id)
 
@@ -39,7 +40,7 @@ async def test_claim_nightly_unavailable(postgres, bank: Bank):
     assert bank.dinks == crud.NIGHTLY_AMOUNT
 
 
-async def test_invest(postgres, bank: Bank):
+async def test_invest(postgres: AsyncSession, bank: Bank):
     """Test investing some Dinks"""
     bank.dinks = 100
     postgres.add(bank)
@@ -52,7 +53,7 @@ async def test_invest(postgres, bank: Bank):
     assert bank.invested == 20
 
 
-async def test_invest_all(postgres, bank: Bank):
+async def test_invest_all(postgres: AsyncSession, bank: Bank):
     """Test investing all dinks"""
     bank.dinks = 100
     postgres.add(bank)
@@ -65,7 +66,7 @@ async def test_invest_all(postgres, bank: Bank):
     assert bank.invested == 100
 
 
-async def test_invest_more_than_owned(postgres, bank: Bank):
+async def test_invest_more_than_owned(postgres: AsyncSession, bank: Bank):
     """Test investing more Dinks than you own"""
     bank.dinks = 100
     postgres.add(bank)

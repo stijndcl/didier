@@ -1,10 +1,11 @@
 from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from database.crud import users as crud
 from database.schemas.relational import User
 
 
-async def test_get_or_add_non_existing(postgres):
+async def test_get_or_add_non_existing(postgres: AsyncSession):
     """Test get_or_add for a user that doesn't exist"""
     await crud.get_or_add(postgres, 1)
     statement = select(User)
@@ -15,7 +16,7 @@ async def test_get_or_add_non_existing(postgres):
     assert res[0].nightly_data is not None
 
 
-async def test_get_or_add_existing(postgres):
+async def test_get_or_add_existing(postgres: AsyncSession):
     """Test get_or_add for a user that does exist"""
     user = await crud.get_or_add(postgres, 1)
     bank = user.bank

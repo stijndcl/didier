@@ -1,5 +1,6 @@
 import pytest
 from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from database.crud import custom_commands as crud
 from database.exceptions.constraints import DuplicateInsertException
@@ -7,7 +8,7 @@ from database.exceptions.not_found import NoResultFoundException
 from database.schemas.relational import CustomCommand
 
 
-async def test_create_command_non_existing(postgres):
+async def test_create_command_non_existing(postgres: AsyncSession):
     """Test creating a new command when it doesn't exist yet"""
     await crud.create_command(postgres, "name", "response")
 
@@ -16,7 +17,7 @@ async def test_create_command_non_existing(postgres):
     assert commands[0].name == "name"
 
 
-async def test_create_command_duplicate_name(postgres):
+async def test_create_command_duplicate_name(postgres: AsyncSession):
     """Test creating a command when the name already exists"""
     await crud.create_command(postgres, "name", "response")
 
@@ -24,7 +25,7 @@ async def test_create_command_duplicate_name(postgres):
         await crud.create_command(postgres, "name", "other response")
 
 
-async def test_create_command_name_is_alias(postgres):
+async def test_create_command_name_is_alias(postgres: AsyncSession):
     """Test creating a command when the name is taken by an alias"""
     await crud.create_command(postgres, "name", "response")
     await crud.create_alias(postgres, "name", "n")
@@ -33,7 +34,7 @@ async def test_create_command_name_is_alias(postgres):
         await crud.create_command(postgres, "n", "other response")
 
 
-async def test_create_alias(postgres):
+async def test_create_alias(postgres: AsyncSession):
     """Test creating an alias when the name is still free"""
     command = await crud.create_command(postgres, "name", "response")
     await crud.create_alias(postgres, command.name, "n")
@@ -43,13 +44,13 @@ async def test_create_alias(postgres):
     assert command.aliases[0].alias == "n"
 
 
-async def test_create_alias_non_existing(postgres):
+async def test_create_alias_non_existing(postgres: AsyncSession):
     """Test creating an alias when the command doesn't exist"""
     with pytest.raises(NoResultFoundException):
         await crud.create_alias(postgres, "name", "alias")
 
 
-async def test_create_alias_duplicate(postgres):
+async def test_create_alias_duplicate(postgres: AsyncSession):
     """Test creating an alias when another alias already has this name"""
     command = await crud.create_command(postgres, "name", "response")
     await crud.create_alias(postgres, command.name, "n")
@@ -58,7 +59,7 @@ async def test_create_alias_duplicate(postgres):
         await crud.create_alias(postgres, command.name, "n")
 
 
-async def test_create_alias_is_command(postgres):
+async def test_create_alias_is_command(postgres: AsyncSession):
     """Test creating an alias when the name is taken by a command"""
     await crud.create_command(postgres, "n", "response")
     command = await crud.create_command(postgres, "name", "response")
@@ -67,7 +68,7 @@ async def test_create_alias_is_command(postgres):
         await crud.create_alias(postgres, command.name, "n")
 
 
-async def test_create_alias_match_by_alias(postgres):
+async def test_create_alias_match_by_alias(postgres: AsyncSession):
     """Test creating an alias for a command when matching the name to another alias"""
     command = await crud.create_command(postgres, "name", "response")
     await crud.create_alias(postgres, command.name, "a1")
@@ -75,21 +76,21 @@ async def test_create_alias_match_by_alias(postgres):
     assert alias.command == command
 
 
-async def test_get_command_by_name_exists(postgres):
+async def test_get_command_by_name_exists(postgres: AsyncSession):
     """Test getting a command by name"""
     await crud.create_command(postgres, "name", "response")
     command = await crud.get_command(postgres, "name")
     assert command is not None
 
 
-async def test_get_command_by_cleaned_name(postgres):
+async def test_get_command_by_cleaned_name(postgres: AsyncSession):
     """Test getting a command by the cleaned version of the name"""
     command = await crud.create_command(postgres, "CAPITALIZED NAME WITH SPACES", "response")
     found = await crud.get_command(postgres, "capitalizednamewithspaces")
     assert command == found
 
 
-async def test_get_command_by_alias(postgres):
+async def test_get_command_by_alias(postgres: AsyncSession):
     """Test getting a command by an alias"""
     command = await crud.create_command(postgres, "name", "response")
     await crud.create_alias(postgres, command.name, "a1")
@@ -99,12 +100,12 @@ async def test_get_command_by_alias(postgres):
     assert command == found
 
 
-async def test_get_command_non_existing(postgres):
+async def test_get_command_non_existing(postgres: AsyncSession):
     """Test getting a command when it doesn't exist"""
     assert await crud.get_command(postgres, "name") is None
 
 
-async def test_edit_command(postgres):
+async def test_edit_command(postgres: AsyncSession):
     """Test editing an existing command"""
     command = await crud.create_command(postgres, "name", "response")
     await crud.edit_command(postgres, command.name, "new name", "new response")
@@ -112,7 +113,7 @@ async def test_edit_command(postgres):
     assert command.response == "new response"
 
 
-async def test_edit_command_non_existing(postgres):
+async def test_edit_command_non_existing(postgres: AsyncSession):
     """Test editing a command that doesn't exist"""
     with pytest.raises(NoResultFoundException):
         await crud.edit_command(postgres, "name", "n", "r")

@@ -19,24 +19,24 @@ async def wordle_game(wordle_collection: MongoCollection, test_user_id: int) -> 
     yield game
 
 
-async def test_start_new_game(wordle_collection: MongoCollection, test_user_id: int):
+async def test_start_new_game(mongodb: MongoDatabase, wordle_collection: MongoCollection, test_user_id: int):
     """Test starting a new game"""
     result = await wordle_collection.find_one({"user_id": test_user_id})
     assert result is None
 
-    await crud.start_new_wordle_game(wordle_collection, test_user_id)
+    await crud.start_new_wordle_game(mongodb, test_user_id)
 
     result = await wordle_collection.find_one({"user_id": test_user_id})
     assert result is not None
 
 
-async def test_get_active_wordle_game_none(wordle_collection: MongoCollection, test_user_id: int):
+async def test_get_active_wordle_game_none(mongodb: MongoDatabase, test_user_id: int):
     """Test getting an active game when there is none"""
-    result = await crud.get_active_wordle_game(wordle_collection, test_user_id)
+    result = await crud.get_active_wordle_game(mongodb, test_user_id)
     assert result is None
 
 
-async def test_get_active_wordle_game(wordle_collection: MongoCollection, wordle_game: WordleGame):
+async def test_get_active_wordle_game(mongodb: MongoDatabase, wordle_game: WordleGame):
     """Test getting an active game when there is none"""
-    result = await crud.get_active_wordle_game(wordle_collection, wordle_game.user_id)
-    assert result == wordle_game.dict(by_alias=True)
+    result = await crud.get_active_wordle_game(mongodb, wordle_game.user_id)
+    assert result.dict(by_alias=True) == wordle_game.dict(by_alias=True)

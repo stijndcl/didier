@@ -9,7 +9,6 @@ from database import enums
 from database.crud.birthdays import get_birthdays_on_day
 from database.crud.ufora_announcements import remove_old_announcements
 from database.crud.wordle import set_daily_word
-from database.schemas.mongo import TemporaryStorage
 from didier import Didier
 from didier.data.embeds.ufora.announcements import fetch_ufora_announcements
 from didier.decorators.tasks import timed_task
@@ -74,12 +73,15 @@ class Tasks(commands.Cog):
             return await ctx.reply(f"Found no tasks matching `{name}`.", mention_author=False)
 
         task = self._tasks[name]
-        await task()
+        await task(forced=True)
+        await self.client.confirm_message(ctx.message)
 
     @tasks.loop(time=SOCIALLY_ACCEPTABLE_TIME)
     @timed_task(enums.TaskType.BIRTHDAYS)
-    async def check_birthdays(self):
+    async def check_birthdays(self, **kwargs):
         """Check if it's currently anyone's birthday"""
+        _ = kwargs
+
         now = tz_aware_now().date()
         async with self.client.postgres_session as session:
             birthdays = await get_birthdays_on_day(session, now)
@@ -99,8 +101,10 @@ class Tasks(commands.Cog):
 
     @tasks.loop(minutes=10)
     @timed_task(enums.TaskType.UFORA_ANNOUNCEMENTS)
-    async def pull_ufora_announcements(self):
+    async def pull_ufora_announcements(self, **kwargs):
         """Task that checks for new Ufora announcements & logs them in a channel"""
+        _ = kwargs
+
         # In theory this shouldn't happen but just to please Mypy
         if settings.UFORA_RSS_TOKEN is None or settings.UFORA_ANNOUNCEMENTS_CHANNEL is None:
             return
@@ -123,11 +127,11 @@ class Tasks(commands.Cog):
             await remove_old_announcements(session)
 
     @tasks.loop(time=DAILY_RESET_TIME)
-    async def reset_wordle_word(self):
+    async def reset_wordle_word(self, forced: bool = False):
         """Reset the daily Wordle word"""
         db = self.client.mongo_db
-        collection = db[TemporaryStorage.collection()]
-        await set_daily_word(collection, random.choice(self.client.wordle_words))
+        word = await set_daily_word(db, random.choice(tuple(self.client.wordle_words)))
+        self.client.database_caches.wordle_word.data = [word]
 
     @reset_wordle_word.before_loop
     async def _before_reset_wordle_word(self):
@@ -145,7 +149,8 @@ class Tasks(commands.Cog):
 async def setup(client: Didier):
     """Load the cog
 
-    Initially reset the Wordle word
+    Initially fetch the wordle word from the database, or reset it
+    if there hasn't been a reset yet today
     """
     cog = Tasks(client)
     await client.add_cog(cog)

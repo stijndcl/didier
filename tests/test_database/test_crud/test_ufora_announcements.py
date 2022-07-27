@@ -1,16 +1,18 @@
 import datetime
 
+from sqlalchemy.ext.asyncio import AsyncSession
+
 from database.crud import ufora_announcements as crud
 from database.schemas.relational import UforaAnnouncement, UforaCourse
 
 
-async def test_get_courses_with_announcements_none(postgres):
+async def test_get_courses_with_announcements_none(postgres: AsyncSession):
     """Test getting all courses with announcements when there are none"""
     results = await crud.get_courses_with_announcements(postgres)
     assert len(results) == 0
 
 
-async def test_get_courses_with_announcements(postgres):
+async def test_get_courses_with_announcements(postgres: AsyncSession):
     """Test getting all courses with announcements"""
     course_1 = UforaCourse(name="test", code="code", year=1, log_announcements=True)
     course_2 = UforaCourse(name="test2", code="code2", year=1, log_announcements=False)
@@ -22,14 +24,14 @@ async def test_get_courses_with_announcements(postgres):
     assert results[0] == course_1
 
 
-async def test_create_new_announcement(ufora_course: UforaCourse, postgres):
+async def test_create_new_announcement(postgres: AsyncSession, ufora_course: UforaCourse):
     """Test creating a new announcement"""
     await crud.create_new_announcement(postgres, 1, course=ufora_course, publication_date=datetime.datetime.now())
     await postgres.refresh(ufora_course)
     assert len(ufora_course.announcements) == 1
 
 
-async def test_remove_old_announcements(ufora_announcement: UforaAnnouncement, postgres):
+async def test_remove_old_announcements(postgres: AsyncSession, ufora_announcement: UforaAnnouncement):
     """Test removing all stale announcements"""
     course = ufora_announcement.course
     ufora_announcement.publication_date -= datetime.timedelta(weeks=2)

@@ -27,7 +27,7 @@ class Didier(commands.Bot):
     error_channel: discord.abc.Messageable
     initial_extensions: tuple[str, ...] = ()
     http_session: ClientSession
-    wordle_words: tuple[str] = tuple()
+    wordle_words: set[str, ...] = set()
 
     def __init__(self):
         activity = discord.Activity(type=discord.ActivityType.playing, name=settings.DISCORD_STATUS_MESSAGE)
@@ -64,14 +64,14 @@ class Didier(commands.Bot):
         # Load the Wordle dictionary
         self._load_wordle_words()
 
-        # Load extensions
-        await self._load_initial_extensions()
-        await self._load_directory_extensions("didier/cogs")
-
         # Initialize caches
         self.database_caches = CacheManager()
         async with self.postgres_session as session:
-            await self.database_caches.initialize_caches(session)
+            await self.database_caches.initialize_caches(session, self.mongo_db)
+
+        # Load extensions
+        await self._load_initial_extensions()
+        await self._load_directory_extensions("didier/cogs")
 
         # Create aiohttp session
         self.http_session = ClientSession()
@@ -107,13 +107,9 @@ class Didier(commands.Bot):
 
     def _load_wordle_words(self):
         """Load the dictionary of Wordle words"""
-        words = []
-
         with open("files/dictionaries/words-english-wordle.txt", "r") as fp:
             for line in fp:
-                words.append(line.strip())
-
-        self.wordle_words = tuple(words)
+                self.wordle_words.add(line.strip())
 
     async def resolve_message(self, reference: discord.MessageReference) -> discord.Message:
         """Fetch a message from a reference"""
