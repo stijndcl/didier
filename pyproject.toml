@@ -42,9 +42,8 @@ ignore_missing_imports = true
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
 env = [
+    "TESTING = 1",
     "MONGO_DB = didier_pytest",
-    "MONGO_USER = pytest",
-    "MONGO_PASS = pytest",
     "MONGO_HOST = localhost",
     "MONGO_PORT = 27018",
     "POSTGRES_DB = didier_pytest",
