@@ -1,8 +1,12 @@
+from datetime import datetime, timedelta
+
 import pytest
+from freezegun import freeze_time
 
 from database.crud import wordle as crud
+from database.enums import TempStorageKey
 from database.mongo_types import MongoCollection, MongoDatabase
-from database.schemas.mongo import WordleGame
+from database.schemas.mongo import TemporaryStorage, WordleGame
 
 
 @pytest.fixture
@@ -37,6 +41,36 @@ async def test_get_active_wordle_game_none(mongodb: MongoDatabase, test_user_id:
 
 
 async def test_get_active_wordle_game(mongodb: MongoDatabase, wordle_game: WordleGame):
-    """Test getting an active game when there is none"""
+    """Test getting an active game when there is one"""
     result = await crud.get_active_wordle_game(mongodb, wordle_game.user_id)
     assert result.dict(by_alias=True) == wordle_game.dict(by_alias=True)
+
+
+async def test_get_daily_word_none(mongodb: MongoDatabase):
+    """Test getting the daily word when the database is empty"""
+    result = await crud.get_daily_word(mongodb)
+    assert result is None
+
+
+@freeze_time("2022-07-30")
+async def test_get_daily_word_not_today(mongodb: MongoDatabase):
+    """Test getting the daily word when there is an entry, but not for today"""
+    day = datetime.today() - timedelta(days=1)
+    collection = mongodb[TemporaryStorage.collection()]
+
+    word = "testword"
+    await collection.insert_one({"key": TempStorageKey.WORDLE_WORD, "day": day, "word": word})
+
+    assert await crud.get_daily_word(mongodb) is None
+
+
+@freeze_time("2022-07-30")
+async def test_get_daily_word_present(mongodb: MongoDatabase):
+    """Test getting the daily word when there is one for today"""
+    day = datetime.today()
+    collection = mongodb[TemporaryStorage.collection()]
+
+    word = "testword"
+    await collection.insert_one({"key": TempStorageKey.WORDLE_WORD, "day": day, "word": word})
+
+    assert await crud.get_daily_word(mongodb) == word
