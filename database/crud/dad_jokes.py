@@ -16,7 +16,7 @@ async def add_dad_joke(session: AsyncSession, joke: str) -> DadJoke:
     return dad_joke
 
 
-async def get_random_dad_joke(session: AsyncSession) -> DadJoke:
+async def get_random_dad_joke(session: AsyncSession) -> DadJoke:  # pragma: no cover # randomness is untestable
     """Return a random database entry"""
     statement = select(DadJoke).order_by(func.random())
     row = (await session.execute(statement)).first()

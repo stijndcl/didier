@@ -20,6 +20,7 @@ omit = [
     "./didier/utils/discord/colours.py",
     "./didier/utils/discord/constants.py",
     "./didier/utils/discord/flags/*",
+    "./didier/views/modals/*"
 ]
 
 [tool.isort]

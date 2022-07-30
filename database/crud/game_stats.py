@@ -24,15 +24,15 @@ async def get_game_stats(database: MongoDatabase, user_id: int) -> GameStats:
     return stats
 
 
-async def complete_wordle_game(database: MongoDatabase, user_id: int, win: bool, guesses: int):
+async def complete_wordle_game(database: MongoDatabase, user_id: int, win: bool, guesses: int = 0):
     """Update the user's Wordle stats"""
     stats = await get_game_stats(database, user_id)
 
-    update: dict[str, dict[str, Union[int, datetime.datetime]]] = {"$inc": {"wordle.games": 1}}
+    update: dict[str, dict[str, Union[int, datetime.datetime]]] = {"$inc": {"wordle.games": 1}, "$set": {}}
 
     if win:
         update["$inc"]["wordle.wins"] = 1
-        update["$inc"][f"wordle.guess_distribution.{guesses}"] = 1
+        update["$inc"][f"wordle.guess_distribution.{guesses - 1}"] = 1
 
         # Update streak
         today = today_only_date()
