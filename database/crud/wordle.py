@@ -61,7 +61,7 @@ async def set_daily_word(database: MongoDatabase, word: str, *, forced: bool = F
     """
     collection = database[TemporaryStorage.collection()]
 
-    current_word = None if forced else await get_daily_word(collection)
+    current_word = None if forced else await get_daily_word(database)
     if current_word is not None:
         return current_word
 

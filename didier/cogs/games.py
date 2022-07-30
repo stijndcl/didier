@@ -52,7 +52,6 @@ class Games(commands.Cog):
                 return await interaction.followup.send(embed=embed)
 
             guess = guess.lower()
-
             await make_wordle_guess(self.client.mongo_db, interaction.user.id, guess)
 
             # Don't re-request the game, we already have it

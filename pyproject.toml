@@ -53,3 +53,7 @@ env = [
     "POSTGRES_PORT = 5433",
     "DISCORD_TOKEN = token"
 ]
+markers = [
+    "mongo: tests that use MongoDB",
+    "postgres: tests that use PostgreSQL"
+]
