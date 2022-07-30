@@ -6,7 +6,8 @@ from freezegun import freeze_time
 from database.crud import wordle as crud
 from database.enums import TempStorageKey
 from database.mongo_types import MongoCollection, MongoDatabase
-from database.schemas.mongo import TemporaryStorage, WordleGame
+from database.schemas.mongo.temporary_storage import TemporaryStorage
+from database.schemas.mongo.wordle import WordleGame
 
 
 @pytest.fixture

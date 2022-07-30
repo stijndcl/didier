@@ -2,7 +2,8 @@ from typing import Optional
 
 from database.enums import TempStorageKey
 from database.mongo_types import MongoDatabase
-from database.schemas.mongo import TemporaryStorage, WordleGame
+from database.schemas.mongo.temporary_storage import TemporaryStorage
+from database.schemas.mongo.wordle import WordleGame
 from database.utils.datetime import today_only_date
 
 __all__ = [

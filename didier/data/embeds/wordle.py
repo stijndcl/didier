@@ -6,7 +6,7 @@ import discord
 from overrides import overrides
 
 from database.constants import WORDLE_GUESS_COUNT, WORDLE_WORD_LENGTH
-from database.schemas.mongo import WordleGame
+from database.schemas.mongo.wordle import WordleGame
 from didier.data.embeds.base import EmbedBaseModel
 from didier.utils.types.datetime import int_to_weekday, tz_aware_now
 
