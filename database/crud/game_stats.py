@@ -56,4 +56,4 @@ async def complete_wordle_game(database: MongoDatabase, user_id: int, win: bool,
         update["$set"]["wordle.current_streak"] = 0
 
     collection = database[GameStats.collection()]
-    collection.update_one({"_id": stats.id}, update)
+    await collection.update_one({"_id": stats.id}, update)
