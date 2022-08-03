@@ -28,7 +28,7 @@ DBSession = sessionmaker(
 )
 
 # MongoDB client
-if not settings.TESTING:
+if not settings.TESTING:  # pragma: no cover
     encoded_mongo_username = quote_plus(settings.MONGO_USER)
     encoded_mongo_password = quote_plus(settings.MONGO_PASS)
     mongo_url = (
