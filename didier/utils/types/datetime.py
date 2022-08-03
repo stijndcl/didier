@@ -10,7 +10,7 @@ LOCAL_TIMEZONE = zoneinfo.ZoneInfo("Europe/Brussels")
 
 def int_to_weekday(number: int) -> str:  # pragma: no cover # it's useless to write a test for this
     """Get the Dutch name of a weekday from the number"""
-    return ["Maandag", "Dinsdag", "Woensdag", "Donderdag", "Vrijdag", "Zaterdag", "Zondag"][number]
+    return ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"][number]
 
 
 def str_to_date(date_str: str, formats: Union[list[str], str] = "%d/%m/%Y") -> datetime.date:

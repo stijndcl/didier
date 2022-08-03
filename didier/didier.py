@@ -27,6 +27,7 @@ class Didier(commands.Bot):
     error_channel: discord.abc.Messageable
     initial_extensions: tuple[str, ...] = ()
     http_session: ClientSession
+    wordle_words: set[str] = set()
 
     def __init__(self):
         activity = discord.Activity(type=discord.ActivityType.playing, name=settings.DISCORD_STATUS_MESSAGE)
@@ -60,14 +61,17 @@ class Didier(commands.Bot):
 
         This hook is called once the bot is initialised
         """
-        # Load extensions
-        await self._load_initial_extensions()
-        await self._load_directory_extensions("didier/cogs")
+        # Load the Wordle dictionary
+        self._load_wordle_words()
 
         # Initialize caches
         self.database_caches = CacheManager()
         async with self.postgres_session as session:
-            await self.database_caches.initialize_caches(session)
+            await self.database_caches.initialize_caches(session, self.mongo_db)
+
+        # Load extensions
+        await self._load_initial_extensions()
+        await self._load_directory_extensions("didier/cogs")
 
         # Create aiohttp session
         self.http_session = ClientSession()
@@ -100,6 +104,12 @@ class Didier(commands.Bot):
                 await self.load_extension(f"{load_path}.{file[:-3]}")
             elif os.path.isdir(new_path := f"{path}/{file}"):
                 await self._load_directory_extensions(new_path)
+
+    def _load_wordle_words(self):
+        """Load the dictionary of Wordle words"""
+        with open("files/dictionaries/words-english-wordle.txt", "r") as fp:
+            for line in fp:
+                self.wordle_words.add(line.strip())
 
     async def resolve_message(self, reference: discord.MessageReference) -> discord.Message:
         """Fetch a message from a reference"""

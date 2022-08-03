@@ -28,7 +28,14 @@ DBSession = sessionmaker(
 )
 
 # MongoDB client
-encoded_mongo_username = quote_plus(settings.MONGO_USER)
-encoded_mongo_password = quote_plus(settings.MONGO_PASS)
-mongo_url = f"mongodb://{encoded_mongo_username}:{encoded_mongo_password}@{settings.MONGO_HOST}:{settings.MONGO_PORT}/"
+if not settings.TESTING:  # pragma: no cover
+    encoded_mongo_username = quote_plus(settings.MONGO_USER)
+    encoded_mongo_password = quote_plus(settings.MONGO_PASS)
+    mongo_url = (
+        f"mongodb://{encoded_mongo_username}:{encoded_mongo_password}@{settings.MONGO_HOST}:{settings.MONGO_PORT}/"
+    )
+else:
+    # Require no authentication when testing
+    mongo_url = f"mongodb://{settings.MONGO_HOST}:{settings.MONGO_PORT}/"
+
 mongo_client = motor.motor_asyncio.AsyncIOMotorClient(mongo_url)

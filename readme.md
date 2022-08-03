@@ -30,10 +30,10 @@ A separate database is used in the tests, as it would obviously not be ideal whe
 
 ```shell
 # Starting the database
-docker-compose up -d db
+docker compose up -d
 
 # Starting the database used in tests
-docker-compose up -d db-pytest
+docker compose -f docker-compose.test.yml up -d
 ```
 
 ### Commands

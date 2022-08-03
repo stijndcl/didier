@@ -47,7 +47,7 @@ class UforaNotification(EmbedBaseModel):
         self.published_dt = self._published_datetime()
         self._published = self._get_published()
 
-    def to_embed(self) -> discord.Embed:
+    def to_embed(self, **kwargs: dict) -> discord.Embed:
         """Turn the notification into an embed"""
         embed = discord.Embed(colour=discord.Colour.from_rgb(30, 100, 200))
 

@@ -1,10 +1,12 @@
+from abc import ABC, abstractmethod
+
 from bson import ObjectId
 from pydantic import BaseModel, Field
 
-__all__ = ["MongoBase"]
+__all__ = ["PyObjectId", "MongoBase", "MongoCollection"]
 
 
-class PyObjectId(str):
+class PyObjectId(ObjectId):
     """Custom type for bson ObjectIds"""
 
     @classmethod
@@ -36,3 +38,16 @@ class MongoBase(BaseModel):
         arbitrary_types_allowed = True
         json_encoders = {ObjectId: str, PyObjectId: str}
         use_enum_values = True
+
+
+class MongoCollection(MongoBase, ABC):
+    """Base model for the 'main class' in a collection
+
+    This field stores the name of the collection to avoid making typos against it
+    """
+
+    @staticmethod
+    @abstractmethod
+    def collection() -> str:
+        """Getter for the name of the collection, in order to avoid typos"""
+        raise NotImplementedError

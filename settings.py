@@ -8,6 +8,7 @@ env.read_env()
 
 __all__ = [
     "SANDBOX",
+    "TESTING",
     "LOGFILE",
     "POSTGRES_DB",
     "POSTGRES_USER",
@@ -28,6 +29,7 @@ __all__ = [
 
 """General config"""
 SANDBOX: bool = env.bool("SANDBOX", True)
+TESTING: bool = env.bool("TESTING", False)
 LOGFILE: str = env.str("LOGFILE", "didier.log")
 SEMESTER: int = env.int("SEMESTER", 2)
 YEAR: int = env.int("YEAR", 3)

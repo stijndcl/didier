@@ -1,8 +1,10 @@
+from sqlalchemy.ext.asyncio import AsyncSession
+
 from database.schemas.relational import UforaCourse
 from database.utils.caches import UforaCourseCache
 
 
-async def test_ufora_course_cache_refresh_empty(postgres, ufora_course_with_alias: UforaCourse):
+async def test_ufora_course_cache_refresh_empty(postgres: AsyncSession, ufora_course_with_alias: UforaCourse):
     """Test loading the data for the Ufora Course cache when it's empty"""
     cache = UforaCourseCache()
     await cache.refresh(postgres)
@@ -12,7 +14,7 @@ async def test_ufora_course_cache_refresh_empty(postgres, ufora_course_with_alia
     assert cache.aliases == {"alias": "test"}
 
 
-async def test_ufora_course_cache_refresh_not_empty(postgres, ufora_course_with_alias: UforaCourse):
+async def test_ufora_course_cache_refresh_not_empty(postgres: AsyncSession, ufora_course_with_alias: UforaCourse):
     """Test loading the data for the Ufora Course cache when it's not empty anymore"""
     cache = UforaCourseCache()
     cache.data = ["Something"]

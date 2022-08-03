@@ -1,6 +1,7 @@
 import datetime
 
 import pytest
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from database.crud import users
 from database.schemas.relational import (
@@ -22,7 +23,7 @@ def test_user_id() -> int:
 
 
 @pytest.fixture
-async def user(postgres, test_user_id) -> User:
+async def user(postgres: AsyncSession, test_user_id: int) -> User:
     """Fixture to create a user"""
     _user = await users.get_or_add(postgres, test_user_id)
     await postgres.refresh(_user)
@@ -30,7 +31,7 @@ async def user(postgres, test_user_id) -> User:
 
 
 @pytest.fixture
-async def bank(postgres, user: User) -> Bank:
+async def bank(postgres: AsyncSession, user: User) -> Bank:
     """Fixture to fetch the test user's bank"""
     _bank = user.bank
     await postgres.refresh(_bank)
@@ -38,7 +39,7 @@ async def bank(postgres, user: User) -> Bank:
 
 
 @pytest.fixture
-async def ufora_course(postgres) -> UforaCourse:
+async def ufora_course(postgres: AsyncSession) -> UforaCourse:
     """Fixture to create a course"""
     course = UforaCourse(name="test", code="code", year=1, log_announcements=True)
     postgres.add(course)
@@ -47,7 +48,7 @@ async def ufora_course(postgres) -> UforaCourse:
 
 
 @pytest.fixture
-async def ufora_course_with_alias(postgres, ufora_course: UforaCourse) -> UforaCourse:
+async def ufora_course_with_alias(postgres: AsyncSession, ufora_course: UforaCourse) -> UforaCourse:
     """Fixture to create a course with an alias"""
     alias = UforaCourseAlias(course_id=ufora_course.course_id, alias="alias")
     postgres.add(alias)
@@ -57,7 +58,7 @@ async def ufora_course_with_alias(postgres, ufora_course: UforaCourse) -> UforaC
 
 
 @pytest.fixture
-async def ufora_announcement(ufora_course: UforaCourse, postgres) -> UforaAnnouncement:
+async def ufora_announcement(postgres: AsyncSession, ufora_course: UforaCourse) -> UforaAnnouncement:
     """Fixture to create an announcement"""
     announcement = UforaAnnouncement(course_id=ufora_course.course_id, publication_date=datetime.datetime.now())
     postgres.add(announcement)

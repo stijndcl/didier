@@ -14,8 +14,6 @@ services:
     image: mongo:5.0
     restart: always
     environment:
-      - MONGO_INITDB_ROOT_USERNAME=pytest
-      - MONGO_INITDB_ROOT_PASSWORD=pytest
       - MONGO_INITDB_DATABASE=didier_pytest
     ports:
       - "27018:27017"

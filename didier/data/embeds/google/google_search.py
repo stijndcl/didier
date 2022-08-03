@@ -33,7 +33,7 @@ class GoogleSearch(EmbedBaseModel):
         return embed
 
     @overrides
-    def to_embed(self) -> discord.Embed:
+    def to_embed(self, **kwargs: dict) -> discord.Embed:
         if not self.data.results or self.data.status_code != HTTPStatus.OK:
             return self._error_embed()
 
