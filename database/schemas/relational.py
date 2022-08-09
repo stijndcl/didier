@@ -28,6 +28,7 @@ __all__ = [
     "CustomCommand",
     "CustomCommandAlias",
     "DadJoke",
+    "Link",
     "NightlyData",
     "Task",
     "UforaAnnouncement",
@@ -107,6 +108,16 @@ class DadJoke(Base):
 
     dad_joke_id: int = Column(Integer, primary_key=True)
     joke: str = Column(Text, nullable=False)
+
+
+class Link(Base):
+    """Useful links that go useful places"""
+
+    __tablename__ = "links"
+
+    link_id: int = Column(Integer, primary_key=True)
+    name: str = Column(Text, nullable=False, unique=True)
+    url: str = Column(Text, nullable=False)
 
 
 class NightlyData(Base):

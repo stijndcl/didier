@@ -111,6 +111,17 @@ class Didier(commands.Bot):
             for line in fp:
                 self.wordle_words.add(line.strip())
 
+    async def get_reply_target(self, ctx: commands.Context) -> discord.Message:
+        """Get the target message that should be replied to
+
+        In case the invoking message is a reply to something, reply to the
+        original message instead
+        """
+        if ctx.message.reference is not None:
+            return await self.resolve_message(ctx.message.reference)
+
+        return ctx.message
+
     async def resolve_message(self, reference: discord.MessageReference) -> discord.Message:
         """Fetch a message from a reference"""
         # Message is in the cache, return it
