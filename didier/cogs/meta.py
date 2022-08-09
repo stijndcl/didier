@@ -15,6 +15,11 @@ class Meta(commands.Cog):
     def __init__(self, client: Didier):
         self.client = client
 
+    @commands.command(name="Marco")
+    async def marco(self, ctx: commands.Context):
+        """Ping command to get the delay of the bot"""
+        return await ctx.reply(f"Polo! {round(self.client.latency * 1000)}ms", mention_author=False)
+
     @commands.command(name="Source", aliases=["Src"])
     async def source(self, ctx: commands.Context, *, command_name: Optional[str] = None):
         """Command to get links to the source code of Didier"""
