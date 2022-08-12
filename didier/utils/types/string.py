@@ -1,7 +1,7 @@
 import math
 from typing import Optional
 
-__all__ = ["abbreviate", "leading", "pluralize"]
+__all__ = ["abbreviate", "leading", "pluralize", "get_edu_year_name"]
 
 
 def abbreviate(text: str, max_length: int) -> str:
@@ -43,3 +43,10 @@ def pluralize(word: str, amount: int, plural_form: Optional[str] = None) -> str:
         return word
 
     return plural_form or (word + "s")
+
+
+def get_edu_year_name(year: int) -> str:
+    """Get the string representation of a university year"""
+    years = ["1st Bachelor", "2nd Bachelor", "3rd Bachelor", "1st Master", "2nd Master"]
+
+    return years[year]

@@ -28,6 +28,7 @@ __all__ = [
     "CustomCommand",
     "CustomCommandAlias",
     "DadJoke",
+    "Deadline",
     "Link",
     "NightlyData",
     "Task",
@@ -110,6 +111,19 @@ class DadJoke(Base):
     joke: str = Column(Text, nullable=False)
 
 
+class Deadline(Base):
+    """A deadline for a university project"""
+
+    __tablename__ = "deadlines"
+
+    deadline_id: int = Column(Integer, primary_key=True)
+    course_id: int = Column(Integer, ForeignKey("ufora_courses.course_id"))
+    name: str = Column(Text, nullable=False)
+    deadline: datetime = Column(DateTime(timezone=True), nullable=False)
+
+    course: UforaCourse = relationship("UforaCourse", back_populates="deadlines", uselist=False, lazy="selectin")
+
+
 class Link(Base):
     """Useful links that go useful places"""
 
@@ -159,6 +173,9 @@ class UforaCourse(Base):
     )
     aliases: list[UforaCourseAlias] = relationship(
         "UforaCourseAlias", back_populates="course", cascade="all, delete-orphan", lazy="selectin"
+    )
+    deadlines: list[Deadline] = relationship(
+        "Deadline", back_populates="course", cascade="all, delete-orphan", lazy="selectin"
     )
 
 

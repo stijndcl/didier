@@ -5,7 +5,9 @@ from discord import app_commands
 from discord.ext import commands
 
 from database.crud import ufora_courses
+from database.crud.deadlines import get_deadlines
 from didier import Didier
+from didier.data.embeds.deadlines import Deadlines
 from didier.utils.discord.flags.school import StudyGuideFlags
 
 
@@ -26,6 +28,15 @@ class School(commands.Cog):
     async def cog_unload(self) -> None:
         """Remove the commands when the cog is unloaded"""
         self.client.tree.remove_command(self._pin_ctx_menu.name, type=self._pin_ctx_menu.type)
+
+    @commands.hybrid_command(name="deadlines", description="Show upcoming deadlines")
+    async def deadlines(self, ctx: commands.Context):
+        """Show upcoming deadlines"""
+        async with self.client.postgres_session as session:
+            deadlines = await get_deadlines(session)
+
+        embed = await Deadlines(deadlines).to_embed()
+        await ctx.reply(embed=embed, mention_author=False, ephemeral=False)
 
     @commands.command(name="Pin", usage="[Message]")
     async def pin(self, ctx: commands.Context, message: Optional[discord.Message] = None):
