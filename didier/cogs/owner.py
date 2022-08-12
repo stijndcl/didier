@@ -5,13 +5,14 @@ from discord import app_commands
 from discord.ext import commands
 
 import settings
-from database.crud import custom_commands, links
+from database.crud import custom_commands, links, ufora_courses
 from database.exceptions.constraints import DuplicateInsertException
 from database.exceptions.not_found import NoResultFoundException
 from didier import Didier
 from didier.utils.discord.flags.owner import EditCustomFlags, SyncOptionFlags
 from didier.views.modals import (
     AddDadJoke,
+    AddDeadline,
     AddLink,
     CreateCustomCommand,
     EditCustomCommand,
@@ -137,6 +138,18 @@ class Owner(commands.Cog):
         modal = AddDadJoke(self.client)
         await interaction.response.send_modal(modal)
 
+    @add_slash.command(name="deadline", description="Add a deadline")
+    async def add_deadline_slash(self, interaction: discord.Interaction, course: str):
+        """Slash command to add a deadline"""
+        async with self.client.postgres_session as session:
+            course_instance = await ufora_courses.get_course_by_name(session, course)
+
+        if course_instance is None:
+            return await interaction.response.send_message(f"No course found matching `{course}`.", ephemeral=True)
+
+        modal = AddDeadline(self.client, course_instance)
+        await interaction.response.send_modal(modal)
+
     @add_slash.command(name="link", description="Add a new link")
     async def add_link_slash(self, interaction: discord.Interaction):
         """Slash command to add new links"""
@@ -166,15 +179,13 @@ class Owner(commands.Cog):
     async def edit_custom_slash(self, interaction: discord.Interaction, command: str):
         """Slash command to edit a custom command"""
         if not await self.client.is_owner(interaction.user):
-            return interaction.response.send_message(
-                "Je hebt geen toestemming om dit commando uit te voeren.", ephemeral=True
-            )
+            return interaction.response.send_message("You don't have permission to run this command.", ephemeral=True)
 
         async with self.client.postgres_session as session:
             _command = await custom_commands.get_command(session, command)
             if _command is None:
                 return await interaction.response.send_message(
-                    f"Geen commando gevonden voor ``{command}``.", ephemeral=True
+                    f"No command found matching `{command}`.", ephemeral=True
                 )
 
             modal = EditCustomCommand(self.client, _command.name, _command.response)

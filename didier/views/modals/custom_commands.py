@@ -71,7 +71,7 @@ class EditCustomCommand(discord.ui.Modal, title="Edit Custom Command"):
         async with self.client.postgres_session as session:
             await edit_command(session, self.original_name, name_field.value, response_field.value)
 
-        await interaction.response.send_message(f"Successfully edited ``{self.original_name}``.", ephemeral=True)
+        await interaction.response.send_message(f"Successfully edited `{self.original_name}`.", ephemeral=True)
 
     @overrides
     async def on_error(self, interaction: discord.Interaction, error: Exception):  # type: ignore

@@ -46,6 +46,7 @@ class Deadlines(EmbedBaseModel):
             # Strike through deadlines that aren't active anymore
             deadlines_grouped[year].append(deadline_str if not passed else f"~~{deadline_str}~~")
 
+        # Send an easter egg when there are no deadlines
         if not has_active_deadlines:
             embed.description = "There are currently no upcoming deadlines."
             embed.set_image(url="https://c.tenor.com/RUzJ3lDGQUsAAAAC/iron-man-you-can-rest-now.gif")
