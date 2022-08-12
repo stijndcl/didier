@@ -72,7 +72,7 @@ class School(commands.Cog):
             ufora_course = await ufora_courses.get_course_by_name(session, course)
 
         if ufora_course is None:
-            return await ctx.reply(f"Found no course matching ``{course}``", ephemeral=True)
+            return await ctx.reply(f"Found no course matching `{course}`", ephemeral=True)
 
         return await ctx.reply(
             f"https://studiekiezer.ugent.be/studiefiche/nl/{ufora_course.code}/{flags.year}",
@@ -80,7 +80,7 @@ class School(commands.Cog):
         )
 
     @study_guide.autocomplete("course")
-    async def study_guide_autocomplete(self, _: discord.Interaction, current: str) -> list[app_commands.Choice[str]]:
+    async def _study_guide_autocomplete(self, _: discord.Interaction, current: str) -> list[app_commands.Choice[str]]:
         """Autocompletion for the 'course'-parameter"""
         return [
             app_commands.Choice(name=course, value=course)

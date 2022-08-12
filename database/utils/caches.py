@@ -4,10 +4,10 @@ from typing import Generic, TypeVar
 from overrides import overrides
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from database.crud import ufora_courses, wordle
+from database.crud import links, ufora_courses, wordle
 from database.mongo_types import MongoDatabase
 
-__all__ = ["CacheManager", "UforaCourseCache"]
+__all__ = ["CacheManager", "LinkCache", "UforaCourseCache"]
 
 T = TypeVar("T")
 
@@ -35,18 +35,27 @@ class DatabaseCache(ABC, Generic[T]):
         self.data.clear()
 
     @abstractmethod
-    async def refresh(self, database_session: T):
-        """Refresh the data stored in this cache"""
-
     async def invalidate(self, database_session: T):
         """Invalidate the data stored in this cache"""
-        await self.refresh(database_session)
 
     def get_autocomplete_suggestions(self, query: str):
         """Filter the cache to find everything that matches the search query"""
         query = query.lower()
         # Return the original (non-transformed) version of the data for pretty display in Discord
         return [self.data[index] for index, value in enumerate(self.data_transformed) if query in value]
+
+
+class LinkCache(DatabaseCache[AsyncSession]):
+    """Cache to store the names of links"""
+
+    @overrides
+    async def invalidate(self, database_session: AsyncSession):
+        self.clear()
+
+        all_links = await links.get_all_links(database_session)
+        self.data = list(map(lambda l: l.name, all_links))
+        self.data.sort()
+        self.data_transformed = list(map(str.lower, self.data))
 
 
 class UforaCourseCache(DatabaseCache[AsyncSession]):
@@ -61,11 +70,10 @@ class UforaCourseCache(DatabaseCache[AsyncSession]):
         super().clear()
 
     @overrides
-    async def refresh(self, database_session: AsyncSession):
+    async def invalidate(self, database_session: AsyncSession):
         self.clear()
 
         courses = await ufora_courses.get_all_courses(database_session)
-
         self.data = list(map(lambda c: c.name, courses))
 
         # Load the aliases
@@ -97,7 +105,7 @@ class UforaCourseCache(DatabaseCache[AsyncSession]):
 class WordleCache(DatabaseCache[MongoDatabase]):
     """Cache to store the current daily Wordle word"""
 
-    async def refresh(self, database_session: MongoDatabase):
+    async def invalidate(self, database_session: MongoDatabase):
         word = await wordle.get_daily_word(database_session)
         if word is not None:
             self.data = [word]
@@ -106,14 +114,17 @@ class WordleCache(DatabaseCache[MongoDatabase]):
 class CacheManager:
     """Class that keeps track of all caches"""
 
+    links: LinkCache
     ufora_courses: UforaCourseCache
     wordle_word: WordleCache
 
     def __init__(self):
+        self.links = LinkCache()
         self.ufora_courses = UforaCourseCache()
         self.wordle_word = WordleCache()
 
     async def initialize_caches(self, postgres_session: AsyncSession, mongo_db: MongoDatabase):
         """Initialize the contents of all caches"""
-        await self.ufora_courses.refresh(postgres_session)
-        await self.wordle_word.refresh(mongo_db)
+        await self.links.invalidate(postgres_session)
+        await self.ufora_courses.invalidate(postgres_session)
+        await self.wordle_word.invalidate(mongo_db)

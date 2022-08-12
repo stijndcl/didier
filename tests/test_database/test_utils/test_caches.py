@@ -7,7 +7,7 @@ from database.utils.caches import UforaCourseCache
 async def test_ufora_course_cache_refresh_empty(postgres: AsyncSession, ufora_course_with_alias: UforaCourse):
     """Test loading the data for the Ufora Course cache when it's empty"""
     cache = UforaCourseCache()
-    await cache.refresh(postgres)
+    await cache.invalidate(postgres)
 
     assert len(cache.data) == 1
     assert cache.data == ["test"]
@@ -20,7 +20,7 @@ async def test_ufora_course_cache_refresh_not_empty(postgres: AsyncSession, ufor
     cache.data = ["Something"]
     cache.data_transformed = ["something"]
 
-    await cache.refresh(postgres)
+    await cache.invalidate(postgres)
 
     assert len(cache.data) == 1
     assert cache.data == ["test"]

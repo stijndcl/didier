@@ -5,12 +5,17 @@ from discord import app_commands
 from discord.ext import commands
 
 import settings
-from database.crud import custom_commands
+from database.crud import custom_commands, links
 from database.exceptions.constraints import DuplicateInsertException
 from database.exceptions.not_found import NoResultFoundException
 from didier import Didier
 from didier.utils.discord.flags.owner import EditCustomFlags, SyncOptionFlags
-from didier.views.modals import AddDadJoke, CreateCustomCommand, EditCustomCommand
+from didier.views.modals import (
+    AddDadJoke,
+    AddLink,
+    CreateCustomCommand,
+    EditCustomCommand,
+)
 
 
 class Owner(commands.Cog):
@@ -80,17 +85,6 @@ class Owner(commands.Cog):
     async def add_msg(self, ctx: commands.Context):
         """Command group for [add X] message commands"""
 
-    @add_msg.command(name="Custom")
-    async def add_custom_msg(self, ctx: commands.Context, name: str, *, response: str):
-        """Add a new custom command"""
-        async with self.client.postgres_session as session:
-            try:
-                await custom_commands.create_command(session, name, response)
-                await self.client.confirm_message(ctx.message)
-            except DuplicateInsertException:
-                await ctx.reply("There is already a command with this name.")
-                await self.client.reject_message(ctx.message)
-
     @add_msg.command(name="Alias")
     async def add_alias_msg(self, ctx: commands.Context, command: str, alias: str):
         """Add a new alias for a custom command"""
@@ -104,6 +98,26 @@ class Owner(commands.Cog):
             except DuplicateInsertException:
                 await ctx.reply("There is already a command with this name.")
                 await self.client.reject_message(ctx.message)
+
+    @add_msg.command(name="Custom")
+    async def add_custom_msg(self, ctx: commands.Context, name: str, *, response: str):
+        """Add a new custom command"""
+        async with self.client.postgres_session as session:
+            try:
+                await custom_commands.create_command(session, name, response)
+                await self.client.confirm_message(ctx.message)
+            except DuplicateInsertException:
+                await ctx.reply("There is already a command with this name.")
+                await self.client.reject_message(ctx.message)
+
+    @add_msg.command(name="Link")
+    async def add_link_msg(self, ctx: commands.Context, name: str, url: str):
+        """Add a new link"""
+        async with self.client.postgres_session as session:
+            await links.add_link(session, name, url)
+            await self.client.database_caches.links.invalidate(session)
+
+        await self.client.confirm_message(ctx.message)
 
     @add_slash.command(name="custom", description="Add a custom command")
     async def add_custom_slash(self, interaction: discord.Interaction):
@@ -123,6 +137,15 @@ class Owner(commands.Cog):
         modal = AddDadJoke(self.client)
         await interaction.response.send_modal(modal)
 
+    @add_slash.command(name="link", description="Add a new link")
+    async def add_link_slash(self, interaction: discord.Interaction):
+        """Slash command to add new links"""
+        if not await self.client.is_owner(interaction.user):
+            return interaction.response.send_message("You don't have permission to run this command.", ephemeral=True)
+
+        modal = AddLink(self.client)
+        await interaction.response.send_modal(modal)
+
     @commands.group(name="Edit", case_insensitive=True, invoke_without_command=False)
     async def edit_msg(self, ctx: commands.Context):
         """Command group for [edit X] commands"""
@@ -135,7 +158,7 @@ class Owner(commands.Cog):
                 await custom_commands.edit_command(session, command, flags.name, flags.response)
                 return await self.client.confirm_message(ctx.message)
             except NoResultFoundException:
-                await ctx.reply(f"No command found matching ``{command}``.")
+                await ctx.reply(f"No command found matching `{command}`.")
                 return await self.client.reject_message(ctx.message)
 
     @edit_slash.command(name="custom", description="Edit a custom command")

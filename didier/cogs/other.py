@@ -1,6 +1,11 @@
+from typing import Optional
+
+import discord
 from discord import app_commands
 from discord.ext import commands
 
+from database.crud.links import get_link_by_name
+from database.schemas.relational import Link
 from didier import Didier
 from didier.data.apis import urban_dictionary
 from didier.data.embeds.google import GoogleSearch
@@ -33,6 +38,38 @@ class Other(commands.Cog):
             results = await google.google_search(self.client.http_session, query)
             embed = GoogleSearch(results).to_embed()
             await ctx.reply(embed=embed, mention_author=False)
+
+    async def _get_link(self, name: str) -> Optional[Link]:
+        async with self.client.postgres_session as session:
+            return await get_link_by_name(session, name.lower())
+
+    @commands.command(name="Link", aliases=["Links"], usage="[Name]")
+    async def link_msg(self, ctx: commands.Context, name: str):
+        """Message command to get the link to something"""
+        link = await self._get_link(name)
+        if link is None:
+            return await ctx.reply(f"Found no links matching `{name}`.", mention_author=False)
+
+        target_message = await self.client.get_reply_target(ctx)
+        await target_message.reply(link.url, mention_author=False)
+
+    @app_commands.command(name="link", description="Get the link to something")
+    @app_commands.describe(name="The name of the link")
+    async def link_slash(self, interaction: discord.Interaction, name: str):
+        """Slash command to get the link to something"""
+        link = await self._get_link(name)
+        if link is None:
+            return await interaction.response.send_message(f"Found no links matching `{name}`.", ephemeral=True)
+
+        return await interaction.response.send_message(link.url)
+
+    @link_slash.autocomplete("name")
+    async def _link_autocomplete(self, _: discord.Interaction, current: str) -> list[app_commands.Choice[str]]:
+        """Autocompletion for the 'name'-parameter"""
+        return [
+            app_commands.Choice(name=name, value=name.lower())
+            for name in self.client.database_caches.links.get_autocomplete_suggestions(current)
+        ]
 
 
 async def setup(client: Didier):
