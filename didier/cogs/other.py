@@ -64,12 +64,9 @@ class Other(commands.Cog):
         return await interaction.response.send_message(link.url)
 
     @link_slash.autocomplete("name")
-    async def _link_autocomplete(self, _: discord.Interaction, current: str) -> list[app_commands.Choice[str]]:
+    async def _link_name_autocomplete(self, _: discord.Interaction, current: str) -> list[app_commands.Choice[str]]:
         """Autocompletion for the 'name'-parameter"""
-        return [
-            app_commands.Choice(name=name, value=name.lower())
-            for name in self.client.database_caches.links.get_autocomplete_suggestions(current)
-        ]
+        return self.client.database_caches.links.get_autocomplete_suggestions(current)
 
 
 async def setup(client: Didier):

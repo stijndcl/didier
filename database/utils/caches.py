@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Generic, TypeVar
 
+from discord import app_commands
 from overrides import overrides
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -38,11 +39,13 @@ class DatabaseCache(ABC, Generic[T]):
     async def invalidate(self, database_session: T):
         """Invalidate the data stored in this cache"""
 
-    def get_autocomplete_suggestions(self, query: str):
+    def get_autocomplete_suggestions(self, query: str) -> list[app_commands.Choice[str]]:
         """Filter the cache to find everything that matches the search query"""
         query = query.lower()
         # Return the original (non-transformed) version of the data for pretty display in Discord
-        return [self.data[index] for index, value in enumerate(self.data_transformed) if query in value]
+        suggestions = [self.data[index] for index, value in enumerate(self.data_transformed) if query in value]
+
+        return [app_commands.Choice(name=suggestion, value=suggestion.lower()) for suggestion in suggestions]
 
 
 class LinkCache(DatabaseCache[AsyncSession]):
@@ -86,7 +89,7 @@ class UforaCourseCache(DatabaseCache[AsyncSession]):
         self.data_transformed = list(map(str.lower, self.data))
 
     @overrides
-    def get_autocomplete_suggestions(self, query: str):
+    def get_autocomplete_suggestions(self, query: str) -> list[app_commands.Choice[str]]:
         query = query.lower()
         results = set()
 
@@ -99,7 +102,8 @@ class UforaCourseCache(DatabaseCache[AsyncSession]):
             if query in alias:
                 results.add(course)
 
-        return sorted(list(results))
+        suggestions = sorted(list(results))
+        return [app_commands.Choice(name=suggestion, value=suggestion.lower()) for suggestion in suggestions]
 
 
 class WordleCache(DatabaseCache[MongoDatabase]):

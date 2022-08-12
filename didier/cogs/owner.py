@@ -139,6 +139,7 @@ class Owner(commands.Cog):
         await interaction.response.send_modal(modal)
 
     @add_slash.command(name="deadline", description="Add a deadline")
+    @app_commands.describe(course="The name of the course to add a deadline for (aliases work too)")
     async def add_deadline_slash(self, interaction: discord.Interaction, course: str):
         """Slash command to add a deadline"""
         async with self.client.postgres_session as session:
@@ -149,6 +150,13 @@ class Owner(commands.Cog):
 
         modal = AddDeadline(self.client, course_instance)
         await interaction.response.send_modal(modal)
+
+    @add_deadline_slash.autocomplete("course")
+    async def _add_deadline_course_autocomplete(
+        self, _: discord.Interaction, current: str
+    ) -> list[app_commands.Choice[str]]:
+        """Autocompletion for the 'course'-parameter"""
+        return self.client.database_caches.ufora_courses.get_autocomplete_suggestions(current)
 
     @add_slash.command(name="link", description="Add a new link")
     async def add_link_slash(self, interaction: discord.Interaction):

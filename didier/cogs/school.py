@@ -35,7 +35,7 @@ class School(commands.Cog):
         async with self.client.postgres_session as session:
             deadlines = await get_deadlines(session)
 
-        embed = await Deadlines(deadlines).to_embed()
+        embed = Deadlines(deadlines).to_embed()
         await ctx.reply(embed=embed, mention_author=False, ephemeral=False)
 
     @commands.command(name="Pin", usage="[Message]")
@@ -76,7 +76,7 @@ class School(commands.Cog):
     @commands.hybrid_command(
         name="fiche", description="Sends the link to the study guide for [Course]", aliases=["guide", "studiefiche"]
     )
-    @app_commands.describe(course="vak")
+    @app_commands.describe(course="The name of the course to fetch the study guide for (aliases work too)")
     async def study_guide(self, ctx: commands.Context, course: str, *, flags: StudyGuideFlags):
         """Create links to study guides"""
         async with self.client.postgres_session as session:
@@ -91,12 +91,11 @@ class School(commands.Cog):
         )
 
     @study_guide.autocomplete("course")
-    async def _study_guide_autocomplete(self, _: discord.Interaction, current: str) -> list[app_commands.Choice[str]]:
+    async def _study_guide_course_autocomplete(
+        self, _: discord.Interaction, current: str
+    ) -> list[app_commands.Choice[str]]:
         """Autocompletion for the 'course'-parameter"""
-        return [
-            app_commands.Choice(name=course, value=course)
-            for course in self.client.database_caches.ufora_courses.get_autocomplete_suggestions(current)
-        ]
+        return self.client.database_caches.ufora_courses.get_autocomplete_suggestions(current)
 
 
 async def setup(client: Didier):

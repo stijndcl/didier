@@ -13,7 +13,7 @@ __all__ = ["add_deadline", "get_deadlines"]
 
 async def add_deadline(session: AsyncSession, course_id: int, name: str, date_str: str):
     """Add a new deadline"""
-    date_dt = parse(date_str).replace(tzinfo=ZoneInfo("Europe/Brussels"))
+    date_dt = parse(date_str, dayfirst=True).replace(tzinfo=ZoneInfo("Europe/Brussels"))
 
     # If we only have a day, assume it's the end of the day
     if date_dt.hour == date_dt.minute == date_dt.second == 0:

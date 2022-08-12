@@ -22,7 +22,7 @@ class Deadlines(EmbedBaseModel):
         self.deadlines.sort(key=lambda deadline: deadline.deadline)
 
     @overrides
-    async def to_embed(self, **kwargs: dict) -> discord.Embed:
+    def to_embed(self, **kwargs: dict) -> discord.Embed:
         embed = discord.Embed(colour=discord.Colour.dark_gold())
         embed.set_author(name="Upcoming Deadlines")
         now = tz_aware_now()
@@ -30,33 +30,33 @@ class Deadlines(EmbedBaseModel):
         has_active_deadlines = False
         deadlines_grouped: dict[int, list[str]] = {}
 
-        deadline: Deadline
-        for year, deadline in itertools.groupby(self.deadlines, key=lambda _deadline: _deadline.course.year):
+        for year, deadlines in itertools.groupby(self.deadlines, key=lambda _deadline: _deadline.course.year):
             if year not in deadlines_grouped:
                 deadlines_grouped[year] = []
 
-            passed = deadline.deadline <= now
-            if passed:
-                has_active_deadlines = True
+            for deadline in deadlines:
+                passed = deadline.deadline <= now
+                if not passed:
+                    has_active_deadlines = True
 
-            deadline_str = (
-                f"{deadline.course.name} - {deadline.name}: <t:{round(datetime.timestamp(deadline.deadline))}:R>"
-            )
+                deadline_str = (
+                    f"{deadline.course.name} - {deadline.name}: <t:{round(datetime.timestamp(deadline.deadline))}:R>"
+                )
 
-            # Strike through deadlines that aren't active anymore
-            deadlines_grouped[year].append(deadline_str if not passed else f"~~{deadline_str}~~")
+                # Strike through deadlines that aren't active anymore
+                deadlines_grouped[year].append(deadline_str if not passed else f"~~{deadline_str}~~")
 
-        # Send an easter egg when there are no deadlines
+        # Send an Easter egg when there are no deadlines
         if not has_active_deadlines:
             embed.description = "There are currently no upcoming deadlines."
             embed.set_image(url="https://c.tenor.com/RUzJ3lDGQUsAAAAC/iron-man-you-can-rest-now.gif")
             return embed
 
-        for i in range(5):
+        for i in range(1, 6):
             if i not in deadlines_grouped:
                 continue
 
-            name = get_edu_year_name(i)
+            name = get_edu_year_name(i - 1)
             description = "\n".join(deadlines_grouped[i])
 
             embed.add_field(name=name, value=description, inline=False)

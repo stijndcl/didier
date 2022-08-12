@@ -32,6 +32,9 @@ class AddDeadline(discord.ui.Modal, title="Add Deadline"):
 
     @overrides
     async def on_submit(self, interaction: Interaction):
+        if not self.name.value or not self.deadline.value:
+            return await interaction.response.send_message("Required fields cannot be empty.", ephemeral=True)
+
         async with self.client.postgres_session as session:
             await add_deadline(session, self.ufora_course.course_id, self.name.value, self.deadline.value)
 
