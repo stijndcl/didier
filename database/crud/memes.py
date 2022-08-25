@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from database.schemas.relational import MemeTemplate
 
-__all__ = ["add_meme", "get_all_memes"]
+__all__ = ["add_meme", "get_all_memes", "get_meme_by_name"]
 
 
 async def add_meme(session: AsyncSession, name: str, template_id: int, field_count: int) -> Optional[MemeTemplate]:
@@ -20,6 +20,12 @@ async def add_meme(session: AsyncSession, name: str, template_id: int, field_cou
         return None
 
 
+async def get_all_memes(session: AsyncSession) -> list[MemeTemplate]:
+    """Get a list of all memes"""
+    statement = select(MemeTemplate)
+    return (await session.execute(statement)).scalars().all()
+
+
 async def get_meme_by_name(session: AsyncSession, query: str) -> Optional[MemeTemplate]:
     """Try to find a meme by its name
 
@@ -27,9 +33,3 @@ async def get_meme_by_name(session: AsyncSession, query: str) -> Optional[MemeTe
     """
     statement = select(MemeTemplate).where(MemeTemplate.name.ilike(f"%{query.lower()}%"))
     return (await session.execute(statement)).scalar()
-
-
-async def get_all_memes(session: AsyncSession) -> list[MemeTemplate]:
-    """Get a list of all memes"""
-    statement = select(MemeTemplate)
-    return (await session.execute(statement)).scalars().all()

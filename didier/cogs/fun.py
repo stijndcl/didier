@@ -3,7 +3,9 @@ from discord import app_commands
 from discord.ext import commands
 
 from database.crud.dad_jokes import get_random_dad_joke
+from database.crud.memes import get_meme_by_name
 from didier import Didier
+from didier.views.modals import GenerateMeme
 
 
 class Fun(commands.Cog):
@@ -11,7 +13,8 @@ class Fun(commands.Cog):
 
     client: Didier
 
-    memegen_slash = app_commands.Group(name="meme", description="Commands to generate memes")
+    # Slash groups
+    memes_slash = app_commands.Group(name="meme", description="Commands to generate memes", guild_only=False)
 
     def __init__(self, client: Didier):
         self.client = client
@@ -31,9 +34,16 @@ class Fun(commands.Cog):
     async def memegen_ctx(self, ctx: commands.Context):
         """Command group for meme-related commands"""
 
-    @memegen_slash.command(name="generate", description="Generate a meme")
-    async def memegen_slash(self, ctx: commands.Context, meme: str):
+    @memes_slash.command(name="generate", description="Generate a meme")
+    async def memegen_slash(self, interaction: discord.Interaction, meme: str):
         """Slash command to generate a meme"""
+        async with self.client.postgres_session as session:
+            result = await get_meme_by_name(session, meme)
+            if result is None:
+                return await interaction.response.send_message(f"Found no meme matching `{meme}`.", ephemeral=True)
+
+        modal = GenerateMeme(self.client, result)
+        await interaction.response.send_modal(modal)
 
     @memegen_slash.autocomplete("meme")
     async def _memegen_slash_autocomplete_meme(
