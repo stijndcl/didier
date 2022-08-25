@@ -5,7 +5,7 @@ from discord import app_commands
 from overrides import overrides
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from database.crud import links, ufora_courses, wordle
+from database.crud import links, memes, ufora_courses, wordle
 from database.mongo_types import MongoDatabase
 
 __all__ = ["CacheManager", "LinkCache", "UforaCourseCache"]
@@ -57,6 +57,19 @@ class LinkCache(DatabaseCache[AsyncSession]):
 
         all_links = await links.get_all_links(database_session)
         self.data = list(map(lambda l: l.name, all_links))
+        self.data.sort()
+        self.data_transformed = list(map(str.lower, self.data))
+
+
+class MemeCache(DatabaseCache[AsyncSession]):
+    """Cache to store the names of meme templates"""
+
+    @overrides
+    async def invalidate(self, database_session: AsyncSession):
+        self.clear()
+
+        all_memes = await memes.get_all_memes(database_session)
+        self.data = list(map(lambda m: m.name, all_memes))
         self.data.sort()
         self.data_transformed = list(map(str.lower, self.data))
 
@@ -119,16 +132,19 @@ class CacheManager:
     """Class that keeps track of all caches"""
 
     links: LinkCache
+    memes: MemeCache
     ufora_courses: UforaCourseCache
     wordle_word: WordleCache
 
     def __init__(self):
         self.links = LinkCache()
+        self.memes = MemeCache()
         self.ufora_courses = UforaCourseCache()
         self.wordle_word = WordleCache()
 
     async def initialize_caches(self, postgres_session: AsyncSession, mongo_db: MongoDatabase):
         """Initialize the contents of all caches"""
         await self.links.invalidate(postgres_session)
+        await self.memes.invalidate(postgres_session)
         await self.ufora_courses.invalidate(postgres_session)
         await self.wordle_word.invalidate(mongo_db)

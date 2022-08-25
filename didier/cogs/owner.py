@@ -5,7 +5,7 @@ from discord import app_commands
 from discord.ext import commands
 
 import settings
-from database.crud import custom_commands, links, ufora_courses
+from database.crud import custom_commands, links, memes, ufora_courses
 from database.exceptions.constraints import DuplicateInsertException
 from database.exceptions.not_found import NoResultFoundException
 from didier import Didier
@@ -166,6 +166,19 @@ class Owner(commands.Cog):
 
         modal = AddLink(self.client)
         await interaction.response.send_modal(modal)
+
+    @add_slash.command(name="meme", description="Add a new meme")
+    async def add_meme_slash(self, interaction: discord.Interaction, name: str, imgflip_id: int, field_count: int):
+        """Slash command to add new memes"""
+        await interaction.response.defer(ephemeral=True)
+
+        async with self.client.postgres_session as session:
+            meme = await memes.add_meme(session, name, imgflip_id, field_count)
+            if meme is None:
+                return await interaction.followup.send("A meme with this name (or id) already exists.")
+
+        await interaction.followup.send(f"Added meme `{meme.meme_id}`.")
+        await self.client.database_caches.memes.invalidate()
 
     @commands.group(name="Edit", case_insensitive=True, invoke_without_command=False)
     async def edit_msg(self, ctx: commands.Context):
