@@ -4,6 +4,7 @@ import os
 import discord
 import motor.motor_asyncio
 from aiohttp import ClientSession
+from discord.app_commands import AppCommandError
 from discord.ext import commands
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -12,6 +13,7 @@ from database.crud import custom_commands
 from database.engine import DBSession, mongo_client
 from database.utils.caches import CacheManager
 from didier.data.embeds.error_embed import create_error_embed
+from didier.exceptions import HTTPException, NoMatch
 from didier.utils.discord.prefix import get_prefix
 
 __all__ = ["Didier"]
@@ -45,6 +47,8 @@ class Didier(commands.Bot):
         super().__init__(
             command_prefix=get_prefix, case_insensitive=True, intents=intents, activity=activity, status=status
         )
+
+        self.tree.on_error = self.on_app_command_error
 
     @property
     def postgres_session(self) -> AsyncSession:
@@ -197,6 +201,18 @@ class Didier(commands.Bot):
         """Event triggered when a new thread is created"""
         await thread.join()
 
+    async def on_app_command_error(self, interaction: discord.Interaction, exception: AppCommandError):
+        """Event triggered when an application command errors"""
+        # If commands have their own error handler, let it handle the error instead
+        if hasattr(interaction.command, "on_error"):
+            return
+
+        if isinstance(exception, (NoMatch, discord.app_commands.CommandInvokeError)):
+            if interaction.response.is_done():
+                return await interaction.response.send_message(str(exception.original), ephemeral=True)
+            else:
+                return await interaction.followup.send(str(exception.original), ephemeral=True)
+
     async def on_command_error(self, ctx: commands.Context, exception: commands.CommandError, /):
         """Event triggered when a regular command errors"""
         # If working locally, print everything to your console
@@ -218,6 +234,16 @@ class Didier(commands.Bot):
             ),
         ):
             return
+
+        # Responses to things that go wrong during processing of commands
+        if isinstance(exception, commands.CommandInvokeError) and isinstance(
+            exception.original,
+            (
+                NoMatch,
+                HTTPException,
+            ),
+        ):
+            return await ctx.reply(str(exception.original), mention_author=False)
 
         # Print everything that we care about to the logs/stderr
         await super().on_command_error(ctx, exception)
