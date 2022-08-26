@@ -1,10 +1,9 @@
-from typing import Optional
-
 from aiohttp import ClientSession
 
 import settings
 from database.schemas.relational import MemeTemplate
 from didier.exceptions.missing_env import MissingEnvironmentVariable
+from didier.utils.http.requests import ensure_post
 
 __all__ = ["generate_meme"]
 
@@ -20,7 +19,7 @@ def generate_boxes(meme: MemeTemplate, fields: list[str]) -> list[str]:
     return fields
 
 
-async def generate_meme(http_session: ClientSession, meme: MemeTemplate, fields: list[str]) -> Optional[str]:
+async def generate_meme(http_session: ClientSession, meme: MemeTemplate, fields: list[str]) -> str:
     """Make a request to Imgflip to generate a meme"""
     name, password = settings.IMGFLIP_NAME, settings.IMGFLIP_PASSWORD
 
@@ -36,9 +35,5 @@ async def generate_meme(http_session: ClientSession, meme: MemeTemplate, fields:
     for i, box in enumerate(boxes):
         payload[f"boxes[{i}][text]"] = box
 
-    async with http_session.post("https://api.imgflip.com/caption_image", data=payload) as response:
-        if response.status != 200:
-            return None
-
-        data = await response.json()
-        return data["data"]["url"]
+    async with ensure_post(http_session, "https://api.imgflip.com/caption_image", payload=payload) as response:
+        return response["data"]["url"]

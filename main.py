@@ -19,7 +19,7 @@ def setup_logging():
     max_log_size = 32 * 1024 * 1024
 
     # Configure Didier handler
-    didier_log = logging.getLogger("didier")
+    didier_log = logging.getLogger(__name__)
 
     didier_handler = RotatingFileHandler(settings.LOGFILE, mode="a", maxBytes=max_log_size, backupCount=5)
     didier_handler.setFormatter(logging.Formatter("[%(asctime)s] [%(levelname)s]: %(message)s"))
