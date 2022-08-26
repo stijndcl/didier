@@ -24,6 +24,8 @@ __all__ = [
     "UFORA_ANNOUNCEMENTS_CHANNEL",
     "UFORA_RSS_TOKEN",
     "URBAN_DICTIONARY_TOKEN",
+    "IMGFLIP_NAME",
+    "IMGFLIP_PASSWORD",
 ]
 
 
@@ -64,3 +66,5 @@ UFORA_ANNOUNCEMENTS_CHANNEL: Optional[int] = env.int("UFORA_ANNOUNCEMENTS_CHANNE
 """API Keys"""
 UFORA_RSS_TOKEN: Optional[str] = env.str("UFORA_RSS_TOKEN", None)
 URBAN_DICTIONARY_TOKEN: Optional[str] = env.str("URBAN_DICTIONARY_TOKEN", None)
+IMGFLIP_NAME: Optional[str] = env.str("IMGFLIP_NAME", None)
+IMGFLIP_PASSWORD: Optional[str] = env.str("IMGFLIP_PASSWORD", None)

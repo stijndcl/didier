@@ -30,6 +30,7 @@ __all__ = [
     "DadJoke",
     "Deadline",
     "Link",
+    "MemeTemplate",
     "NightlyData",
     "Task",
     "UforaAnnouncement",
@@ -132,6 +133,17 @@ class Link(Base):
     link_id: int = Column(Integer, primary_key=True)
     name: str = Column(Text, nullable=False, unique=True)
     url: str = Column(Text, nullable=False)
+
+
+class MemeTemplate(Base):
+    """A meme template for the Imgflip API"""
+
+    __tablename__ = "meme"
+
+    meme_id: int = Column(Integer, primary_key=True)
+    name: str = Column(Text, nullable=False, unique=True)
+    template_id: int = Column(Integer, nullable=False, unique=True)
+    field_count: int = Column(Integer, nullable=False)
 
 
 class NightlyData(Base):

@@ -46,12 +46,12 @@ class Currency(commands.Cog):
             bank = await crud.get_bank(session, ctx.author.id)
 
         embed = discord.Embed(colour=discord.Colour.blue())
-        embed.set_author(name=f"Bank van {ctx.author.display_name}")
+        embed.set_author(name=f"{ctx.author.display_name}'s Bank")
         embed.set_thumbnail(url=ctx.author.avatar.url)
 
         embed.add_field(name="Interest level", value=bank.interest_level)
-        embed.add_field(name="Capaciteit level", value=bank.capacity_level)
-        embed.add_field(name="Momenteel geïnvesteerd", value=bank.invested, inline=False)
+        embed.add_field(name="Capacity level", value=bank.capacity_level)
+        embed.add_field(name="Currently invested", value=bank.invested, inline=False)
 
         await ctx.reply(embed=embed, mention_author=False)
 
@@ -68,11 +68,11 @@ class Currency(commands.Cog):
             name=f"Interest ({bank.interest_level})", value=str(interest_upgrade_price(bank.interest_level))
         )
         embed.add_field(
-            name=f"Capaciteit ({bank.capacity_level})", value=str(capacity_upgrade_price(bank.capacity_level))
+            name=f"Capacity ({bank.capacity_level})", value=str(capacity_upgrade_price(bank.capacity_level))
         )
         embed.add_field(name=f"Rob ({bank.rob_level})", value=str(rob_upgrade_price(bank.rob_level)))
 
-        embed.set_footer(text="Didier Bank Upgrade [Categorie]")
+        embed.set_footer(text="Didier Bank Upgrade [Category]")
 
         await ctx.reply(embed=embed, mention_author=False)
 
@@ -84,7 +84,7 @@ class Currency(commands.Cog):
                 await crud.upgrade_capacity(session, ctx.author.id)
                 await ctx.message.add_reaction("⏫")
             except NotEnoughDinks:
-                await ctx.reply("Je hebt niet genoeg Didier Dinks om dit te doen.", mention_author=False)
+                await ctx.reply("You don't have enough Didier Dinks to do this.", mention_author=False)
                 await self.client.reject_message(ctx.message)
 
     @bank_upgrades.command(name="Interest", aliases=["I"])
@@ -95,7 +95,7 @@ class Currency(commands.Cog):
                 await crud.upgrade_interest(session, ctx.author.id)
                 await ctx.message.add_reaction("⏫")
             except NotEnoughDinks:
-                await ctx.reply("Je hebt niet genoeg Didier Dinks om dit te doen.", mention_author=False)
+                await ctx.reply("You don't have enough Didier Dinks to do this.", mention_author=False)
                 await self.client.reject_message(ctx.message)
 
     @bank_upgrades.command(name="Rob", aliases=["R"])
@@ -106,7 +106,7 @@ class Currency(commands.Cog):
                 await crud.upgrade_rob(session, ctx.author.id)
                 await ctx.message.add_reaction("⏫")
             except NotEnoughDinks:
-                await ctx.reply("Je hebt niet genoeg Didier Dinks om dit te doen.", mention_author=False)
+                await ctx.reply("You don't have enough Didier Dinks to do this.", mention_author=False)
                 await self.client.reject_message(ctx.message)
 
     @commands.hybrid_command(name="dinks")
@@ -115,7 +115,7 @@ class Currency(commands.Cog):
         async with self.client.postgres_session as session:
             bank = await crud.get_bank(session, ctx.author.id)
             plural = pluralize("Didier Dink", bank.dinks)
-            await ctx.reply(f"**{ctx.author.display_name}** heeft **{bank.dinks}** {plural}.", mention_author=False)
+            await ctx.reply(f"**{ctx.author.display_name}** has **{bank.dinks}** {plural}.", mention_author=False)
 
     @commands.command(name="Invest", aliases=["Deposit", "Dep"])
     async def invest(self, ctx: commands.Context, amount: abbreviated_number):  # type: ignore
@@ -127,10 +127,10 @@ class Currency(commands.Cog):
             plural = pluralize("Didier Dink", invested)
 
             if invested == 0:
-                await ctx.reply("Je hebt geen Didier Dinks om te investeren.", mention_author=False)
+                await ctx.reply("You don't have any Didier Dinks to invest.", mention_author=False)
             else:
                 await ctx.reply(
-                    f"**{ctx.author.display_name}** heeft **{invested}** {plural} geïnvesteerd.", mention_author=False
+                    f"**{ctx.author.display_name}** has invested **{invested}** {plural}.", mention_author=False
                 )
 
     @commands.hybrid_command(name="nightly")
@@ -139,9 +139,11 @@ class Currency(commands.Cog):
         async with self.client.postgres_session as session:
             try:
                 await crud.claim_nightly(session, ctx.author.id)
-                await ctx.reply(f"Je hebt je dagelijkse **{crud.NIGHTLY_AMOUNT}** Didier Dinks geclaimd.")
+                await ctx.reply(f"You've claimed your daily **{crud.NIGHTLY_AMOUNT}** Didier Dinks.")
             except DoubleNightly:
-                await ctx.reply("Je hebt je nightly al geclaimd vandaag.", mention_author=False, ephemeral=True)
+                await ctx.reply(
+                    "You've already claimed your Didier Nightly today.", mention_author=False, ephemeral=True
+                )
 
 
 async def setup(client: Didier):
