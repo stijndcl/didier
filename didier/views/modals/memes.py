@@ -38,10 +38,6 @@ class GenerateMeme(discord.ui.Modal, title="Generate Meme"):
         fields = [item.value for item in self.children if isinstance(item, discord.ui.TextInput)]
 
         meme_url = await generate_meme(self.client.http_session, self.meme, fields)
-
-        if meme_url is None:
-            return await interaction.followup.send("Something went wrong.")
-
         await interaction.followup.send(meme_url)
 
     @overrides

@@ -64,7 +64,20 @@ class Fun(commands.Cog):
         modal = GenerateMeme(self.client, result)
         await interaction.response.send_modal(modal)
 
+    @memes_slash.command(
+        name="preview", description="Generate a preview for a meme, to see how the fields are structured"
+    )
+    async def memegen_preview_slash(self, interaction: discord.Interaction, meme: str):
+        """Slash command to generate a meme preview"""
+        await interaction.response.defer()
+
+        fields = [f"Field #{i + 1}" for i in range(20)]
+        meme_url = await self._do_generate_meme(meme, fields)
+
+        await interaction.followup.send(meme_url)
+
     @memegen_slash.autocomplete("meme")
+    @memegen_preview_slash.autocomplete("meme")
     async def _memegen_slash_autocomplete_meme(
         self, _: discord.Interaction, current: str
     ) -> list[app_commands.Choice[str]]:
