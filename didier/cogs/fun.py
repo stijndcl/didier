@@ -59,7 +59,7 @@ class Fun(commands.Cog):
     async def memegen_slash(self, interaction: discord.Interaction, meme: str):
         """Slash command to generate a meme"""
         async with self.client.postgres_session as session:
-            result = await expect(get_meme_by_name(session, meme), entity_type="meme", argument=meme)
+            result = expect(await get_meme_by_name(session, meme), entity_type="meme", argument=meme)
 
         modal = GenerateMeme(self.client, result)
         await interaction.response.send_modal(modal)
