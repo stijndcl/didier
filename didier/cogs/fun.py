@@ -74,7 +74,7 @@ class Fun(commands.Cog):
         fields = [f"Field #{i + 1}" for i in range(20)]
         meme_url = await self._do_generate_meme(meme, fields)
 
-        await interaction.followup.send(meme_url)
+        await interaction.followup.send(meme_url, ephemeral=True)
 
     @memegen_slash.autocomplete("meme")
     @memegen_preview_slash.autocomplete("meme")
