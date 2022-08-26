@@ -177,8 +177,8 @@ class Owner(commands.Cog):
             if meme is None:
                 return await interaction.followup.send("A meme with this name (or id) already exists.")
 
-        await interaction.followup.send(f"Added meme `{meme.meme_id}`.")
-        await self.client.database_caches.memes.invalidate()
+            await interaction.followup.send(f"Added meme `{meme.meme_id}`.")
+            await self.client.database_caches.memes.invalidate(session)
 
     @commands.group(name="Edit", case_insensitive=True, invoke_without_command=False)
     async def edit_msg(self, ctx: commands.Context):

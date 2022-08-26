@@ -34,7 +34,7 @@ class Fun(commands.Cog):
             return await ctx.reply(joke.joke, mention_author=False)
 
     @commands.group(name="Memegen", aliases=["Meme", "Memes"], invoke_without_command=True, case_insensitive=True)
-    async def memegen_ctx(self, ctx: commands.Context, meme_name: str, *, fields: str):
+    async def memegen_msg(self, ctx: commands.Context, meme_name: str, *, fields: str):
         """Command group for meme-related commands"""
         async with ctx.typing():
             async with self.client.postgres_session as session:
