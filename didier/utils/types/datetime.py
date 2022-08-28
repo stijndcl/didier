@@ -25,7 +25,7 @@ def forward_to_next_weekday(day_dt: DateType, target_weekday: int, *, allow_toda
         raise ValueError
 
     # Skip at least one day
-    if not allow_today:
+    if not allow_today and day_dt.weekday() == target_weekday:
         day_dt += datetime.timedelta(days=1)
 
     while day_dt.weekday() != target_weekday:
@@ -76,7 +76,7 @@ def parse_dm_string(argument: str) -> datetime.date:
         return datetime.date(day=day, month=month, year=today.year)
 
     # Month Day
-    match = re.search(r"\d+", spl[0])
+    match = re.search(r"\d+", spl[1])
     if match is not None:
         day = int(match.group())
         month = str_to_month(spl[0])
