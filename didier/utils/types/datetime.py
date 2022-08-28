@@ -69,16 +69,16 @@ def parse_dm_string(argument: str) -> datetime.date:
         raise ValueError
 
     # Day Month
-    match = re.search(r"\d+", spl[0]).group()
+    match = re.search(r"\d+", spl[0])
     if match is not None:
-        day = int(match)
+        day = int(match.group())
         month = str_to_month(spl[1])
         return datetime.date(day=day, month=month, year=today.year)
 
     # Month Day
-    match = re.search(r"\d+", spl[0]).group()
+    match = re.search(r"\d+", spl[0])
     if match is not None:
-        day = int(match)
+        day = int(match.group())
         month = str_to_month(spl[0])
         return datetime.date(day=day, month=month, year=today.year)
 

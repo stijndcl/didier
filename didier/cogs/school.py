@@ -44,6 +44,9 @@ class School(commands.Cog):
 
         Menus are Dutch, as a lot of dishes have very weird translations
         """
+        if day_dt is None:
+            day_dt = date.today()
+
         async with ctx.typing():
             try:
                 menu = await fetch_menu(self.client.http_session, day_dt)

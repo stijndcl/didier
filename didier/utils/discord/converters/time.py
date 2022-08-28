@@ -5,7 +5,7 @@ from typing import Optional, Union
 
 import discord
 from discord import app_commands
-from discord.ext.commands import ArgumentParsingError
+from discord.ext import commands
 from overrides import overrides
 
 from didier.utils.discord.autocompletion.time import autocomplete_day
@@ -50,7 +50,7 @@ def date_converter(argument: Optional[str]) -> date:
         return parse_dm_string(argument)
 
     # Unparseable
-    raise ArgumentParsingError(f"Unable to interpret `{original_argument}` as a date.")
+    raise commands.ArgumentParsingError(f"Unable to interpret `{original_argument}` as a date.")
 
 
 class DateTransformer(app_commands.Transformer):
