@@ -33,14 +33,19 @@ class School(commands.Cog):
         await ctx.reply(embed=embed, mention_author=False, ephemeral=False)
 
     @commands.hybrid_command(
-        name="menu", description="Show the menu in the Ghent University restaurants", aliases=["Eten", "Food"]
+        name="menu",
+        description="Show the menu in the Ghent University restaurants.",
+        aliases=["Eten", "Food"],
     )
     async def menu(self, ctx: commands.Context, day: Optional[str] = None):
-        """Get the menu for a given day in the restaurants"""
+        """Show the menu in the Ghent University restaurants.
+
+        Menus are Dutch, as a lot of dishes have very weird translations
+        """
         # TODO time converter (transformer) for [DAY]
         # TODO autocompletion for [DAY]
         async with ctx.typing():
-            day_dt = datetime.now()
+            day_dt = datetime(year=2022, month=8, day=29)
 
             try:
                 menu = await fetch_menu(self.client.http_session, day_dt)
