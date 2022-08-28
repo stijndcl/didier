@@ -38,6 +38,8 @@ docker compose -f docker-compose.test.yml up -d
 
 ### Commands
 
+_All of these are Python tools. Depending on your OS and configuration, you may have to prefix them with `python3 -m`._
+
 ```shell
 # Starting Didier
 python3 main.py
