@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import date
 from enum import Enum
 from typing import Optional, cast
 
@@ -105,7 +105,7 @@ class Menu(EmbedPydantic):
 
     @overrides
     def to_embed(self, **kwargs) -> discord.Embed:
-        day_dt: datetime = cast(datetime, kwargs.get("day_dt"))
+        day_dt: date = cast(date, kwargs.get("day_dt"))
         weekday = int_to_weekday(day_dt.weekday())
         formatted_date = f"{leading('0', str(day_dt.day))}/{leading('0', str(day_dt.month))}/{day_dt.year}"
 
@@ -119,7 +119,7 @@ class Menu(EmbedPydantic):
         return embed
 
 
-def no_menu_found(day_dt: datetime) -> discord.Embed:
+def no_menu_found(day_dt: date) -> discord.Embed:
     """Return a different embed if no menu could be found"""
     embed = discord.Embed(title="Menu", colour=discord.Colour.red())
     embed.description = f"Unable to retrieve menu for {day_dt.strftime('%d/%m/%Y')}."
