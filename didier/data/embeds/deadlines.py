@@ -23,8 +23,7 @@ class Deadlines(EmbedBaseModel):
 
     @overrides
     def to_embed(self, **kwargs: dict) -> discord.Embed:
-        embed = discord.Embed(colour=discord.Colour.dark_gold())
-        embed.set_author(name="Upcoming Deadlines")
+        embed = discord.Embed(title="Upcoming Deadlines", colour=discord.Colour.dark_gold())
         now = tz_aware_now()
 
         has_active_deadlines = False

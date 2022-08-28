@@ -15,6 +15,7 @@ import settings
 from database.crud import ufora_announcements as crud
 from database.schemas.relational import UforaCourse
 from didier.data.embeds.base import EmbedBaseModel
+from didier.utils.discord.colours import ghent_university_blue
 from didier.utils.types.datetime import int_to_weekday
 from didier.utils.types.string import leading
 
@@ -49,7 +50,7 @@ class UforaNotification(EmbedBaseModel):
 
     def to_embed(self, **kwargs: dict) -> discord.Embed:
         """Turn the notification into an embed"""
-        embed = discord.Embed(colour=discord.Colour.from_rgb(30, 100, 200))
+        embed = discord.Embed(title=self._title, colour=ghent_university_blue())
 
         embed.set_author(name=self.course.name)
         embed.title = self._title

@@ -10,13 +10,12 @@ from didier import Didier
 class CustomHelpCommand(commands.MinimalHelpCommand):
     """Customised Help command to override the default implementation
 
-    The default is ugly as hell so we do some fiddling with it
+    The default is ugly as hell, so we do some fiddling with it
     """
 
     def _help_embed_base(self, title: str) -> discord.Embed:
         """Create the base structure for the embeds that get sent with the Help commands"""
-        embed = discord.Embed(colour=discord.Colour.blue())
-        embed.set_author(name=title)
+        embed = discord.Embed(title=title, colour=discord.Colour.blue())
         embed.set_footer(text="Syntax: Didier Help [Categorie] of Didier Help [Commando]")
         return embed
 

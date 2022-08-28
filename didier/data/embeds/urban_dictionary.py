@@ -47,8 +47,7 @@ class Definition(EmbedPydantic):
 
     @overrides
     def to_embed(self, **kwargs: dict) -> discord.Embed:
-        embed = discord.Embed(colour=colours.urban_dictionary_green())
-        embed.set_author(name="Urban Dictionary")
+        embed = discord.Embed(title="Urban Dictionary", colour=colours.urban_dictionary_green())
 
         embed.add_field(name="Term", value=self.word, inline=True)
         embed.add_field(name="Author", value=self.author, inline=True)

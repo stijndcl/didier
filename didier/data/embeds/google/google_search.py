@@ -19,8 +19,7 @@ class GoogleSearch(EmbedBaseModel):
 
     def _error_embed(self) -> discord.Embed:
         """Custom embed for unsuccessful requests"""
-        embed = discord.Embed(colour=discord.Colour.red())
-        embed.set_author(name="Google Search")
+        embed = discord.Embed(title="Google Search", colour=discord.Colour.red())
 
         # Empty embed
         if not self.data.results:
@@ -37,8 +36,7 @@ class GoogleSearch(EmbedBaseModel):
         if not self.data.results or self.data.status_code != HTTPStatus.OK:
             return self._error_embed()
 
-        embed = discord.Embed(colour=discord.Colour.blue())
-        embed.set_author(name="Google Search")
+        embed = discord.Embed(title="Google Search", colour=discord.Colour.blue())
         embed.set_footer(text=self.data.result_stats or None)
 
         # Add all results into the description

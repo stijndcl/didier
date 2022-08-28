@@ -45,8 +45,7 @@ class Currency(commands.Cog):
         async with self.client.postgres_session as session:
             bank = await crud.get_bank(session, ctx.author.id)
 
-        embed = discord.Embed(colour=discord.Colour.blue())
-        embed.set_author(name=f"{ctx.author.display_name}'s Bank")
+        embed = discord.Embed(title=f"{ctx.author.display_name}'s Bank", colour=discord.Colour.blue())
         embed.set_thumbnail(url=ctx.author.avatar.url)
 
         embed.add_field(name="Interest level", value=bank.interest_level)
@@ -61,8 +60,7 @@ class Currency(commands.Cog):
         async with self.client.postgres_session as session:
             bank = await crud.get_bank(session, ctx.author.id)
 
-        embed = discord.Embed(colour=discord.Colour.blue())
-        embed.set_author(name="Bank upgrades")
+        embed = discord.Embed(title="Bank upgrades", colour=discord.Colour.blue())
 
         embed.add_field(
             name=f"Interest ({bank.interest_level})", value=str(interest_upgrade_price(bank.interest_level))

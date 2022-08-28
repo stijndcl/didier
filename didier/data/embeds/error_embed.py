@@ -37,8 +37,7 @@ def create_error_embed(ctx: commands.Context, exception: Exception) -> discord.E
 
     invocation = f"{ctx.author.display_name} in {origin}"
 
-    embed = discord.Embed(colour=discord.Colour.red())
-    embed.set_author(name="Error")
+    embed = discord.Embed(title="Error", colour=discord.Colour.red())
     embed.add_field(name="Command", value=f"{ctx.message.content}", inline=True)
     embed.add_field(name="Context", value=invocation, inline=True)
     embed.add_field(name="Exception", value=abbreviate(str(exception), Limits.EMBED_FIELD_VALUE_LENGTH), inline=False)
