@@ -94,12 +94,17 @@ class Menu(EmbedPydantic):
         return embed
 
     def _regular_embed(self, embed: discord.Embed) -> discord.Embed:
-        embed.add_field(name="🥣 Soep", value=self._get_soups(), inline=False)
-        embed.add_field(name="🍴 Hoofdgerechten", value=self._get_main_courses(), inline=False)
-        embed.add_field(name="❄️Koud", value=self._get_cold_meals(), inline=False)
+        if soups := self._get_soups():
+            embed.add_field(name="🥣 Soep", value=soups, inline=False)
 
-        vegetables = "\n".join(list(sorted(self.vegetables)))
-        embed.add_field(name="🥦 Groenten", value=vegetables, inline=False)
+        if mains := self._get_main_courses():
+            embed.add_field(name="🍴 Hoofdgerechten", value=mains, inline=False)
+
+        if cold := self._get_cold_meals():
+            embed.add_field(name="❄️Koud", value=cold, inline=False)
+
+        if vegetables := "\n".join(list(sorted(self.vegetables))):
+            embed.add_field(name="🥦 Groenten", value=vegetables, inline=False)
 
         return embed
 

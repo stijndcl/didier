@@ -15,7 +15,7 @@ from didier.utils.types.datetime import (
     str_to_weekday,
 )
 
-__all__ = ["date_converter"]
+__all__ = ["date_converter", "DateTransformer"]
 
 
 def date_converter(argument: Optional[str]) -> date:
@@ -56,6 +56,7 @@ def date_converter(argument: Optional[str]) -> date:
 class DateTransformer(app_commands.Transformer):
     """Application commands transformer for dates"""
 
+    @overrides
     async def autocomplete(
         self, interaction: discord.Interaction, value: Union[int, float, str]
     ) -> list[app_commands.Choice[Union[int, float, str]]]:
