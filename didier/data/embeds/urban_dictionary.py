@@ -46,7 +46,7 @@ class Definition(EmbedPydantic):
         return string_utils.abbreviate(field, max_length=Limits.EMBED_FIELD_VALUE_LENGTH)
 
     @overrides
-    def to_embed(self, **kwargs: dict) -> discord.Embed:
+    def to_embed(self, **kwargs) -> discord.Embed:
         embed = discord.Embed(title="Urban Dictionary", colour=colours.urban_dictionary_green())
 
         embed.add_field(name="Term", value=self.word, inline=True)

@@ -13,7 +13,7 @@ class EmbedBaseModel(ABC):
     """Abstract base class for a model that can be turned into a Discord embed"""
 
     @abstractmethod
-    def to_embed(self, **kwargs: dict) -> discord.Embed:
+    def to_embed(self, **kwargs) -> discord.Embed:
         """Turn this model into a Discord embed"""
         raise NotImplementedError
 

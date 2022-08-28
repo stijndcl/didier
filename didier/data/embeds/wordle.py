@@ -126,7 +126,7 @@ class WordleErrorEmbed(EmbedBaseModel):
     message: str
 
     @overrides
-    def to_embed(self, **kwargs: dict) -> discord.Embed:
+    def to_embed(self, **kwargs) -> discord.Embed:
         embed = discord.Embed(colour=discord.Colour.red(), title="Wordle")
         embed.description = self.message
         embed.set_footer(text=footer())

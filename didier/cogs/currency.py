@@ -27,10 +27,13 @@ class Currency(commands.Cog):
 
     @commands.command(name="Award")
     @commands.check(is_owner)
-    async def award(self, ctx: commands.Context, user: discord.User, amount: abbreviated_number):  # type: ignore
+    async def award(
+        self,
+        ctx: commands.Context,
+        user: discord.User,
+        amount: typing.Annotated[int, abbreviated_number],
+    ):
         """Award a user a given amount of Didier Dinks"""
-        amount = typing.cast(int, amount)
-
         async with self.client.postgres_session as session:
             await crud.add_dinks(session, user.id, amount)
             plural = pluralize("Didier Dink", amount)
@@ -116,10 +119,8 @@ class Currency(commands.Cog):
             await ctx.reply(f"**{ctx.author.display_name}** has **{bank.dinks}** {plural}.", mention_author=False)
 
     @commands.command(name="Invest", aliases=["Deposit", "Dep"])
-    async def invest(self, ctx: commands.Context, amount: abbreviated_number):  # type: ignore
+    async def invest(self, ctx: commands.Context, amount: typing.Annotated[typing.Union[str, int], abbreviated_number]):
         """Invest a given amount of Didier Dinks"""
-        amount = typing.cast(typing.Union[str, int], amount)
-
         async with self.client.postgres_session as session:
             invested = await crud.invest(session, ctx.author.id, amount)
             plural = pluralize("Didier Dink", invested)

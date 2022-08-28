@@ -22,7 +22,7 @@ class Deadlines(EmbedBaseModel):
         self.deadlines.sort(key=lambda deadline: deadline.deadline)
 
     @overrides
-    def to_embed(self, **kwargs: dict) -> discord.Embed:
+    def to_embed(self, **kwargs) -> discord.Embed:
         embed = discord.Embed(title="Upcoming Deadlines", colour=discord.Colour.dark_gold())
         now = tz_aware_now()
 

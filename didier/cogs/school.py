@@ -1,3 +1,6 @@
+from datetime import datetime
+from typing import Optional
+
 import discord
 from discord import app_commands
 from discord.ext import commands
@@ -5,7 +8,10 @@ from discord.ext import commands
 from database.crud import ufora_courses
 from database.crud.deadlines import get_deadlines
 from didier import Didier
+from didier.data.apis.hydra import fetch_menu
 from didier.data.embeds.deadlines import Deadlines
+from didier.data.embeds.hydra import no_menu_found
+from didier.exceptions import HTTPException
 from didier.utils.discord.flags.school import StudyGuideFlags
 
 
@@ -25,6 +31,23 @@ class School(commands.Cog):
 
         embed = Deadlines(deadlines).to_embed()
         await ctx.reply(embed=embed, mention_author=False, ephemeral=False)
+
+    @commands.hybrid_command(
+        name="menu", description="Show the menu in the Ghent University restaurants", aliases=["Eten", "Food"]
+    )
+    async def menu(self, ctx: commands.Context, day: Optional[str] = None):
+        """Get the menu for a given day in the restaurants"""
+        # TODO time converter (transformer) for [DAY]
+        # TODO autocompletion for [DAY]
+        async with ctx.typing():
+            day_dt = datetime.now()
+
+            try:
+                menu = await fetch_menu(self.client.http_session, day_dt)
+                embed = menu.to_embed(day_dt=day_dt)
+            except HTTPException:
+                embed = no_menu_found(day_dt)
+            await ctx.reply(embed=embed, mention_author=False)
 
     @commands.hybrid_command(
         name="fiche", description="Sends the link to the study guide for [Course]", aliases=["guide", "studiefiche"]
