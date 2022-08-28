@@ -1,9 +1,14 @@
 import contextlib
+import datetime
 from datetime import date, timedelta
-from typing import Optional
+from typing import Optional, Union
 
+import discord
+from discord import app_commands
 from discord.ext.commands import ArgumentParsingError
+from overrides import overrides
 
+from didier.utils.discord.autocompletion.time import autocomplete_day
 from didier.utils.types.datetime import (
     forward_to_next_weekday,
     parse_dm_string,
@@ -46,3 +51,16 @@ def date_converter(argument: Optional[str]) -> date:
 
     # Unparseable
     raise ArgumentParsingError(f"Unable to interpret `{original_argument}` as a date.")
+
+
+class DateTransformer(app_commands.Transformer):
+    """Application commands transformer for dates"""
+
+    async def autocomplete(
+        self, interaction: discord.Interaction, value: Union[int, float, str]
+    ) -> list[app_commands.Choice[Union[int, float, str]]]:
+        return autocomplete_day(str(value))
+
+    @overrides
+    async def transform(self, interaction: discord.Interaction, value: str) -> datetime.date:
+        return date_converter(value)

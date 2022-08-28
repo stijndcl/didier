@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import date
 from typing import Optional
 
 import discord
@@ -12,6 +12,7 @@ from didier.data.apis.hydra import fetch_menu
 from didier.data.embeds.deadlines import Deadlines
 from didier.data.embeds.hydra import no_menu_found
 from didier.exceptions import HTTPException
+from didier.utils.discord.converters.time import DateTransformer
 from didier.utils.discord.flags.school import StudyGuideFlags
 
 
@@ -37,16 +38,13 @@ class School(commands.Cog):
         description="Show the menu in the Ghent University restaurants.",
         aliases=["Eten", "Food"],
     )
-    async def menu(self, ctx: commands.Context, day: Optional[str] = None):
+    @app_commands.rename(day_dt="date")
+    async def menu(self, ctx: commands.Context, day_dt: Optional[app_commands.Transform[date, DateTransformer]] = None):
         """Show the menu in the Ghent University restaurants.
 
         Menus are Dutch, as a lot of dishes have very weird translations
         """
-        # TODO time converter (transformer) for [DAY]
-        # TODO autocompletion for [DAY]
         async with ctx.typing():
-            day_dt = datetime(year=2022, month=8, day=29)
-
             try:
                 menu = await fetch_menu(self.client.http_session, day_dt)
                 embed = menu.to_embed(day_dt=day_dt)
