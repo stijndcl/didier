@@ -109,7 +109,7 @@ class Menu(discord.ui.View):
 
         if interaction is not None:
             await interaction.response.edit_message(view=self)
-        else:
+        elif self.message is not None:
             await self.message.edit(view=self)
 
     @overrides
