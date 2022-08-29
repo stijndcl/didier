@@ -13,6 +13,7 @@ from sqlalchemy import (
     ForeignKey,
     Integer,
     Text,
+    UniqueConstraint,
 )
 from sqlalchemy.orm import declarative_base, relationship
 
@@ -25,6 +26,7 @@ __all__ = [
     "Base",
     "Bank",
     "Birthday",
+    "Bookmark",
     "CustomCommand",
     "CustomCommandAlias",
     "DadJoke",
@@ -76,6 +78,20 @@ class Birthday(Base):
     birthday: date = Column(Date, nullable=False)
 
     user: User = relationship("User", uselist=False, back_populates="birthday", lazy="selectin")
+
+
+class Bookmark(Base):
+    """A bookmark to a given message"""
+
+    __tablename__ = "bookmarks"
+    __table_args__ = (UniqueConstraint("user_id", "label"),)
+
+    bookmark_id: int = Column(Integer, primary_key=True)
+    label: str = Column(Text, nullable=False)
+    jump_url: str = Column(Text, nullable=False)
+    user_id: int = Column(BigInteger, ForeignKey("users.user_id"))
+
+    user: User = relationship("User", back_populates="bookmarks", uselist=False, lazy="selectin")
 
 
 class CustomCommand(Base):
@@ -230,6 +246,9 @@ class User(Base):
     )
     birthday: Optional[Birthday] = relationship(
         "Birthday", back_populates="user", uselist=False, lazy="selectin", cascade="all, delete-orphan"
+    )
+    bookmarks: list[Bookmark] = relationship(
+        "Bookmark", back_populates="user", uselist=True, lazy="selectin", cascade="all, delete-orphan"
     )
     nightly_data: NightlyData = relationship(
         "NightlyData", back_populates="user", uselist=False, lazy="selectin", cascade="all, delete-orphan"
