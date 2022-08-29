@@ -4,7 +4,7 @@ from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from database.schemas.relational import MemeTemplate
+from database.schemas import MemeTemplate
 
 __all__ = ["add_meme", "get_all_memes", "get_meme_by_name"]
 

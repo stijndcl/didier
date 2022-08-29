@@ -1,7 +1,7 @@
 from aiohttp import ClientSession
 
 import settings
-from database.schemas.relational import MemeTemplate
+from database.schemas import MemeTemplate
 from didier.exceptions.missing_env import MissingEnvironmentVariable
 from didier.utils.http.requests import ensure_post
 

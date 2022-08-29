@@ -1,16 +1,26 @@
 import enum
 from dataclasses import dataclass
-from typing import Optional
 
 import discord
 from overrides import overrides
 
 from database.constants import WORDLE_GUESS_COUNT, WORDLE_WORD_LENGTH
-from database.schemas.mongo.wordle import WordleGame
+from database.schemas import WordleWord
 from didier.data.embeds.base import EmbedBaseModel
 from didier.utils.types.datetime import int_to_weekday, tz_aware_now
 
-__all__ = ["WordleEmbed", "WordleErrorEmbed"]
+__all__ = ["is_wordle_game_over", "WordleEmbed", "WordleErrorEmbed"]
+
+
+def is_wordle_game_over(guesses: list[str], word: str) -> bool:
+    """Check if the current game is over or not"""
+    if not guesses:
+        return False
+
+    if len(guesses) == WORDLE_GUESS_COUNT:
+        return True
+
+    return word.lower() in guesses
 
 
 def footer() -> str:
@@ -32,18 +42,18 @@ class WordleColour(enum.IntEnum):
 class WordleEmbed(EmbedBaseModel):
     """Embed for a Wordle game"""
 
-    game: Optional[WordleGame]
-    word: str
+    guesses: list[str]
+    word: WordleWord
 
     def _letter_colour(self, guess: str, index: int) -> WordleColour:
         """Get the colour for a guess at a given position"""
-        if guess[index] == self.word[index]:
+        if guess[index] == self.word.word[index]:
             return WordleColour.CORRECT
 
         wrong_letter = 0
         wrong_position = 0
 
-        for i, letter in enumerate(self.word):
+        for i, letter in enumerate(self.word.word):
             if letter == guess[index] and guess[i] != guess[index]:
                 wrong_letter += 1
 
@@ -68,9 +78,8 @@ class WordleEmbed(EmbedBaseModel):
         colours = []
 
         # Add all the guesses
-        if self.game is not None:
-            for guess in self.game.guesses:
-                colours.append(self._guess_colours(guess))
+        for guess in self.guesses:
+            colours.append(self._guess_colours(guess))
 
         # Fill the rest with empty spots
         for _ in range(WORDLE_GUESS_COUNT - len(colours)):
@@ -99,19 +108,19 @@ class WordleEmbed(EmbedBaseModel):
 
         colours = self.colour_code_game()
 
-        embed = discord.Embed(colour=discord.Colour.blue(), title="Wordle")
+        embed = discord.Embed(colour=discord.Colour.blue(), title=f"Wordle #{self.word.word_id + 1}")
         emojis = self._colours_to_emojis(colours)
 
         rows = [" ".join(row) for row in emojis]
 
         # Don't reveal anything if we only want to show the colours
-        if not only_colours and self.game is not None:
-            for i, guess in enumerate(self.game.guesses):
+        if not only_colours and self.guesses:
+            for i, guess in enumerate(self.guesses):
                 rows[i] += f"   ||{guess.upper()}||"
 
             # If the game is over, reveal the word
-            if self.game.is_game_over(self.word):
-                rows.append(f"\n\nThe word was **{self.word.upper()}**!")
+            if is_wordle_game_over(self.guesses, self.word.word):
+                rows.append(f"\n\nThe word was **{self.word.word.upper()}**!")
 
         embed.description = "\n\n".join(rows)
         embed.set_footer(text=footer())

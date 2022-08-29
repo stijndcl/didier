@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from database.crud import users
 from database.exceptions import currency as exceptions
-from database.schemas.relational import Bank, NightlyData
+from database.schemas import Bank, NightlyData
 from database.utils.math.currency import (
     capacity_upgrade_price,
     interest_upgrade_price,
@@ -29,13 +29,13 @@ NIGHTLY_AMOUNT = 420
 
 async def get_bank(session: AsyncSession, user_id: int) -> Bank:
     """Get a user's bank info"""
-    user = await users.get_or_add(session, user_id)
+    user = await users.get_or_add_user(session, user_id)
     return user.bank
 
 
 async def get_nightly_data(session: AsyncSession, user_id: int) -> NightlyData:
     """Get a user's nightly info"""
-    user = await users.get_or_add(session, user_id)
+    user = await users.get_or_add_user(session, user_id)
     return user.nightly_data
 
 

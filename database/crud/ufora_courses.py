@@ -3,7 +3,7 @@ from typing import Optional
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from database.schemas.relational import UforaCourse, UforaCourseAlias
+from database.schemas import UforaCourse, UforaCourseAlias
 
 __all__ = ["get_all_courses", "get_course_by_name"]
 

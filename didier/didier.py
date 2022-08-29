@@ -2,7 +2,6 @@ import logging
 import os
 
 import discord
-import motor.motor_asyncio
 from aiohttp import ClientSession
 from discord.app_commands import AppCommandError
 from discord.ext import commands
@@ -10,7 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 import settings
 from database.crud import custom_commands
-from database.engine import DBSession, mongo_client
+from database.engine import DBSession
 from database.utils.caches import CacheManager
 from didier.data.embeds.error_embed import create_error_embed
 from didier.exceptions import HTTPException, NoMatch
@@ -55,11 +54,6 @@ class Didier(commands.Bot):
         """Obtain a session for the PostgreSQL database"""
         return DBSession()
 
-    @property
-    def mongo_db(self) -> motor.motor_asyncio.AsyncIOMotorDatabase:
-        """Obtain a reference to the MongoDB database"""
-        return mongo_client[settings.MONGO_DB]
-
     async def setup_hook(self) -> None:
         """Do some initial setup
 
@@ -71,7 +65,7 @@ class Didier(commands.Bot):
         # Initialize caches
         self.database_caches = CacheManager()
         async with self.postgres_session as session:
-            await self.database_caches.initialize_caches(session, self.mongo_db)
+            await self.database_caches.initialize_caches(session)
 
         # Load extensions
         await self._load_initial_extensions()

@@ -1,7 +1,7 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from database.crud import ufora_courses as crud
-from database.schemas.relational import UforaCourse
+from database.schemas import UforaCourse
 
 
 async def test_get_course_by_name_exact(postgres: AsyncSession, ufora_course: UforaCourse):

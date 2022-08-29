@@ -7,7 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from database.crud import users
-from database.schemas.relational import Birthday, User
+from database.schemas import Birthday, User
 
 __all__ = ["add_birthday", "get_birthday_for_user", "get_birthdays_on_day"]
 
@@ -17,7 +17,7 @@ async def add_birthday(session: AsyncSession, user_id: int, birthday: date):
 
     If already present, overwrites the existing one
     """
-    user = await users.get_or_add(session, user_id, options=[selectinload(User.birthday)])
+    user = await users.get_or_add_user(session, user_id, options=[selectinload(User.birthday)])
 
     if user.birthday is not None:
         bd = user.birthday

@@ -4,7 +4,7 @@ import pytest
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from database.crud import users
-from database.schemas.relational import (
+from database.schemas import (
     Bank,
     UforaAnnouncement,
     UforaCourse,
@@ -25,7 +25,7 @@ def test_user_id() -> int:
 @pytest.fixture
 async def user(postgres: AsyncSession, test_user_id: int) -> User:
     """Fixture to create a user"""
-    _user = await users.get_or_add(postgres, test_user_id)
+    _user = await users.get_or_add_user(postgres, test_user_id)
     await postgres.refresh(_user)
     return _user
 

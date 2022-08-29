@@ -37,13 +37,6 @@ SEMESTER: int = env.int("SEMESTER", 2)
 YEAR: int = env.int("YEAR", 3)
 
 """Database"""
-# MongoDB
-MONGO_DB: str = env.str("MONGO_DB", "didier")
-MONGO_USER: str = env.str("MONGO_USER", "root")
-MONGO_PASS: str = env.str("MONGO_PASS", "root")
-MONGO_HOST: str = env.str("MONGO_HOST", "localhost")
-MONGO_PORT: int = env.int("MONGO_PORT", "27017")
-
 # PostgreSQL
 POSTGRES_DB: str = env.str("POSTGRES_DB", "didier")
 POSTGRES_USER: str = env.str("POSTGRES_USER", "postgres")

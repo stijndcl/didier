@@ -1,19 +1,17 @@
 from abc import ABC, abstractmethod
-from typing import Generic, TypeVar
 
 from discord import app_commands
 from overrides import overrides
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from database.crud import links, memes, ufora_courses, wordle
-from database.mongo_types import MongoDatabase
 
 __all__ = ["CacheManager", "LinkCache", "UforaCourseCache"]
 
-T = TypeVar("T")
+from database.schemas import WordleWord
 
 
-class DatabaseCache(ABC, Generic[T]):
+class DatabaseCache(ABC):
     """Base class for a simple cache-like structure
 
     The goal of this class is to store data for Discord auto-completion results
@@ -25,7 +23,7 @@ class DatabaseCache(ABC, Generic[T]):
     Considering the fact that a user isn't obligated to choose something from the suggestions,
     chances are high we have to go to the database for the final action either way.
 
-    Also stores the data in lowercase to allow fast searching
+    Also stores the data in lowercase to allow fast searching.
     """
 
     data: list[str] = []
@@ -36,7 +34,7 @@ class DatabaseCache(ABC, Generic[T]):
         self.data.clear()
 
     @abstractmethod
-    async def invalidate(self, database_session: T):
+    async def invalidate(self, database_session: AsyncSession):
         """Invalidate the data stored in this cache"""
 
     def get_autocomplete_suggestions(self, query: str) -> list[app_commands.Choice[str]]:
@@ -48,7 +46,7 @@ class DatabaseCache(ABC, Generic[T]):
         return [app_commands.Choice(name=suggestion, value=suggestion.lower()) for suggestion in suggestions]
 
 
-class LinkCache(DatabaseCache[AsyncSession]):
+class LinkCache(DatabaseCache):
     """Cache to store the names of links"""
 
     @overrides
@@ -61,7 +59,7 @@ class LinkCache(DatabaseCache[AsyncSession]):
         self.data_transformed = list(map(str.lower, self.data))
 
 
-class MemeCache(DatabaseCache[AsyncSession]):
+class MemeCache(DatabaseCache):
     """Cache to store the names of meme templates"""
 
     @overrides
@@ -74,7 +72,7 @@ class MemeCache(DatabaseCache[AsyncSession]):
         self.data_transformed = list(map(str.lower, self.data))
 
 
-class UforaCourseCache(DatabaseCache[AsyncSession]):
+class UforaCourseCache(DatabaseCache):
     """Cache to store the names of Ufora courses"""
 
     # Also store the aliases to add additional support
@@ -119,13 +117,15 @@ class UforaCourseCache(DatabaseCache[AsyncSession]):
         return [app_commands.Choice(name=suggestion, value=suggestion.lower()) for suggestion in suggestions]
 
 
-class WordleCache(DatabaseCache[MongoDatabase]):
+class WordleCache(DatabaseCache):
     """Cache to store the current daily Wordle word"""
 
-    async def invalidate(self, database_session: MongoDatabase):
+    word: WordleWord
+
+    async def invalidate(self, database_session: AsyncSession):
         word = await wordle.get_daily_word(database_session)
         if word is not None:
-            self.data = [word]
+            self.word = word
 
 
 class CacheManager:
@@ -142,9 +142,9 @@ class CacheManager:
         self.ufora_courses = UforaCourseCache()
         self.wordle_word = WordleCache()
 
-    async def initialize_caches(self, postgres_session: AsyncSession, mongo_db: MongoDatabase):
+    async def initialize_caches(self, postgres_session: AsyncSession):
         """Initialize the contents of all caches"""
         await self.links.invalidate(postgres_session)
         await self.memes.invalidate(postgres_session)
         await self.ufora_courses.invalidate(postgres_session)
-        await self.wordle_word.invalidate(mongo_db)
+        await self.wordle_word.invalidate(postgres_session)

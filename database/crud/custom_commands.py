@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from database.exceptions.constraints import DuplicateInsertException
 from database.exceptions.not_found import NoResultFoundException
-from database.schemas.relational import CustomCommand, CustomCommandAlias
+from database.schemas import CustomCommand, CustomCommandAlias
 
 __all__ = [
     "clean_name",

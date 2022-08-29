@@ -4,7 +4,7 @@ from datetime import datetime
 import discord
 from overrides import overrides
 
-from database.schemas.relational import Deadline
+from database.schemas import Deadline
 from didier.data.embeds.base import EmbedBaseModel
 from didier.utils.types.datetime import tz_aware_now
 from didier.utils.types.string import get_edu_year_name

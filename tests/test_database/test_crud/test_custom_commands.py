@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from database.crud import custom_commands as crud
 from database.exceptions.constraints import DuplicateInsertException
 from database.exceptions.not_found import NoResultFoundException
-from database.schemas.relational import CustomCommand
+from database.schemas import CustomCommand
 
 
 async def test_create_command_non_existing(postgres: AsyncSession):

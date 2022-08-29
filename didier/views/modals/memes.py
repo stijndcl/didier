@@ -3,7 +3,7 @@ import traceback
 import discord.ui
 from overrides import overrides
 
-from database.schemas.relational import MemeTemplate
+from database.schemas import MemeTemplate
 from didier import Didier
 from didier.data.apis.imgflip import generate_meme
 

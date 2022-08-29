@@ -4,7 +4,7 @@ from overrides import overrides
 from didier import Didier
 
 
-class TestCog(commands.Cog):
+class DebugCog(commands.Cog):
     """Testing cog for dev purposes"""
 
     client: Didier
@@ -16,11 +16,11 @@ class TestCog(commands.Cog):
     async def cog_check(self, ctx: commands.Context) -> bool:
         return await self.client.is_owner(ctx.author)
 
-    @commands.command()
-    async def test(self, ctx: commands.Context):
+    @commands.command(aliases=["Dev"])
+    async def debug(self, ctx: commands.Context):
         """Debugging command"""
 
 
 async def setup(client: Didier):
     """Load the cog"""
-    await client.add_cog(TestCog(client))
+    await client.add_cog(DebugCog(client))

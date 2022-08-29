@@ -3,7 +3,7 @@ import datetime
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from database.crud import ufora_announcements as crud
-from database.schemas.relational import UforaAnnouncement, UforaCourse
+from database.schemas import UforaAnnouncement, UforaCourse
 
 
 async def test_get_courses_with_announcements_none(postgres: AsyncSession):
