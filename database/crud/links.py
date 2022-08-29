@@ -4,7 +4,7 @@ from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from database.exceptions import NoResultFoundException
-from database.schemas.relational import Link
+from database.schemas import Link
 
 __all__ = ["add_link", "edit_link", "get_all_links", "get_link_by_name"]
 

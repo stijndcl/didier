@@ -1,6 +1,6 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from database.schemas.relational import UforaCourse
+from database.schemas import UforaCourse
 from database.utils.caches import UforaCourseCache
 
 

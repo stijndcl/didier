@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from database.crud import birthdays as crud
 from database.crud import users
-from database.schemas.relational import User
+from database.schemas import User
 
 
 async def test_add_birthday_not_present(postgres: AsyncSession, user: User):

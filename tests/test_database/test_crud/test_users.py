@@ -2,7 +2,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from database.crud import users as crud
-from database.schemas.relational import User
+from database.schemas import User
 
 
 async def test_get_or_add_non_existing(postgres: AsyncSession):

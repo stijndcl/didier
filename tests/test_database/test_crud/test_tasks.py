@@ -7,7 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from database.crud import tasks as crud
 from database.enums import TaskType
-from database.schemas.relational import Task
+from database.schemas import Task
 
 
 @pytest.fixture

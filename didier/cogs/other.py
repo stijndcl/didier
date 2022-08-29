@@ -5,7 +5,7 @@ from discord import app_commands
 from discord.ext import commands
 
 from database.crud.links import get_link_by_name
-from database.schemas.relational import Link
+from database.schemas import Link
 from didier import Didier
 from didier.data.apis import urban_dictionary
 from didier.data.embeds.google import GoogleSearch

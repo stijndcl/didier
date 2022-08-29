@@ -7,7 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from database.crud import users
-from database.schemas.relational import Birthday, User
+from database.schemas import Birthday, User
 
 __all__ = ["add_birthday", "get_birthday_for_user", "get_birthdays_on_day"]
 

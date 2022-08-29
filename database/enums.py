@@ -1,6 +1,6 @@
 import enum
 
-__all__ = ["TaskType", "TempStorageKey"]
+__all__ = ["TaskType"]
 
 
 # There is a bug in typeshed that causes an incorrect PyCharm warning
@@ -11,10 +11,3 @@ class TaskType(enum.IntEnum):
 
     BIRTHDAYS = enum.auto()
     UFORA_ANNOUNCEMENTS = enum.auto()
-
-
-@enum.unique
-class TempStorageKey(str, enum.Enum):
-    """Enum for keys to distinguish the TemporaryStorage rows"""
-
-    WORDLE_WORD = "wordle_word"

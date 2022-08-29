@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from database.crud import currency as crud
 from database.exceptions import currency as exceptions
-from database.schemas.relational import Bank
+from database.schemas import Bank
 
 
 async def test_add_dinks(postgres: AsyncSession, bank: Bank):

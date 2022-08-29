@@ -7,7 +7,6 @@ git+https://github.com/Rapptz/discord-ext-menus@8686b5d
 environs==9.5.0
 feedparser==6.0.10
 markdownify==0.11.2
-motor==3.0.0
 overrides==6.1.0
 pydantic==1.9.1
 python-dateutil==2.8.2

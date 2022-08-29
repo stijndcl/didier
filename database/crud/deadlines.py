@@ -6,7 +6,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from database.schemas.relational import Deadline, UforaCourse
+from database.schemas import Deadline, UforaCourse
 
 __all__ = ["add_deadline", "get_deadlines"]
 

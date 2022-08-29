@@ -5,7 +5,7 @@ from discord import Interaction
 from overrides import overrides
 
 from database.crud.deadlines import add_deadline
-from database.schemas.relational import UforaCourse
+from database.schemas import UforaCourse
 
 __all__ = ["AddDeadline"]
 

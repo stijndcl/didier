@@ -5,7 +5,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from database.enums import TaskType
-from database.schemas.relational import Task
+from database.schemas import Task
 from database.utils.datetime import LOCAL_TIMEZONE
 
 __all__ = ["get_task_by_enum", "set_last_task_execution_time"]

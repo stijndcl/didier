@@ -4,7 +4,7 @@ import pytest
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from database.crud import users
-from database.schemas.relational import (
+from database.schemas import (
     Bank,
     UforaAnnouncement,
     UforaCourse,

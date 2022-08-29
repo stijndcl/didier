@@ -1,56 +1,45 @@
+import datetime
 from typing import Optional
 
-from database.enums import TempStorageKey
-from database.mongo_types import MongoDatabase
-from database.schemas.mongo.temporary_storage import TemporaryStorage
-from database.schemas.mongo.wordle import WordleGame
-from database.utils.datetime import today_only_date
+from sqlalchemy import delete, select
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from database.schemas import WordleGuess, WordleWord
 
 __all__ = [
     "get_active_wordle_game",
     "make_wordle_guess",
-    "start_new_wordle_game",
     "set_daily_word",
     "reset_wordle_games",
 ]
 
 
-async def get_active_wordle_game(database: MongoDatabase, user_id: int) -> Optional[WordleGame]:
+async def get_active_wordle_game(session: AsyncSession, user_id: int) -> list[WordleGuess]:
     """Find a player's active game"""
-    collection = database[WordleGame.collection()]
-    result = await collection.find_one({"user_id": user_id})
-    if result is None:
-        return None
-
-    return WordleGame(**result)
+    statement = select(WordleGuess).where(WordleGuess.user_id == user_id)
+    guesses = (await session.execute(statement)).scalars().all()
+    return guesses
 
 
-async def start_new_wordle_game(database: MongoDatabase, user_id: int) -> WordleGame:
-    """Start a new game"""
-    collection = database[WordleGame.collection()]
-    game = WordleGame(user_id=user_id)
-    await collection.insert_one(game.dict(by_alias=True))
-    return game
-
-
-async def make_wordle_guess(database: MongoDatabase, user_id: int, guess: str):
+async def make_wordle_guess(session: AsyncSession, user_id: int, guess: str):
     """Make a guess in your current game"""
-    collection = database[WordleGame.collection()]
-    await collection.update_one({"user_id": user_id}, {"$push": {"guesses": guess}})
+    guess_instance = WordleGuess(user_id=user_id, guess=guess)
+    session.add(guess_instance)
+    await session.commit()
 
 
-async def get_daily_word(database: MongoDatabase) -> Optional[str]:
+async def get_daily_word(session: AsyncSession) -> Optional[WordleWord]:
     """Get the word of today"""
-    collection = database[TemporaryStorage.collection()]
+    statement = select(WordleWord).where(WordleWord.day == datetime.date.today())
+    row = (await session.execute(statement)).scalar_one_or_none()
 
-    result = await collection.find_one({"key": TempStorageKey.WORDLE_WORD, "day": today_only_date()})
-    if result is None:
+    if row is None:
         return None
 
-    return result["word"]
+    return row
 
 
-async def set_daily_word(database: MongoDatabase, word: str, *, forced: bool = False) -> str:
+async def set_daily_word(session: AsyncSession, word: str, *, forced: bool = False) -> str:
     """Set the word of today
 
     This does NOT overwrite the existing word if there is one, so that it can safely run
@@ -60,23 +49,28 @@ async def set_daily_word(database: MongoDatabase, word: str, *, forced: bool = F
 
     Returns the word that was chosen. If one already existed, return that instead.
     """
-    collection = database[TemporaryStorage.collection()]
+    current_word = await get_daily_word(session)
 
-    current_word = None if forced else await get_daily_word(database)
-    if current_word is not None:
-        return current_word
+    if current_word is None:
+        current_word = WordleWord(word=word, day=datetime.date.today())
+        session.add(current_word)
+        await session.commit()
 
-    await collection.update_one(
-        {"key": TempStorageKey.WORDLE_WORD}, {"$set": {"day": today_only_date(), "word": word}}, upsert=True
-    )
+        # Remove all active games
+        await reset_wordle_games(session)
+    elif forced:
+        current_word.word = word
+        current_word.day = datetime.date.today()
+        session.add(current_word)
+        await session.commit()
 
-    # Remove all active games
-    await reset_wordle_games(database)
+        # Remove all active games
+        await reset_wordle_games(session)
 
-    return word
+    return current_word.word
 
 
-async def reset_wordle_games(database: MongoDatabase):
+async def reset_wordle_games(session: AsyncSession):
     """Reset all active games"""
-    collection = database[WordleGame.collection()]
-    await collection.drop()
+    statement = delete(WordleGuess)
+    await session.execute(statement)
