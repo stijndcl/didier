@@ -5,6 +5,7 @@ from overrides import overrides
 
 from didier.data.embeds.base import EmbedBaseModel
 from didier.data.scrapers.google import SearchData
+from didier.utils.discord.colours import google_blue
 
 __all__ = ["GoogleSearch"]
 
@@ -36,7 +37,7 @@ class GoogleSearch(EmbedBaseModel):
         if not self.data.results or self.data.status_code != HTTPStatus.OK:
             return self._error_embed()
 
-        embed = discord.Embed(title="Google Search", colour=discord.Colour.blue())
+        embed = discord.Embed(title="Google Search", colour=google_blue())
         embed.set_footer(text=self.data.result_stats or None)
 
         # Add all results into the description
