@@ -8,6 +8,9 @@ from database.crud import birthdays, bookmarks
 from database.exceptions import DuplicateInsertException, ForbiddenNameException
 from didier import Didier
 from didier.exceptions import expect
+from didier.menus.bookmarks import BookmarkSource
+from didier.menus.common import Menu
+from didier.utils.discord.assets import get_author_avatar
 from didier.utils.types.datetime import str_to_date
 from didier.utils.types.string import leading
 from didier.views.modals import CreateBookmark
@@ -107,6 +110,19 @@ class Discord(commands.Cog):
     @bookmark.command(name="Search", aliases=["List", "Ls"])
     async def bookmark_search(self, ctx: commands.Context, *, query: Optional[str] = None):
         """Search through the list of bookmarks"""
+        async with self.client.postgres_session as session:
+            results = await bookmarks.get_bookmarks(session, ctx.author.id, query=query)
+
+        if not results:
+            embed = discord.Embed(title="Bookmarks", colour=discord.Colour.red())
+            avatar_url = get_author_avatar(ctx).url
+            embed.set_author(name=ctx.author.display_name, icon_url=avatar_url)
+            embed.description = "You haven't created any bookmarks yet."
+            return await ctx.reply(embed=embed, mention_author=False)
+
+        source = BookmarkSource(ctx, results)
+        menu = Menu(source)
+        await menu.start(ctx)
 
     async def _bookmark_ctx(self, interaction: discord.Interaction, message: discord.Message):
         """Create a bookmark out of this message"""
