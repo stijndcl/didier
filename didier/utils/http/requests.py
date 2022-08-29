@@ -1,6 +1,6 @@
 import logging
 from contextlib import asynccontextmanager
-from typing import AsyncGenerator, Type, TypeVar
+from typing import AsyncGenerator
 
 from aiohttp import ClientResponse, ClientSession, ContentTypeError
 
@@ -12,9 +12,6 @@ logger = logging.getLogger(__name__)
 __all__ = ["ensure_get", "ensure_post"]
 
 
-T = TypeVar("T", str, dict)
-
-
 def request_successful(response: ClientResponse) -> bool:
     """Check if a request was successful or not"""
     return 200 <= response.status < 300
@@ -22,12 +19,12 @@ def request_successful(response: ClientResponse) -> bool:
 
 @asynccontextmanager
 async def ensure_get(
-    http_session: ClientSession, endpoint: str, *, return_type: Type[T] = dict, log_exceptions: bool = True
-) -> AsyncGenerator[T, None]:
+    http_session: ClientSession, endpoint: str, *, log_exceptions: bool = True
+) -> AsyncGenerator[dict, None]:
     """Context manager that automatically raises an exception if a GET-request fails"""
     async with http_session.get(endpoint) as response:
         try:
-            content = (await response.json()) if return_type == dict else (await response.text())
+            content = await response.json()
         except ContentTypeError:
             content = await response.text()
 
@@ -46,15 +43,14 @@ async def ensure_post(
     endpoint: str,
     payload: dict,
     *,
-    return_type: Type[T] = dict,
     log_exceptions: bool = True,
     expect_return: bool = True
-) -> AsyncGenerator[T, None]:
+) -> AsyncGenerator[dict, None]:
     """Context manager that automatically raises an exception if a POST-request fails"""
     async with http_session.post(endpoint, data=payload) as response:
         if not request_successful(response):
             try:
-                content = (await response.json()) if return_type == dict else (await response.text())
+                content = await response.json()
             except ContentTypeError:
                 content = await response.text()
 
