@@ -5,7 +5,6 @@ import discord
 from overrides import overrides
 
 from database.constants import WORDLE_GUESS_COUNT, WORDLE_WORD_LENGTH
-from database.schemas import WordleGuess
 from didier.data.embeds.base import EmbedBaseModel
 from didier.utils.types.datetime import int_to_weekday, tz_aware_now
 
@@ -31,7 +30,7 @@ class WordleColour(enum.IntEnum):
 class WordleEmbed(EmbedBaseModel):
     """Embed for a Wordle game"""
 
-    guesses: list[WordleGuess]
+    guesses: list[str]
     word: str
 
     def _letter_colour(self, guess: str, index: int) -> WordleColour:
