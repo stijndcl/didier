@@ -63,6 +63,9 @@ BIRTHDAY_ANNOUNCEMENT_CHANNEL: Optional[int] = env.int("BIRTHDAY_ANNOUNCEMENT_CH
 ERRORS_CHANNEL: Optional[int] = env.int("ERRORS_CHANNEL", None)
 UFORA_ANNOUNCEMENTS_CHANNEL: Optional[int] = env.int("UFORA_ANNOUNCEMENTS_CHANNEL", None)
 
+""""General config"""
+MENU_TIMEOUT: int = env.int("MENU_TIMEOUT", 30)
+
 """API Keys"""
 UFORA_RSS_TOKEN: Optional[str] = env.str("UFORA_RSS_TOKEN", None)
 URBAN_DICTIONARY_TOKEN: Optional[str] = env.str("URBAN_DICTIONARY_TOKEN", None)
