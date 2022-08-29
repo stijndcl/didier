@@ -4,6 +4,7 @@ from typing import Optional
 from sqlalchemy import delete, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from database.crud.users import get_or_add_user
 from database.schemas import WordleGuess, WordleWord
 
 __all__ = [
@@ -16,6 +17,7 @@ __all__ = [
 
 async def get_active_wordle_game(session: AsyncSession, user_id: int) -> list[WordleGuess]:
     """Find a player's active game"""
+    await get_or_add_user(session, user_id)
     statement = select(WordleGuess).where(WordleGuess.user_id == user_id)
     guesses = (await session.execute(statement)).scalars().all()
     return guesses

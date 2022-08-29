@@ -29,13 +29,13 @@ NIGHTLY_AMOUNT = 420
 
 async def get_bank(session: AsyncSession, user_id: int) -> Bank:
     """Get a user's bank info"""
-    user = await users.get_or_add(session, user_id)
+    user = await users.get_or_add_user(session, user_id)
     return user.bank
 
 
 async def get_nightly_data(session: AsyncSession, user_id: int) -> NightlyData:
     """Get a user's nightly info"""
-    user = await users.get_or_add(session, user_id)
+    user = await users.get_or_add_user(session, user_id)
     return user.nightly_data
 
 

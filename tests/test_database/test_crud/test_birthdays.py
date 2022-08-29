@@ -54,7 +54,7 @@ async def test_get_birthdays_on_day(postgres: AsyncSession, user: User):
     """Test getting all birthdays on a given day"""
     await crud.add_birthday(postgres, user.user_id, datetime.today().replace(year=2001))
 
-    user_2 = await users.get_or_add(postgres, user.user_id + 1)
+    user_2 = await users.get_or_add_user(postgres, user.user_id + 1)
     await crud.add_birthday(postgres, user_2.user_id, datetime.today() + timedelta(weeks=1))
     birthdays = await crud.get_birthdays_on_day(postgres, datetime.today())
     assert len(birthdays) == 1

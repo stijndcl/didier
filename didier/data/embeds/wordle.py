@@ -1,12 +1,11 @@
 import enum
 from dataclasses import dataclass
-from typing import Optional
 
 import discord
 from overrides import overrides
 
 from database.constants import WORDLE_GUESS_COUNT, WORDLE_WORD_LENGTH
-from database.schemas.mongo.wordle import WordleGame
+from database.schemas import WordleGuess
 from didier.data.embeds.base import EmbedBaseModel
 from didier.utils.types.datetime import int_to_weekday, tz_aware_now
 
@@ -32,7 +31,7 @@ class WordleColour(enum.IntEnum):
 class WordleEmbed(EmbedBaseModel):
     """Embed for a Wordle game"""
 
-    game: Optional[WordleGame]
+    guesses: list[WordleGuess]
     word: str
 
     def _letter_colour(self, guess: str, index: int) -> WordleColour:
@@ -68,9 +67,8 @@ class WordleEmbed(EmbedBaseModel):
         colours = []
 
         # Add all the guesses
-        if self.game is not None:
-            for guess in self.game.guesses:
-                colours.append(self._guess_colours(guess))
+        for guess in self.guesses:
+            colours.append(self._guess_colours(guess))
 
         # Fill the rest with empty spots
         for _ in range(WORDLE_GUESS_COUNT - len(colours)):
@@ -93,6 +91,16 @@ class WordleEmbed(EmbedBaseModel):
 
         return emojis
 
+    def _is_game_over(self) -> bool:
+        """Check if the current game is over or not"""
+        if not self.guesses:
+            return False
+
+        if len(self.guesses) == WORDLE_GUESS_COUNT:
+            return True
+
+        return self.word.lower() in self.guesses
+
     @overrides
     def to_embed(self, **kwargs) -> discord.Embed:
         only_colours = kwargs.get("only_colours", False)
@@ -105,12 +113,12 @@ class WordleEmbed(EmbedBaseModel):
         rows = [" ".join(row) for row in emojis]
 
         # Don't reveal anything if we only want to show the colours
-        if not only_colours and self.game is not None:
-            for i, guess in enumerate(self.game.guesses):
+        if not only_colours and self.guesses:
+            for i, guess in enumerate(self.guesses):
                 rows[i] += f"   ||{guess.upper()}||"
 
             # If the game is over, reveal the word
-            if self.game.is_game_over(self.word):
+            if self._is_game_over():
                 rows.append(f"\n\nThe word was **{self.word.upper()}**!")
 
         embed.description = "\n\n".join(rows)

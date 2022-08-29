@@ -6,11 +6,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from database.schemas import Bank, NightlyData, User
 
 __all__ = [
-    "get_or_add",
+    "get_or_add_user",
 ]
 
 
-async def get_or_add(session: AsyncSession, user_id: int, *, options: Optional[list] = None) -> User:
+async def get_or_add_user(session: AsyncSession, user_id: int, *, options: Optional[list] = None) -> User:
     """Get a user's profile
 
     If it doesn't exist yet, create it (along with all linked datastructures)

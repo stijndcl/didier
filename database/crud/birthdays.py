@@ -17,7 +17,7 @@ async def add_birthday(session: AsyncSession, user_id: int, birthday: date):
 
     If already present, overwrites the existing one
     """
-    user = await users.get_or_add(session, user_id, options=[selectinload(User.birthday)])
+    user = await users.get_or_add_user(session, user_id, options=[selectinload(User.birthday)])
 
     if user.birthday is not None:
         bd = user.birthday

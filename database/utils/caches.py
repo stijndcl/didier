@@ -121,7 +121,7 @@ class WordleCache(DatabaseCache):
     async def invalidate(self, database_session: AsyncSession):
         word = await wordle.get_daily_word(database_session)
         if word is not None:
-            self.data = [word]
+            self.data = [word.word]
 
 
 class CacheManager:
