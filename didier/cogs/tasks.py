@@ -3,6 +3,7 @@ import random
 import traceback
 
 from discord.ext import commands, tasks  # type: ignore # Strange & incorrect Mypy error
+from overrides import overrides
 
 import settings
 from database import enums
@@ -38,6 +39,15 @@ class Tasks(commands.Cog):
     def __init__(self, client: Didier):
         self.client = client
 
+        self._tasks = {
+            "birthdays": self.check_birthdays,
+            "ufora": self.pull_ufora_announcements,
+            "remove_ufora": self.remove_old_ufora_announcements,
+            "wordle": self.reset_wordle_word,
+        }
+
+    @overrides
+    def cog_load(self) -> None:
         # Only check birthdays if there's a channel to send it to
         if settings.BIRTHDAY_ANNOUNCEMENT_CHANNEL is not None:
             self.check_birthdays.start()
@@ -50,11 +60,12 @@ class Tasks(commands.Cog):
         # Start other tasks
         self.reset_wordle_word.start()
 
-        self._tasks = {
-            "birthdays": self.check_birthdays,
-            "ufora": self.pull_ufora_announcements,
-            "wordle": self.reset_wordle_word,
-        }
+    @overrides
+    def cog_unload(self) -> None:
+        # Cancel all pending tasks
+        for task in self._tasks.values():
+            if task.is_running():
+                task.stop()
 
     @commands.group(name="Tasks", aliases=["Task"], case_insensitive=True, invoke_without_command=True)
     @commands.check(is_owner)
