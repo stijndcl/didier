@@ -3,6 +3,7 @@ from datetime import date
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from database.crud.users import get_or_add_user
 from database.schemas import WordleStats
 
 __all__ = ["get_wordle_stats", "complete_wordle_game"]
@@ -13,6 +14,8 @@ async def get_wordle_stats(session: AsyncSession, user_id: int) -> WordleStats:
 
     If no entry is found, it is first created
     """
+    await get_or_add_user(session, user_id)
+
     statement = select(WordleStats).where(WordleStats.user_id == user_id)
     stats = (await session.execute(statement)).scalar_one_or_none()
     if stats is not None:

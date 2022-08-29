@@ -9,6 +9,7 @@ from database.schemas import WordleGuess, WordleWord
 
 __all__ = [
     "get_active_wordle_game",
+    "get_wordle_guesses",
     "make_wordle_guess",
     "set_daily_word",
     "reset_wordle_games",
@@ -21,6 +22,12 @@ async def get_active_wordle_game(session: AsyncSession, user_id: int) -> list[Wo
     statement = select(WordleGuess).where(WordleGuess.user_id == user_id)
     guesses = (await session.execute(statement)).scalars().all()
     return guesses
+
+
+async def get_wordle_guesses(session: AsyncSession, user_id: int) -> list[str]:
+    """Get the strings of a player's guesses"""
+    active_game = await get_active_wordle_game(session, user_id)
+    return list(map(lambda g: g.guess.lower(), active_game))
 
 
 async def make_wordle_guess(session: AsyncSession, user_id: int, guess: str):
@@ -62,7 +69,6 @@ async def set_daily_word(session: AsyncSession, word: str, *, forced: bool = Fal
         await reset_wordle_games(session)
     elif forced:
         current_word.word = word
-        current_word.day = datetime.date.today()
         session.add(current_word)
         await session.commit()
 
@@ -76,3 +82,4 @@ async def reset_wordle_games(session: AsyncSession):
     """Reset all active games"""
     statement = delete(WordleGuess)
     await session.execute(statement)
+    await session.commit()

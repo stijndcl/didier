@@ -121,13 +121,12 @@ async def test_make_wordle_guess(postgres: AsyncSession, user: User):
 
     guess = "guess"
     await crud.make_wordle_guess(postgres, test_user_id, guess)
-    wordle_guesses = await crud.get_active_wordle_game(postgres, test_user_id)
-    assert list(map(lambda x: x.guess, wordle_guesses)) == [guess]
+    assert crud.get_wordle_guesses(postgres, test_user_id) == [guess]
 
     other_guess = "otherguess"
     await crud.make_wordle_guess(postgres, test_user_id, other_guess)
-    wordle_guesses = await crud.get_active_wordle_game(postgres, test_user_id)
-    assert list(map(lambda x: x.guess, wordle_guesses)) == [guess, other_guess]
+    await crud.get_active_wordle_game(postgres, test_user_id)
+    assert crud.get_wordle_guesses(postgres, test_user_id) == [guess, other_guess]
 
 
 @pytest.mark.postgres

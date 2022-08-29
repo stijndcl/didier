@@ -141,8 +141,8 @@ class Tasks(commands.Cog):
     async def reset_wordle_word(self, forced: bool = False):
         """Reset the daily Wordle word"""
         async with self.client.postgres_session as session:
-            word = await set_daily_word(session, random.choice(tuple(self.client.wordle_words)), forced=forced)
-            self.client.database_caches.wordle_word.data = [word]
+            await set_daily_word(session, random.choice(tuple(self.client.wordle_words)), forced=forced)
+            await self.client.database_caches.wordle_word.invalidate(session)
 
     @reset_wordle_word.before_loop
     async def _before_reset_wordle_word(self):

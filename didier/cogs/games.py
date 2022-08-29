@@ -4,10 +4,11 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
-from database.constants import WORDLE_GUESS_COUNT, WORDLE_WORD_LENGTH
-from database.crud.wordle import get_active_wordle_game, make_wordle_guess
+from database.constants import WORDLE_WORD_LENGTH
+from database.crud.wordle import get_wordle_guesses, make_wordle_guess
+from database.crud.wordle_stats import complete_wordle_game
 from didier import Didier
-from didier.data.embeds.wordle import WordleEmbed, WordleErrorEmbed
+from didier.data.embeds.wordle import WordleEmbed, WordleErrorEmbed, is_wordle_game_over
 
 
 class Games(commands.Cog):
@@ -31,14 +32,13 @@ class Games(commands.Cog):
             embed = WordleErrorEmbed(message=f"Guess must be 5 characters, but `{guess}` is {len(guess)}.").to_embed()
             return await interaction.followup.send(embed=embed)
 
-        word = self.client.database_caches.wordle_word.data[0].lower()
+        word_instance = self.client.database_caches.wordle_word.word
 
         async with self.client.postgres_session as session:
-            guesses_instances = await get_active_wordle_game(session, interaction.user.id)
-            guesses = list(map(lambda g: g.guess, guesses_instances))
+            guesses = await get_wordle_guesses(session, interaction.user.id)
 
             # Trying to guess with a complete game
-            if (len(guesses) == WORDLE_GUESS_COUNT and guess) or word in guesses:
+            if is_wordle_game_over(guesses, word_instance.word):
                 embed = WordleErrorEmbed(
                     message="You've already completed today's Wordle.\nTry again tomorrow!"
                 ).to_embed()
@@ -58,8 +58,13 @@ class Games(commands.Cog):
                 # just append locally
                 guesses.append(guess)
 
-            embed = WordleEmbed(guesses=guesses, word=word).to_embed()
+            embed = WordleEmbed(guesses=guesses, word=word_instance).to_embed()
             await interaction.followup.send(embed=embed)
+
+            # After responding to the interaction: update stats in the background
+            game_over = is_wordle_game_over(guesses, word_instance.word)
+            if game_over:
+                await complete_wordle_game(session, interaction.user.id, word_instance.word in guesses)
 
 
 async def setup(client: Didier):

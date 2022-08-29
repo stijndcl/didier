@@ -8,6 +8,8 @@ from database.crud import links, memes, ufora_courses, wordle
 
 __all__ = ["CacheManager", "LinkCache", "UforaCourseCache"]
 
+from database.schemas import WordleWord
+
 
 class DatabaseCache(ABC):
     """Base class for a simple cache-like structure
@@ -118,10 +120,12 @@ class UforaCourseCache(DatabaseCache):
 class WordleCache(DatabaseCache):
     """Cache to store the current daily Wordle word"""
 
+    word: WordleWord
+
     async def invalidate(self, database_session: AsyncSession):
         word = await wordle.get_daily_word(database_session)
         if word is not None:
-            self.data = [word.word]
+            self.word = word
 
 
 class CacheManager:
