@@ -17,11 +17,12 @@ class PageSource(ABC, Generic[T]):
     """Base class that handles the embeds displayed in a menu"""
 
     dataset: list[T]
-    embeds: list[discord.Embed] = []
+    embeds: list[discord.Embed]
     page_count: int
     per_page: int
 
     def __init__(self, ctx: commands.Context, dataset: list[T], *, per_page: int = 10):
+        self.embeds = []
         self.dataset = dataset
         self.per_page = per_page
         self.page_count = self._get_page_count()

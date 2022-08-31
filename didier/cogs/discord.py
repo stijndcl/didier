@@ -5,7 +5,12 @@ from discord import app_commands
 from discord.ext import commands
 
 from database.crud import birthdays, bookmarks
-from database.exceptions import DuplicateInsertException, ForbiddenNameException
+from database.exceptions import (
+    DuplicateInsertException,
+    Forbidden,
+    ForbiddenNameException,
+    NoResultFoundException,
+)
 from didier import Didier
 from didier.exceptions import expect
 from didier.menus.bookmarks import BookmarkSource
@@ -73,8 +78,12 @@ class Discord(commands.Cog):
             await self.client.confirm_message(ctx.message)
 
     @commands.group(name="Bookmark", aliases=["Bm", "Bookmarks"], case_insensitive=True, invoke_without_command=True)
-    async def bookmark(self, ctx: commands.Context, label: str):
+    async def bookmark(self, ctx: commands.Context, *, label: Optional[str] = None):
         """Post a bookmarked message"""
+        # No label: shortcut to display bookmarks
+        if label is None:
+            return await self.bookmark_search(ctx, query=None)
+
         async with self.client.postgres_session as session:
             result = expect(
                 await bookmarks.get_bookmark_by_name(session, ctx.author.id, label),
@@ -106,6 +115,28 @@ class Discord(commands.Cog):
         except ForbiddenNameException:
             # Label isn't allowed
             return await ctx.reply(f"Bookmarks cannot be named `{label}`.", mention_author=False)
+
+    @bookmark.command(name="Delete", aliases=["Rm"])
+    async def bookmark_delete(self, ctx: commands.Context, bookmark_id: str):
+        """Delete a bookmark by its id"""
+        # The bookmarks are displayed with a hashtag in front of the id
+        # so strip it out in case people want to try and use this
+        bookmark_id = bookmark_id.removeprefix("#")
+
+        try:
+            bookmark_id_int = int(bookmark_id)
+        except ValueError:
+            return await ctx.reply(f"`{bookmark_id}` is not a valid bookmark id.", mention_author=False)
+
+        async with self.client.postgres_session as session:
+            try:
+                await bookmarks.delete_bookmark_by_id(session, ctx.author.id, bookmark_id_int)
+            except NoResultFoundException:
+                return await ctx.reply(f"Found no bookmark with id `#{bookmark_id_int}`.", mention_author=False)
+            except Forbidden:
+                return await ctx.reply(f"You don't own bookmark `#{bookmark_id_int}`.", mention_author=False)
+
+        return await ctx.reply(f"Successfully deleted bookmark `#{bookmark_id_int}`.", mention_author=False)
 
     @bookmark.command(name="Search", aliases=["List", "Ls"])
     async def bookmark_search(self, ctx: commands.Context, *, query: Optional[str] = None):

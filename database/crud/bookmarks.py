@@ -1,11 +1,16 @@
 from typing import Optional
 
 import sqlalchemy.exc
-from sqlalchemy import func, select
+from sqlalchemy import delete, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from database.crud.users import get_or_add_user
-from database.exceptions import DuplicateInsertException, ForbiddenNameException
+from database.exceptions import (
+    DuplicateInsertException,
+    Forbidden,
+    ForbiddenNameException,
+    NoResultFoundException,
+)
 from database.schemas import Bookmark
 
 __all__ = ["create_bookmark", "get_bookmarks", "get_bookmark_by_name"]
@@ -14,7 +19,7 @@ __all__ = ["create_bookmark", "get_bookmarks", "get_bookmark_by_name"]
 async def create_bookmark(session: AsyncSession, user_id: int, label: str, jump_url: str) -> Bookmark:
     """Create a new bookmark to a message"""
     # Don't allow bookmarks with names of subcommands
-    if label.lower() in ["create", "ls", "list", "search"]:
+    if label.lower() in ["create", "delete", "ls", "list", "Rm", "search"]:
         raise ForbiddenNameException
 
     await get_or_add_user(session, user_id)
@@ -28,6 +33,28 @@ async def create_bookmark(session: AsyncSession, user_id: int, label: str, jump_
         raise DuplicateInsertException from e
 
     return bookmark
+
+
+async def delete_bookmark_by_id(session: AsyncSession, user_id: int, bookmark_id: int):
+    """Find a bookmark by its id & delete it
+
+    This fails if you don't own this bookmark
+    """
+    statement = select(Bookmark).where(Bookmark.bookmark_id == bookmark_id)
+    bookmark = (await session.execute(statement)).scalar_one_or_none()
+
+    # No bookmark with this id
+    if bookmark is None:
+        raise NoResultFoundException
+
+    # You don't own this bookmark
+    if bookmark.user_id != user_id:
+        raise Forbidden
+
+    # Delete it
+    statement = delete(Bookmark).where(Bookmark.bookmark_id == bookmark_id)
+    await session.execute(statement)
+    await session.commit()
 
 
 async def get_bookmarks(session: AsyncSession, user_id: int, *, query: Optional[str] = None) -> list[Bookmark]:
