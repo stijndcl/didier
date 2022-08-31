@@ -40,8 +40,8 @@ async def delete_bookmark_by_id(session: AsyncSession, user_id: int, bookmark_id
 
     This fails if you don't own this bookmark
     """
-    statement = select(Bookmark).where(Bookmark.bookmark_id == bookmark_id)
-    bookmark = (await session.execute(statement)).scalar_one_or_none()
+    select_statement = select(Bookmark).where(Bookmark.bookmark_id == bookmark_id)
+    bookmark = (await session.execute(select_statement)).scalar_one_or_none()
 
     # No bookmark with this id
     if bookmark is None:
@@ -52,8 +52,8 @@ async def delete_bookmark_by_id(session: AsyncSession, user_id: int, bookmark_id
         raise Forbidden
 
     # Delete it
-    statement = delete(Bookmark).where(Bookmark.bookmark_id == bookmark_id)
-    await session.execute(statement)
+    delete_statement = delete(Bookmark).where(Bookmark.bookmark_id == bookmark_id)
+    await session.execute(delete_statement)
     await session.commit()
 
 
