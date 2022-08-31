@@ -17,15 +17,16 @@ class PageSource(ABC, Generic[T]):
     """Base class that handles the embeds displayed in a menu"""
 
     dataset: list[T]
-    embeds: list[discord.Embed] = []
+    embeds: list[discord.Embed]
     page_count: int
     per_page: int
 
-    def __init__(self, dataset: list[T], *, per_page: int = 10):
+    def __init__(self, ctx: commands.Context, dataset: list[T], *, per_page: int = 10):
+        self.embeds = []
         self.dataset = dataset
         self.per_page = per_page
         self.page_count = self._get_page_count()
-        self.create_embeds()
+        self.create_embeds(ctx)
         self._add_embed_page_footers()
 
     def _get_page_count(self) -> int:
@@ -47,7 +48,7 @@ class PageSource(ABC, Generic[T]):
             embed.set_footer(text=f"{i + 1}/{self.page_count}")
 
     @abstractmethod
-    def create_embeds(self):
+    def create_embeds(self, ctx: commands.Context):
         """Method that builds the list of embeds from the input data"""
         raise NotImplementedError
 
@@ -68,6 +69,10 @@ class Menu(discord.ui.View):
 
     def do_button_disabling(self):
         """Disable buttons depending on the current page"""
+        # No items to disable
+        if not self.children:
+            return
+
         first_page = cast(discord.ui.Button, self.children[0])
         first_page.disabled = self.current_page == 0
 
@@ -87,8 +92,6 @@ class Menu(discord.ui.View):
         """
         self.do_button_disabling()
 
-        print(self.current_page, self.source[self.current_page].footer.text)
-
         # Send the initial message if there is none yet, else edit the existing one
         if self.message is None:
             self.message = await self.ctx.reply(
@@ -100,6 +103,10 @@ class Menu(discord.ui.View):
     async def start(self, ctx: commands.Context):
         """Send the initial message with this menu"""
         self.ctx = ctx
+
+        if len(self.source) == 1:
+            self.clear_items()
+
         await self.display_current_state()
 
     async def stop_view(self, interaction: Optional[discord.Interaction] = None):
