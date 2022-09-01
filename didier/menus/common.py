@@ -144,6 +144,11 @@ class Menu(discord.ui.View):
     @discord.ui.button(label="Stop", style=discord.ButtonStyle.red)
     async def stop_pages(self, interaction: discord.Interaction, button: discord.ui.Button):
         """Button to stop the view"""
+        if self.ctx is not None and self.ctx.author != interaction.user:
+            return await interaction.response.send_message(
+                "Only the person that invoked the command can stop this menu.", ephemeral=True
+            )
+
         await self.stop_view(interaction)
 
     @discord.ui.button(label=">", style=discord.ButtonStyle.primary)
