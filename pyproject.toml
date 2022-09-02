@@ -17,6 +17,7 @@ omit = [
     "./didier/data/constants.py",
     "./didier/data/embeds/*",
     "./didier/data/flags/*",
+    "./didier/menus/*",
     "./didier/utils/discord/colours.py",
     "./didier/utils/discord/constants.py",
     "./didier/utils/discord/flags/*",

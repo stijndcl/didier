@@ -45,7 +45,7 @@ def pluralize(word: str, amount: int, plural_form: Optional[str] = None) -> str:
     return plural_form or (word + "s")
 
 
-def get_edu_year_name(year: int) -> str:
+def get_edu_year_name(year: int) -> str:  # pragma: no cover
     """Get the string representation of a university year"""
     years = ["1st Bachelor", "2nd Bachelor", "3rd Bachelor", "1st Master", "2nd Master"]
 
