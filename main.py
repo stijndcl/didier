@@ -11,7 +11,10 @@ from didier import Didier
 async def run_bot():
     """Run Didier"""
     didier = Didier()
-    await didier.start(settings.DISCORD_TOKEN)
+    try:
+        await didier.start(settings.DISCORD_TOKEN)
+    finally:
+        await didier.http_session.close()
 
 
 def setup_logging():

@@ -11,9 +11,12 @@ from didier import Didier
 from didier.data.apis.hydra import fetch_menu
 from didier.data.embeds.deadlines import Deadlines
 from didier.data.embeds.hydra import no_menu_found
-from didier.exceptions import HTTPException
+from didier.data.embeds.schedules import Schedule, get_schedule_for_user
+from didier.exceptions import HTTPException, NotInMainGuildException
 from didier.utils.discord.converters.time import DateTransformer
 from didier.utils.discord.flags.school import StudyGuideFlags
+from didier.utils.discord.users import to_main_guild_member
+from didier.utils.types.datetime import skip_weekends
 
 
 class School(commands.Cog):
@@ -32,6 +35,30 @@ class School(commands.Cog):
 
         embed = Deadlines(deadlines).to_embed()
         await ctx.reply(embed=embed, mention_author=False, ephemeral=False)
+
+    @commands.hybrid_command(
+        name="les", description="Show your personalized schedule for a given day.", aliases=["Sched", "Schedule"]
+    )
+    @app_commands.rename(day_dt="date")
+    async def les(self, ctx: commands.Context, day_dt: Optional[app_commands.Transform[date, DateTransformer]] = None):
+        """Show your personalized schedule for a given day."""
+        if day_dt is None:
+            day_dt = date.today()
+
+        day_dt = skip_weekends(day_dt)
+
+        async with ctx.typing():
+            try:
+                member_instance = to_main_guild_member(self.client, ctx.author)
+
+                # Always make sure there is at least one schedule in case it returns None
+                # this allows proper error messages
+                schedule = get_schedule_for_user(self.client, member_instance, day_dt) or Schedule()
+
+                return await ctx.reply(embed=schedule.to_embed(day=day_dt), mention_author=False)
+
+            except NotInMainGuildException:
+                return await ctx.reply(f"You are not a member of {self.client.main_guild.name}.", mention_author=False)
 
     @commands.hybrid_command(
         name="menu",

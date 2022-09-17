@@ -1,6 +1,7 @@
 import logging
 import os
 import pathlib
+from functools import cached_property
 
 import discord
 from aiohttp import ClientSession
@@ -13,7 +14,7 @@ from database.crud import custom_commands
 from database.engine import DBSession
 from database.utils.caches import CacheManager
 from didier.data.embeds.error_embed import create_error_embed
-from didier.data.schedules import Schedule, parse_schedule
+from didier.data.embeds.schedules import Schedule, parse_schedule
 from didier.exceptions import HTTPException, NoMatch
 from didier.utils.discord.prefix import get_prefix
 
@@ -51,6 +52,11 @@ class Didier(commands.Bot):
         )
 
         self.tree.on_error = self.on_app_command_error
+
+    @cached_property
+    def main_guild(self) -> discord.Guild:
+        """Obtain a reference to the main guild"""
+        return self.get_guild(settings.DISCORD_MAIN_GUILD)
 
     @property
     def postgres_session(self) -> AsyncSession:

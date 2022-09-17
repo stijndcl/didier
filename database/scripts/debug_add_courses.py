@@ -10,7 +10,14 @@ async def main():
     """Add debug Ufora courses"""
     session: AsyncSession
     async with DBSession() as session:
-        modsim = UforaCourse(course_id=439235, code="C003786", name="Modelleren en Simuleren", year=3, compulsory=False)
+        modsim = UforaCourse(
+            course_id=439235,
+            code="C003786",
+            name="Modelleren en Simuleren",
+            year=3,
+            compulsory=False,
+            role_id=785577582561067028,
+        )
 
         session.add_all([modsim])
         await session.commit()
