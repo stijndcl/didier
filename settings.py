@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 from typing import Optional
 
 from environs import Env
@@ -22,10 +23,13 @@ __all__ = [
     "DISCORD_BOOS_REACT",
     "DISCORD_CUSTOM_COMMAND_PREFIX",
     "UFORA_ANNOUNCEMENTS_CHANNEL",
+    "BA3_ROLE",
     "UFORA_RSS_TOKEN",
     "URBAN_DICTIONARY_TOKEN",
     "IMGFLIP_NAME",
     "IMGFLIP_PASSWORD",
+    "BA3_SCHEDULE_URL",
+    "SCHEDULE_DATA",
 ]
 
 
@@ -35,6 +39,7 @@ TESTING: bool = env.bool("TESTING", False)
 LOGFILE: str = env.str("LOGFILE", "didier.log")
 SEMESTER: int = env.int("SEMESTER", 2)
 YEAR: int = env.int("YEAR", 3)
+MENU_TIMEOUT: int = env.int("MENU_TIMEOUT", 30)
 
 """Database"""
 # PostgreSQL
@@ -56,11 +61,29 @@ BIRTHDAY_ANNOUNCEMENT_CHANNEL: Optional[int] = env.int("BIRTHDAY_ANNOUNCEMENT_CH
 ERRORS_CHANNEL: Optional[int] = env.int("ERRORS_CHANNEL", None)
 UFORA_ANNOUNCEMENTS_CHANNEL: Optional[int] = env.int("UFORA_ANNOUNCEMENTS_CHANNEL", None)
 
-""""General config"""
-MENU_TIMEOUT: int = env.int("MENU_TIMEOUT", 30)
+"""Discord Role ID's"""
+BA3_ROLE: Optional[int] = env.int("BA3_ROLE", 891743208248324196)
 
 """API Keys"""
 UFORA_RSS_TOKEN: Optional[str] = env.str("UFORA_RSS_TOKEN", None)
 URBAN_DICTIONARY_TOKEN: Optional[str] = env.str("URBAN_DICTIONARY_TOKEN", None)
 IMGFLIP_NAME: Optional[str] = env.str("IMGFLIP_NAME", None)
 IMGFLIP_PASSWORD: Optional[str] = env.str("IMGFLIP_PASSWORD", None)
+
+"""Schedule URLs"""
+BA3_SCHEDULE_URL: Optional[str] = env.str("BA3_SCHEDULE_URL", None)
+
+
+"""Computed properties"""
+
+
+@dataclass
+class ScheduleInfo:
+    """Dataclass to hold and combine some information about schedule-related settings"""
+
+    role_id: Optional[int]
+    schedule_url: Optional[str]
+    name: Optional[str] = None
+
+
+SCHEDULE_DATA = [ScheduleInfo(name="ba3", role_id=BA3_ROLE, schedule_url=BA3_SCHEDULE_URL)]

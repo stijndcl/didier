@@ -10,4 +10,5 @@ class TaskType(enum.IntEnum):
     """Enum for the different types of tasks"""
 
     BIRTHDAYS = enum.auto()
+    SCHEDULES = enum.auto()
     UFORA_ANNOUNCEMENTS = enum.auto()

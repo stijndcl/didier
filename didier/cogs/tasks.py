@@ -41,6 +41,7 @@ class Tasks(commands.Cog):
 
         self._tasks = {
             "birthdays": self.check_birthdays,
+            "schedules": self.pull_schedules,
             "ufora": self.pull_ufora_announcements,
             "remove_ufora": self.remove_old_ufora_announcements,
             "wordle": self.reset_wordle_word,
@@ -59,6 +60,7 @@ class Tasks(commands.Cog):
 
         # Start other tasks
         self.reset_wordle_word.start()
+        self.pull_schedules.start()
 
     @overrides
     def cog_unload(self) -> None:
@@ -109,6 +111,32 @@ class Tasks(commands.Cog):
     @check_birthdays.before_loop
     async def _before_check_birthdays(self):
         await self.client.wait_until_ready()
+
+    @tasks.loop(time=DAILY_RESET_TIME)
+    @timed_task(enums.TaskType.SCHEDULES)
+    async def pull_schedules(self, **kwargs):
+        """Task that pulls the schedules & saves the files locally
+
+        Schedules are then parsed & cached in memory
+        """
+        _ = kwargs
+
+        for data in settings.SCHEDULE_DATA:
+            if data.schedule_url is None:
+                return
+
+            async with self.client.http_session.get(data.schedule_url) as response:
+                # If a schedule couldn't be fetched, log it and move on
+                if response.status != 200:
+                    await self.client.log_warning(
+                        f"Unable to fetch schedule {data.name} (status {response.status}).", log_to_discord=False
+                    )
+                    continue
+
+                # Write the content to a file
+                content = await response.text()
+                with open(f"files/schedules/{data.name}.ics", "w+") as fp:
+                    fp.write(content)
 
     @tasks.loop(minutes=10)
     @timed_task(enums.TaskType.UFORA_ANNOUNCEMENTS)
@@ -166,3 +194,4 @@ async def setup(client: Didier):
     cog = Tasks(client)
     await client.add_cog(cog)
     await cog.reset_wordle_word()
+    await cog.pull_schedules()

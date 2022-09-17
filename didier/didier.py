@@ -1,5 +1,6 @@
 import logging
 import os
+import pathlib
 
 import discord
 from aiohttp import ClientSession
@@ -59,6 +60,9 @@ class Didier(commands.Bot):
 
         This hook is called once the bot is initialised
         """
+        # Create directories that are ignored on GitHub
+        self._create_ignored_directories()
+
         # Load the Wordle dictionary
         self._load_wordle_words()
 
@@ -67,18 +71,25 @@ class Didier(commands.Bot):
         async with self.postgres_session as session:
             await self.database_caches.initialize_caches(session)
 
+        # Create aiohttp session
+        self.http_session = ClientSession()
+
         # Load extensions
         await self._load_initial_extensions()
         await self._load_directory_extensions("didier/cogs")
-
-        # Create aiohttp session
-        self.http_session = ClientSession()
 
         # Configure channel to send errors to
         if settings.ERRORS_CHANNEL is not None:
             self.error_channel = self.get_channel(settings.ERRORS_CHANNEL)
         else:
             self.error_channel = self.get_user(self.owner_id)
+
+    def _create_ignored_directories(self):
+        """Create directories that store ignored data"""
+        ignored = ["files/schedules"]
+
+        for directory in ignored:
+            pathlib.Path(directory).mkdir(exist_ok=True, parents=True)
 
     async def _load_initial_extensions(self):
         """Load all extensions that should  be loaded before the others"""
@@ -138,12 +149,26 @@ class Didier(commands.Bot):
         """Add an X to a message"""
         await message.add_reaction("❌")
 
-    async def log_error(self, message: str, log_to_discord: bool = True):
-        """Send an error message to the logs, and optionally the configured channel"""
-        logger.error(message)
+    async def _log(self, level: int, message: str, log_to_discord: bool = True):
+        """Log a message to the logging file, and optionally to the configured channel"""
+        methods = {
+            logging.ERROR: logger.error,
+            logging.WARNING: logger.warning,
+        }
+
+        methods.get(level, logger.error)(message)
         if log_to_discord:
             # TODO pretty embed
+            #  different colours per level?
             await self.error_channel.send(message)
+
+    async def log_error(self, message: str, log_to_discord: bool = True):
+        """Log an error message"""
+        await self._log(logging.ERROR, message, log_to_discord)
+
+    async def log_warning(self, message: str, log_to_discord: bool = True):
+        """Log a warning message"""
+        await self._log(logging.WARNING, message, log_to_discord)
 
     async def on_ready(self):
         """Event triggered when the bot is ready"""
