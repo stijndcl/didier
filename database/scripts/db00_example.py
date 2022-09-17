@@ -7,7 +7,7 @@ __all__ = ["main"]
 
 
 async def main():
-    """Add debug Ufora courses"""
+    """Example script: add a Ufora course"""
     session: AsyncSession
     async with DBSession() as session:
         modsim = UforaCourse(

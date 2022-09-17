@@ -7,7 +7,7 @@ import asyncio
 import sys
 from typing import Callable
 
-from database.scripts.debug_add_courses import main as debug_add_courses
+from database.scripts.db00_example import main as debug_add_courses
 
 script_mapping: dict[str, Callable] = {"debug_add_courses.py": debug_add_courses}
 
