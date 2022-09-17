@@ -105,6 +105,7 @@ class ScheduleSlot:
         """Fix some properties to display more nicely"""
         # Re-format the location data
         room, building, campus = re.search(r"(.*)\. Gebouw (.*)\. Campus (.*)\. ", self.location).groups()
+        room = room.replace("PC / laptoplokaal ", "PC-lokaal")
         self.location = f"{campus} {building} {room}"
 
         self._hash = hash(f"{self.course.course_id} {str(self.start_time)}")
