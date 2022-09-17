@@ -1,8 +1,8 @@
 """Initial migration
 
-Revision ID: ea9811f060aa
+Revision ID: 5bdb99885a5d
 Revises:
-Create Date: 2022-09-17 17:31:20.593318
+Create Date: 2022-09-17 22:39:15.969694
 
 """
 import sqlalchemy as sa
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 from alembic import op
 
 # revision identifiers, used by Alembic.
-revision = "ea9811f060aa"
+revision = "5bdb99885a5d"
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -70,6 +70,7 @@ def upgrade() -> None:
         sa.Column("year", sa.Integer(), nullable=False),
         sa.Column("compulsory", sa.Boolean(), server_default="1", nullable=False),
         sa.Column("role_id", sa.Integer(), nullable=True),
+        sa.Column("overarching_role_id", sa.Integer(), nullable=True),
         sa.Column("log_announcements", sa.Boolean(), server_default="0", nullable=False),
         sa.PrimaryKeyConstraint("course_id"),
         sa.UniqueConstraint("code"),

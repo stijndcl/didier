@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from enum import Enum
 from typing import Optional
 
 from environs import Env
@@ -29,6 +30,8 @@ __all__ = [
     "IMGFLIP_NAME",
     "IMGFLIP_PASSWORD",
     "BA3_SCHEDULE_URL",
+    "ScheduleType",
+    "ScheduleInfo",
     "SCHEDULE_DATA",
 ]
 
@@ -53,6 +56,7 @@ POSTGRES_PORT: int = env.int("POSTGRES_PORT", "5432")
 DISCORD_TOKEN: str = env.str("DISCORD_TOKEN")
 DISCORD_READY_MESSAGE: str = env.str("DISCORD_READY_MESSAGE", "I'M READY I'M READY I'M READY")
 DISCORD_STATUS_MESSAGE: str = env.str("DISCORD_STATUS_MESSAGE", "with your Didier Dinks.")
+DISCORD_MAIN_GUILD: Optional[int] = env.int("DISCORD_MAIN_GUILD", 626699611192688641)
 DISCORD_TEST_GUILDS: list[int] = env.list("DISCORD_TEST_GUILDS", [], subcast=int)
 DISCORD_OWNER_GUILDS: Optional[list[int]] = env.list("DISCORD_OWNER_GUILDS", [], subcast=int) or None
 DISCORD_BOOS_REACT: str = env.str("DISCORD_BOOS_REACT", "<:boos:629603785840263179>")
@@ -77,6 +81,12 @@ BA3_SCHEDULE_URL: Optional[str] = env.str("BA3_SCHEDULE_URL", None)
 """Computed properties"""
 
 
+class ScheduleType(str, Enum):
+    """Enum to differentiate schedules"""
+
+    BA3 = "ba3"
+
+
 @dataclass
 class ScheduleInfo:
     """Dataclass to hold and combine some information about schedule-related settings"""
@@ -86,4 +96,4 @@ class ScheduleInfo:
     name: Optional[str] = None
 
 
-SCHEDULE_DATA = [ScheduleInfo(name="ba3", role_id=BA3_ROLE, schedule_url=BA3_SCHEDULE_URL)]
+SCHEDULE_DATA = [ScheduleInfo(name=ScheduleType.BA3, role_id=BA3_ROLE, schedule_url=BA3_SCHEDULE_URL)]

@@ -53,6 +53,15 @@ class Owner(commands.Cog):
         """Raise an exception for debugging purposes"""
         raise Exception(message)
 
+    @commands.command(name="Reload")
+    async def reload(self, ctx: commands.Context, *cogs: str):
+        """Reload the cogs passed as an argument"""
+        for cog in cogs:
+            await self.client.reload_extension(f"didier.cogs.{cog}")
+
+        await self.client.confirm_message(ctx.message)
+        return await ctx.reply(f"Successfully reloaded {', '.join(cogs)}.", mention_author=False)
+
     @commands.command(name="Sync")
     async def sync(
         self,

@@ -13,6 +13,7 @@ from database.crud import custom_commands
 from database.engine import DBSession
 from database.utils.caches import CacheManager
 from didier.data.embeds.error_embed import create_error_embed
+from didier.data.schedules import Schedule, parse_schedule
 from didier.exceptions import HTTPException, NoMatch
 from didier.utils.discord.prefix import get_prefix
 
@@ -29,6 +30,7 @@ class Didier(commands.Bot):
     error_channel: discord.abc.Messageable
     initial_extensions: tuple[str, ...] = ()
     http_session: ClientSession
+    schedules: dict[settings.ScheduleType, Schedule] = {}
     wordle_words: set[str] = set()
 
     def __init__(self):
@@ -62,6 +64,9 @@ class Didier(commands.Bot):
         """
         # Create directories that are ignored on GitHub
         self._create_ignored_directories()
+
+        # Load schedules
+        await self.load_schedules()
 
         # Load the Wordle dictionary
         self._load_wordle_words()
@@ -119,6 +124,18 @@ class Didier(commands.Bot):
         with open("files/dictionaries/words-english-wordle.txt", "r") as fp:
             for line in fp:
                 self.wordle_words.add(line.strip())
+
+    async def load_schedules(self):
+        """Parse & load all schedules into memory"""
+        self.schedules = {}
+
+        async with self.postgres_session as session:
+            for schedule_data in settings.SCHEDULE_DATA:
+                schedule = await parse_schedule(schedule_data.name, database_session=session)
+                if schedule is None:
+                    continue
+
+                self.schedules[schedule_data.name] = schedule
 
     async def get_reply_target(self, ctx: commands.Context) -> discord.Message:
         """Get the target message that should be replied to

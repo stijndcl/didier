@@ -12,6 +12,7 @@ from database.crud.ufora_announcements import remove_old_announcements
 from database.crud.wordle import set_daily_word
 from didier import Didier
 from didier.data.embeds.ufora.announcements import fetch_ufora_announcements
+from didier.data.schedules import parse_schedule_from_content
 from didier.decorators.tasks import timed_task
 from didier.utils.discord.checks import is_owner
 from didier.utils.types.datetime import LOCAL_TIMEZONE, tz_aware_now
@@ -121,22 +122,25 @@ class Tasks(commands.Cog):
         """
         _ = kwargs
 
-        for data in settings.SCHEDULE_DATA:
-            if data.schedule_url is None:
-                return
+        async with self.client.postgres_session as session:
+            for data in settings.SCHEDULE_DATA:
+                if data.schedule_url is None:
+                    return
 
-            async with self.client.http_session.get(data.schedule_url) as response:
-                # If a schedule couldn't be fetched, log it and move on
-                if response.status != 200:
-                    await self.client.log_warning(
-                        f"Unable to fetch schedule {data.name} (status {response.status}).", log_to_discord=False
-                    )
-                    continue
+                async with self.client.http_session.get(data.schedule_url) as response:
+                    # If a schedule couldn't be fetched, log it and move on
+                    if response.status != 200:
+                        await self.client.log_warning(
+                            f"Unable to fetch schedule {data.name} (status {response.status}).", log_to_discord=False
+                        )
+                        continue
 
-                # Write the content to a file
-                content = await response.text()
-                with open(f"files/schedules/{data.name}.ics", "w+") as fp:
-                    fp.write(content)
+                    # Write the content to a file
+                    content = await response.text()
+                    with open(f"files/schedules/{data.name}.ics", "w+") as fp:
+                        fp.write(content)
+
+                    await parse_schedule_from_content(content, database_session=session)
 
     @tasks.loop(minutes=10)
     @timed_task(enums.TaskType.UFORA_ANNOUNCEMENTS)
@@ -194,4 +198,4 @@ async def setup(client: Didier):
     cog = Tasks(client)
     await client.add_cog(cog)
     await cog.reset_wordle_word()
-    await cog.pull_schedules()
+    # await cog.pull_schedules()
