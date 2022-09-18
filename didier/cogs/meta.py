@@ -8,21 +8,24 @@ from didier import Didier
 
 
 class Meta(commands.Cog):
-    """Cog for Didier-related commands"""
+    """Commands related to Didier himself."""
 
     client: Didier
 
     def __init__(self, client: Didier):
         self.client = client
 
-    @commands.command(name="Marco")
+    @commands.command(name="marco")
     async def marco(self, ctx: commands.Context):
-        """Ping command to get the delay of the bot"""
+        """Ping command to get Didier's latency."""
         return await ctx.reply(f"Polo! {round(self.client.latency * 1000)}ms", mention_author=False)
 
-    @commands.command(name="Source", aliases=["Src"])
+    @commands.command(name="source", aliases=["src"])
     async def source(self, ctx: commands.Context, *, command_name: Optional[str] = None):
-        """Command to get links to the source code of Didier"""
+        """Get a link to the source code of Didier.
+
+        If a value for `command_name` is passed, the source for `command_name` is shown instead.
+        """
         repo_home = "https://github.com/stijndcl/didier"
 
         if command_name is None:
@@ -38,12 +41,12 @@ class Meta(commands.Cog):
             filename = src.co_filename
 
         if command is None:
-            return await ctx.reply(f"Geen commando gevonden voor ``{command_name}``.", mention_author=False)
+            return await ctx.reply(f"Found no command named `{command_name}`.", mention_author=False)
 
         lines, first_line = inspect.getsourcelines(src)
 
         if filename is None:
-            return await ctx.reply(f"Geen code gevonden voor ``{command_name}``.", mention_author=False)
+            return await ctx.reply(f"Found no source file for `{command_name}`.", mention_author=False)
 
         file_location = os.path.relpath(filename).replace("\\", "/")
 

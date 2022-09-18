@@ -31,7 +31,7 @@ class Fun(commands.Cog):
 
     @commands.hybrid_command(
         name="dadjoke",
-        aliases=["Dad", "Dj"],
+        aliases=["dad", "dj"],
         description="Why does Yoda's code always crash? Because there is no try.",
     )
     async def dad_joke(self, ctx: commands.Context):
@@ -40,14 +40,14 @@ class Fun(commands.Cog):
             joke = await get_random_dad_joke(session)
             return await ctx.reply(joke.joke, mention_author=False)
 
-    @commands.group(name="Memegen", aliases=["Meme", "Memes"], invoke_without_command=True, case_insensitive=True)
+    @commands.group(name="memegen", aliases=["meme", "memes"], invoke_without_command=True, case_insensitive=True)
     async def memegen_msg(self, ctx: commands.Context, meme_name: str, *, fields: str):
         """Command group for meme-related commands"""
         async with ctx.typing():
             meme = await self._do_generate_meme(meme_name, shlex.split(fields))
             return await ctx.reply(meme, mention_author=False)
 
-    @memegen_msg.command(name="Preview", aliases=["P"])
+    @memegen_msg.command(name="preview", aliases=["p"])
     async def memegen_preview_msg(self, ctx: commands.Context, meme_name: str):
         """Generate a preview for a meme, to see how the fields are structured"""
         async with ctx.typing():

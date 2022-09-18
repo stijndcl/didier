@@ -9,9 +9,10 @@ from didier.utils.discord.colours import error_red
 
 
 class CustomHelpCommand(commands.MinimalHelpCommand):
-    """Customised Help command to override the default implementation
+    """Customised Help command that overrides the default implementation
 
-    The default is ugly as hell, so we do some fiddling with it
+    The default is ugly as hell, so we do some fiddling with it and put everything
+    in fancy embeds
     """
 
     @overrides
@@ -154,6 +155,14 @@ class CustomHelpCommand(commands.MinimalHelpCommand):
 
 async def setup(client: Didier):
     """Load the cog"""
-    attributes = {"aliases": ["h", "man"]}
+    help_str = (
+        "Shows the help page for a category or command. "
+        "`/commands` are not included, as they already have built-in descriptions in the UI."
+        "\n\nThe command signatures follow the POSIX-standard format for help messages:"
+        "\n- `required_positional_argument`"
+        "\n- `[optional_positional_argument]`"
+    )
+
+    attributes = {"aliases": ["h", "man"], "usage": "[category or command]", "help": help_str}
 
     client.help_command = CustomHelpCommand(command_attrs=attributes)
