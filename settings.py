@@ -67,6 +67,8 @@ UFORA_ANNOUNCEMENTS_CHANNEL: Optional[int] = env.int("UFORA_ANNOUNCEMENTS_CHANNE
 
 """Discord Role ID's"""
 BA3_ROLE: Optional[int] = env.int("BA3_ROLE", 891743208248324196)
+MA_CS_ROLE: Optional[int] = env.int("MA_CS_ROLE", None)
+MA_CS_ENG_ROLE: Optional[int] = env.int("MA_CS_ENG_ROLE", None)
 
 """API Keys"""
 UFORA_RSS_TOKEN: Optional[str] = env.str("UFORA_RSS_TOKEN", None)
@@ -76,6 +78,8 @@ IMGFLIP_PASSWORD: Optional[str] = env.str("IMGFLIP_PASSWORD", None)
 
 """Schedule URLs"""
 BA3_SCHEDULE_URL: Optional[str] = env.str("BA3_SCHEDULE_URL", None)
+MA_CS_SCHEDULE_URL: Optional[str] = env.str("MA_CS_SCHEDULE_URL", None)
+MA_CS_ENG_SCHEDULE_URL: Optional[str] = env.str("MA_CS_ENG_SCHEDULE_URL", None)
 
 
 """Computed properties"""
@@ -85,6 +89,8 @@ class ScheduleType(str, Enum):
     """Enum to differentiate schedules"""
 
     BA3 = "ba3"
+    MA_CS = "ma_cs"
+    MA_CS_ENG = "ma_cs_eng"
 
 
 @dataclass
@@ -96,4 +102,8 @@ class ScheduleInfo:
     name: Optional[str] = None
 
 
-SCHEDULE_DATA = [ScheduleInfo(name=ScheduleType.BA3, role_id=BA3_ROLE, schedule_url=BA3_SCHEDULE_URL)]
+SCHEDULE_DATA = [
+    ScheduleInfo(name=ScheduleType.BA3, role_id=BA3_ROLE, schedule_url=BA3_SCHEDULE_URL),
+    ScheduleInfo(name=ScheduleType.MA_CS, role_id=MA_CS_ROLE, schedule_url=MA_CS_SCHEDULE_URL),
+    ScheduleInfo(name=ScheduleType.MA_CS_ENG, role_id=MA_CS_ENG_ROLE, schedule_url=MA_CS_ENG_SCHEDULE_URL),
+]
