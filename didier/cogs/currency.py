@@ -25,7 +25,7 @@ class Currency(commands.Cog):
         super().__init__()
         self.client = client
 
-    @commands.command(name="Award")
+    @commands.command(name="award")
     @commands.check(is_owner)
     async def award(
         self,
@@ -38,11 +38,11 @@ class Currency(commands.Cog):
             await crud.add_dinks(session, user.id, amount)
             plural = pluralize("Didier Dink", amount)
             await ctx.reply(
-                f"**{ctx.author.display_name}** heeft **{user.display_name}** **{amount}** {plural} geschonken.",
+                f"**{ctx.author.display_name}** has awarded **{user.display_name}** **{amount}** {plural}.",
                 mention_author=False,
             )
 
-    @commands.group(name="bank", aliases=["B"], case_insensitive=True, invoke_without_command=True)
+    @commands.group(name="bank", aliases=["b"], case_insensitive=True, invoke_without_command=True)
     async def bank(self, ctx: commands.Context):
         """Show your Didier Bank information"""
         async with self.client.postgres_session as session:
@@ -57,7 +57,7 @@ class Currency(commands.Cog):
 
         await ctx.reply(embed=embed, mention_author=False)
 
-    @bank.group(name="Upgrade", aliases=["U", "Upgrades"], case_insensitive=True, invoke_without_command=True)
+    @bank.group(name="upgrade", aliases=["u", "upgrades"], case_insensitive=True, invoke_without_command=True)
     async def bank_upgrades(self, ctx: commands.Context):
         """List the upgrades you can buy & their prices"""
         async with self.client.postgres_session as session:
@@ -77,7 +77,7 @@ class Currency(commands.Cog):
 
         await ctx.reply(embed=embed, mention_author=False)
 
-    @bank_upgrades.command(name="Capacity", aliases=["C"])
+    @bank_upgrades.command(name="capacity", aliases=["c"])
     async def bank_upgrade_capacity(self, ctx: commands.Context):
         """Upgrade the capacity level of your bank"""
         async with self.client.postgres_session as session:
@@ -88,7 +88,7 @@ class Currency(commands.Cog):
                 await ctx.reply("You don't have enough Didier Dinks to do this.", mention_author=False)
                 await self.client.reject_message(ctx.message)
 
-    @bank_upgrades.command(name="Interest", aliases=["I"])
+    @bank_upgrades.command(name="interest", aliases=["i"])
     async def bank_upgrade_interest(self, ctx: commands.Context):
         """Upgrade the interest level of your bank"""
         async with self.client.postgres_session as session:
@@ -99,7 +99,7 @@ class Currency(commands.Cog):
                 await ctx.reply("You don't have enough Didier Dinks to do this.", mention_author=False)
                 await self.client.reject_message(ctx.message)
 
-    @bank_upgrades.command(name="Rob", aliases=["R"])
+    @bank_upgrades.command(name="rob", aliases=["r"])
     async def bank_upgrade_rob(self, ctx: commands.Context):
         """Upgrade the rob level of your bank"""
         async with self.client.postgres_session as session:
@@ -118,7 +118,7 @@ class Currency(commands.Cog):
             plural = pluralize("Didier Dink", bank.dinks)
             await ctx.reply(f"**{ctx.author.display_name}** has **{bank.dinks}** {plural}.", mention_author=False)
 
-    @commands.command(name="Invest", aliases=["Deposit", "Dep"])
+    @commands.command(name="invest", aliases=["deposit", "dep"])
     async def invest(self, ctx: commands.Context, amount: typing.Annotated[typing.Union[str, int], abbreviated_number]):
         """Invest a given amount of Didier Dinks"""
         async with self.client.postgres_session as session:

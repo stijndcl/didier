@@ -190,8 +190,10 @@ class Tasks(commands.Cog):
         await self.client.wait_until_ready()
 
     @check_birthdays.error
+    @pull_schedules.error
     @pull_ufora_announcements.error
     @remove_old_ufora_announcements.error
+    @reset_wordle_word.error
     async def _on_tasks_error(self, error: BaseException):
         """Error handler for all tasks"""
         print("".join(traceback.format_exception(type(error), error, error.__traceback__)))
