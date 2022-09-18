@@ -50,7 +50,8 @@ env = [
     "POSTGRES_PASS = pytest",
     "POSTGRES_HOST = localhost",
     "POSTGRES_PORT = 5433",
-    "DISCORD_TOKEN = token"
+    "DISCORD_TOKEN = token",
+    "DISCORD_MAIN_GUILD = 123456789101112131415"
 ]
 markers = [
     "postgres: tests that use PostgreSQL"
