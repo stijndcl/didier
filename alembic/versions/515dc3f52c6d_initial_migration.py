@@ -242,4 +242,5 @@ def downgrade() -> None:
         batch_op.drop_index(batch_op.f("ix_custom_commands_indexed_name"))
 
     op.drop_table("custom_commands")
+    sa.Enum("BIRTHDAYS", "SCHEDULES", "UFORA_ANNOUNCEMENTS", name="tasktype").drop(op.get_bind())
     # ### end Alembic commands ###
