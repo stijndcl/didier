@@ -46,7 +46,7 @@ async def test_set_execution_time_exists(postgres: AsyncSession, task: Task, tas
 
     await crud.set_last_task_execution_time(postgres, task_type)
     await postgres.refresh(task)
-    assert task.previous_run == datetime.datetime(year=2022, month=7, day=24)
+    assert task.previous_run == datetime.datetime(year=2022, month=7, day=24, tzinfo=datetime.timezone.utc)
 
 
 @freeze_time("2022/07/24")
@@ -60,4 +60,4 @@ async def test_set_execution_time_doesnt_exist(postgres: AsyncSession, task_type
     results = list((await postgres.execute(statement)).scalars().all())
     assert len(results) == 1
     task = results[0]
-    assert task.previous_run == datetime.datetime(year=2022, month=7, day=24)
+    assert task.previous_run == datetime.datetime(year=2022, month=7, day=24, tzinfo=datetime.timezone.utc)

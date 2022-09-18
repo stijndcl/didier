@@ -53,7 +53,7 @@ def date_converter(argument: Optional[str]) -> date:
     raise commands.ArgumentParsingError(f"Unable to interpret `{original_argument}` as a date.")
 
 
-class DateTransformer(app_commands.Transformer):
+class DateTransformer(commands.Converter, app_commands.Transformer):
     """Application commands transformer for dates"""
 
     @overrides
@@ -61,6 +61,10 @@ class DateTransformer(app_commands.Transformer):
         self, interaction: discord.Interaction, value: Union[int, float, str]
     ) -> list[app_commands.Choice[Union[int, float, str]]]:
         return autocomplete_day(str(value))
+
+    @overrides
+    async def convert(self, ctx: commands.Context, argument: str) -> datetime.date:
+        return date_converter(argument)
 
     @overrides
     async def transform(self, interaction: discord.Interaction, value: str) -> datetime.date:

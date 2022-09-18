@@ -1,3 +1,5 @@
+from dataclasses import dataclass
+from enum import Enum
 from typing import Optional
 
 from environs import Env
@@ -22,10 +24,15 @@ __all__ = [
     "DISCORD_BOOS_REACT",
     "DISCORD_CUSTOM_COMMAND_PREFIX",
     "UFORA_ANNOUNCEMENTS_CHANNEL",
+    "BA3_ROLE",
     "UFORA_RSS_TOKEN",
     "URBAN_DICTIONARY_TOKEN",
     "IMGFLIP_NAME",
     "IMGFLIP_PASSWORD",
+    "BA3_SCHEDULE_URL",
+    "ScheduleType",
+    "ScheduleInfo",
+    "SCHEDULE_DATA",
 ]
 
 
@@ -35,6 +42,7 @@ TESTING: bool = env.bool("TESTING", False)
 LOGFILE: str = env.str("LOGFILE", "didier.log")
 SEMESTER: int = env.int("SEMESTER", 2)
 YEAR: int = env.int("YEAR", 3)
+MENU_TIMEOUT: int = env.int("MENU_TIMEOUT", 30)
 
 """Database"""
 # PostgreSQL
@@ -48,6 +56,7 @@ POSTGRES_PORT: int = env.int("POSTGRES_PORT", "5432")
 DISCORD_TOKEN: str = env.str("DISCORD_TOKEN")
 DISCORD_READY_MESSAGE: str = env.str("DISCORD_READY_MESSAGE", "I'M READY I'M READY I'M READY")
 DISCORD_STATUS_MESSAGE: str = env.str("DISCORD_STATUS_MESSAGE", "with your Didier Dinks.")
+DISCORD_MAIN_GUILD: int = env.int("DISCORD_MAIN_GUILD")
 DISCORD_TEST_GUILDS: list[int] = env.list("DISCORD_TEST_GUILDS", [], subcast=int)
 DISCORD_OWNER_GUILDS: Optional[list[int]] = env.list("DISCORD_OWNER_GUILDS", [], subcast=int) or None
 DISCORD_BOOS_REACT: str = env.str("DISCORD_BOOS_REACT", "<:boos:629603785840263179>")
@@ -56,11 +65,45 @@ BIRTHDAY_ANNOUNCEMENT_CHANNEL: Optional[int] = env.int("BIRTHDAY_ANNOUNCEMENT_CH
 ERRORS_CHANNEL: Optional[int] = env.int("ERRORS_CHANNEL", None)
 UFORA_ANNOUNCEMENTS_CHANNEL: Optional[int] = env.int("UFORA_ANNOUNCEMENTS_CHANNEL", None)
 
-""""General config"""
-MENU_TIMEOUT: int = env.int("MENU_TIMEOUT", 30)
+"""Discord Role ID's"""
+BA3_ROLE: Optional[int] = env.int("BA3_ROLE", 891743208248324196)
+MA_CS_ROLE: Optional[int] = env.int("MA_CS_ROLE", None)
+MA_CS_ENG_ROLE: Optional[int] = env.int("MA_CS_ENG_ROLE", None)
 
 """API Keys"""
 UFORA_RSS_TOKEN: Optional[str] = env.str("UFORA_RSS_TOKEN", None)
 URBAN_DICTIONARY_TOKEN: Optional[str] = env.str("URBAN_DICTIONARY_TOKEN", None)
 IMGFLIP_NAME: Optional[str] = env.str("IMGFLIP_NAME", None)
 IMGFLIP_PASSWORD: Optional[str] = env.str("IMGFLIP_PASSWORD", None)
+
+"""Schedule URLs"""
+BA3_SCHEDULE_URL: Optional[str] = env.str("BA3_SCHEDULE_URL", None)
+MA_CS_SCHEDULE_URL: Optional[str] = env.str("MA_CS_SCHEDULE_URL", None)
+MA_CS_ENG_SCHEDULE_URL: Optional[str] = env.str("MA_CS_ENG_SCHEDULE_URL", None)
+
+
+"""Computed properties"""
+
+
+class ScheduleType(str, Enum):
+    """Enum to differentiate schedules"""
+
+    BA3 = "ba3"
+    MA_CS = "ma_cs"
+    MA_CS_ENG = "ma_cs_eng"
+
+
+@dataclass
+class ScheduleInfo:
+    """Dataclass to hold and combine some information about schedule-related settings"""
+
+    role_id: Optional[int]
+    schedule_url: Optional[str]
+    name: Optional[str] = None
+
+
+SCHEDULE_DATA = [
+    ScheduleInfo(name=ScheduleType.BA3, role_id=BA3_ROLE, schedule_url=BA3_SCHEDULE_URL),
+    ScheduleInfo(name=ScheduleType.MA_CS, role_id=MA_CS_ROLE, schedule_url=MA_CS_SCHEDULE_URL),
+    ScheduleInfo(name=ScheduleType.MA_CS_ENG, role_id=MA_CS_ENG_ROLE, schedule_url=MA_CS_ENG_SCHEDULE_URL),
+]

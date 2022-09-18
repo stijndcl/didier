@@ -8,9 +8,11 @@ __all__ = [
     "forward_to_next_weekday",
     "int_to_weekday",
     "parse_dm_string",
+    "skip_weekends",
     "str_to_date",
     "str_to_month",
     "str_to_weekday",
+    "time_string",
     "tz_aware_now",
 ]
 
@@ -84,6 +86,12 @@ def parse_dm_string(argument: str) -> datetime.date:
 
     # Unparseable
     raise ValueError
+
+
+def skip_weekends(dt_instance: datetime.date) -> datetime.date:
+    """Fast-forward a date instance until its weekday is no longer a weekend"""
+    to_skip = (7 - dt_instance.weekday()) if dt_instance.weekday() > 4 else 0
+    return dt_instance + datetime.timedelta(days=to_skip)
 
 
 def str_to_date(date_str: str, formats: Union[list[str], str] = "%d/%m/%Y") -> datetime.date:
@@ -169,6 +177,11 @@ def str_to_weekday(argument: str) -> int:
             return value
 
     raise ValueError
+
+
+def time_string(dt_instance: datetime.datetime) -> str:
+    """Get an HH:MM representation of a datetime instance"""
+    return dt_instance.strftime("%H:%M")
 
 
 def tz_aware_now() -> datetime.datetime:

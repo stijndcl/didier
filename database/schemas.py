@@ -197,6 +197,9 @@ class UforaCourse(Base):
     name: str = Column(Text, nullable=False, unique=True)
     code: str = Column(Text, nullable=False, unique=True)
     year: int = Column(Integer, nullable=False)
+    compulsory: bool = Column(Boolean, server_default="1", nullable=False)
+    role_id: Optional[int] = Column(BigInteger, nullable=True, unique=False)
+    overarching_role_id: Optional[int] = Column(BigInteger, nullable=True, unique=False)
     log_announcements: bool = Column(Boolean, server_default="0", nullable=False)
 
     announcements: list[UforaAnnouncement] = relationship(
