@@ -65,7 +65,7 @@ class Discord(commands.Cog):
     async def birthday_set(self, ctx: commands.Context, day: str):
         """Set your birthday to `day`.
 
-        Parsing of the `day`-parameter happens in the following order: `DD/MM/YYYY`, `DD/MM/YY`, `DD/MM`.
+        Parsing of the `day`-argument happens in the following order: `DD/MM/YYYY`, `DD/MM/YY`, `DD/MM`.
         Other formats will not be accepted.
         """
         try:
@@ -111,7 +111,7 @@ class Discord(commands.Cog):
         """Create a new bookmark for message `message` with label `label`.
 
         Instead of the link to a message, you can also reply to the message you wish to bookmark. In this case,
-        the `message`-parameter can be left out.
+        the `message`-argument can be left out.
 
         `label` can not be names (or aliases) of subcommands.
         """
@@ -204,7 +204,7 @@ class Discord(commands.Cog):
         """Pin `message` in the current channel.
 
         Instead of the link to a message, you can also reply to the message you wish to pin. In this case,
-        the `message`-parameter can be left out.
+        the `message`-argument can be left out.
         """
         # If no message was passed, allow replying to the message that should be pinned
         if message is None and ctx.message.reference is not None:

@@ -122,8 +122,8 @@ class Currency(commands.Cog):
     async def invest(self, ctx: commands.Context, amount: typing.Annotated[typing.Union[str, int], abbreviated_number]):
         """Invest `amount` Didier Dinks into your bank.
 
-        The `amount`-parameter can take both raw numbers, and abbreviations of big numbers. Passing `all` as the
-        value will invest all of your Didier Dinks.
+        The `amount`-argument can take both raw numbers, and abbreviations of big numbers. Additionally, passing
+        `all` as the value will invest all of your Didier Dinks.
 
         Example usage:
         ```
