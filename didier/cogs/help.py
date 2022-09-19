@@ -143,7 +143,7 @@ class CustomHelpCommand(commands.MinimalHelpCommand):
         embed = discord.Embed(title=title.title(), colour=discord.Colour.blue())
         return embed
 
-    def _clean_command_help(self, command: commands.Command) -> str:
+    def _clean_command_doc(self, command: commands.Command) -> str:
         """Clean up a help docstring
 
         This will strip out single newlines, because these are only there for readability and line length.
@@ -170,7 +170,7 @@ class CustomHelpCommand(commands.MinimalHelpCommand):
 
         This allows re-using this logic for Group commands that can be invoked by themselves.
         """
-        embed.description = self._clean_command_help(command)
+        embed.description = self._clean_command_doc(command)
 
         signature = self.get_command_signature(command)
         embed.add_field(name="Signature", value=signature, inline=False)
@@ -188,16 +188,27 @@ class CustomHelpCommand(commands.MinimalHelpCommand):
 
     async def _filter_cogs(self, cogs: list[commands.Cog]) -> list[commands.Cog]:
         """Filter the list of cogs down to all those that the user can see"""
-        # Remove cogs that we never want to see in the help page because they
-        # don't contain commands
-        filtered_cogs = list(
-            filter(lambda cog: cog is not None and cog.qualified_name.lower() not in ("tasks", "debugcog"), cogs)
-        )
 
-        # Remove owner-only cogs for people that shouldn't see them
-        if not await self.context.bot.is_owner(self.context.author):
-            filtered_cogs = list(filter(lambda cog: cog.qualified_name.lower() not in ("owner",), filtered_cogs))
+        async def _predicate(cog: Optional[commands.Cog]) -> bool:
+            if cog is None:
+                return False
 
+            # Remove cogs that we never want to see in the help page because they
+            # don't contain commands, or shouldn't be visible at all
+            if not cog.get_commands():
+                return False
+
+            if cog.qualified_name.lower() in ("tasks", "debugcog"):
+                return False
+
+            # Hide owner-only cogs if you're not the owner
+            if not await self.context.bot.is_owner(self.context.author):
+                return cog.qualified_name.lower() not in ("owner",)
+
+            return True
+
+        # Filter list of cogs down
+        filtered_cogs = [cog for cog in cogs if await _predicate(cog)]
         return list(sorted(filtered_cogs, key=lambda cog: cog.qualified_name))
 
 
