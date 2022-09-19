@@ -1,5 +1,5 @@
 import re
-from typing import Mapping, Optional
+from typing import Mapping, Optional, Type
 
 import discord
 from discord.ext import commands
@@ -7,6 +7,7 @@ from overrides import overrides
 
 from didier import Didier
 from didier.utils.discord.colours import error_red
+from didier.utils.discord.flags import PosixFlags
 from didier.utils.types.string import re_find_all, re_replace_with_list
 
 
@@ -85,7 +86,10 @@ class CustomHelpCommand(commands.MinimalHelpCommand):
             if is_optional:
                 name = f"[{name}]"
 
-            signature_list.append(name)
+            if issubclass(param.annotation, PosixFlags):
+                signature_list.append("[--OPTIONS]")
+            else:
+                signature_list.append(name)
 
         return " ".join(signature_list)
 
@@ -163,6 +167,11 @@ class CustomHelpCommand(commands.MinimalHelpCommand):
         if codeblocks:
             description = re_replace_with_list(r"```.*?```", description, codeblocks)
 
+        # Add flag help in
+        flags_class = self._get_flags_class(command)
+        if flags_class is not None:
+            description += f"\n\n{self.get_flags_help(flags_class)}"
+
         return description
 
     def _add_command_help(self, embed: discord.Embed, command: commands.Command):
@@ -210,6 +219,34 @@ class CustomHelpCommand(commands.MinimalHelpCommand):
         # Filter list of cogs down
         filtered_cogs = [cog for cog in cogs if await _predicate(cog)]
         return list(sorted(filtered_cogs, key=lambda cog: cog.qualified_name))
+
+    def _get_flags_class(self, command: commands.Command) -> Optional[Type[PosixFlags]]:
+        """Check if a command has flags"""
+        flag_param = command.params.get("flags", None)
+        if flag_param is None:
+            return None
+
+        if issubclass(flag_param.annotation, PosixFlags):
+            return flag_param.annotation
+
+        return None
+
+    def get_flags_help(self, flags_class: Type[PosixFlags]) -> str:
+        """Get the description for flag arguments"""
+        help_data = []
+
+        # Present flags in alphabetical order, as dicts have no set ordering
+        flag_mapping = flags_class.__commands_flags__
+        flags = list(flag_mapping.items())
+        flags.sort(key=lambda f: f[0])
+
+        for name, flag in flags:
+            flag_names = [name, *flag.aliases]
+            # Add the --prefix in front of all flags
+            flag_names = list(map(lambda n: f"--{n}", flag_names))
+            help_data.append(f"{', '.join(flag_names)} [default `{flag.default}`]")
+
+        return "Options:\n" + "\n".join(help_data)
 
 
 async def setup(client: Didier):
