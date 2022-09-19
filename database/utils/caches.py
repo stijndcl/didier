@@ -4,11 +4,10 @@ from discord import app_commands
 from overrides import overrides
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from database.crud import links, memes, ufora_courses, wordle
+from database.crud import easter_eggs, links, memes, ufora_courses, wordle
+from database.schemas import EasterEgg, WordleWord
 
-__all__ = ["CacheManager", "LinkCache", "UforaCourseCache"]
-
-from database.schemas import WordleWord
+__all__ = ["CacheManager", "EasterEggCache", "LinkCache", "UforaCourseCache"]
 
 
 class DatabaseCache(ABC):
@@ -44,6 +43,22 @@ class DatabaseCache(ABC):
         suggestions = [self.data[index] for index, value in enumerate(self.data_transformed) if query in value]
 
         return [app_commands.Choice(name=suggestion, value=suggestion.lower()) for suggestion in suggestions]
+
+
+class EasterEggCache(DatabaseCache):
+    """Cache to store easter eggs invoked by messages"""
+
+    easter_eggs: list[EasterEgg] = []
+
+    @overrides
+    async def clear(self):
+        self.easter_eggs.clear()
+
+    @overrides
+    async def invalidate(self, database_session: AsyncSession):
+        """Invalidate the data stored in this cache"""
+        await self.clear()
+        self.easter_eggs = await easter_eggs.get_all_easter_eggs(database_session)
 
 
 class LinkCache(DatabaseCache):
@@ -131,12 +146,14 @@ class WordleCache(DatabaseCache):
 class CacheManager:
     """Class that keeps track of all caches"""
 
+    easter_eggs: EasterEggCache
     links: LinkCache
     memes: MemeCache
     ufora_courses: UforaCourseCache
     wordle_word: WordleCache
 
     def __init__(self):
+        self.easter_eggs = EasterEggCache()
         self.links = LinkCache()
         self.memes = MemeCache()
         self.ufora_courses = UforaCourseCache()
@@ -144,6 +161,7 @@ class CacheManager:
 
     async def initialize_caches(self, postgres_session: AsyncSession):
         """Initialize the contents of all caches"""
+        await self.easter_eggs.invalidate(postgres_session)
         await self.links.invalidate(postgres_session)
         await self.memes.invalidate(postgres_session)
         await self.ufora_courses.invalidate(postgres_session)

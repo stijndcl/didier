@@ -17,6 +17,7 @@ from didier.data.embeds.error_embed import create_error_embed
 from didier.data.embeds.schedules import Schedule, parse_schedule
 from didier.exceptions import HTTPException, NoMatch
 from didier.utils.discord.prefix import get_prefix
+from didier.utils.easter_eggs import detect_easter_egg
 
 __all__ = ["Didier"]
 
@@ -213,8 +214,9 @@ class Didier(commands.Bot):
 
         await self.process_commands(message)
 
-        # TODO easter eggs
-        # TODO stats
+        easter_egg = await detect_easter_egg(self, message, self.database_caches.easter_eggs)
+        if easter_egg is not None:
+            await message.reply(easter_egg, mention_author=False)
 
     async def _try_invoke_custom_command(self, message: discord.Message) -> bool:
         """Check if the message tries to invoke a custom command

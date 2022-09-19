@@ -1,18 +1,19 @@
 import re
+from typing import Optional
 
 from discord import Message
 from discord.ext import commands
 
 from didier.data import constants
 
-__all__ = ["get_prefix"]
+__all__ = ["get_prefix", "match_prefix"]
 
 
-def get_prefix(client: commands.Bot, message: Message) -> str:
-    """Match a prefix against a message
+def match_prefix(client: commands.Bot, message: Message) -> Optional[str]:
+    """Try to match a prefix against a message, returning None instead of a default value
 
-    This is done dynamically to allow variable amounts of whitespace,
-    and through regexes to allow case-insensitivity among other things.
+    This is done dynamically through regexes to allow case-insensitivity
+    and variable amounts of whitespace among other things.
     """
     mention = f"<@!?{client.user.id}>"
     regex = r"^({})\s*"
@@ -26,5 +27,13 @@ def get_prefix(client: commands.Bot, message: Message) -> str:
             # .group() is inconsistent with whitespace, so that can't be used
             return message.content[: match.end()]
 
-    # Matched nothing
-    return "didier"
+    return None
+
+
+def get_prefix(client: commands.Bot, message: Message) -> str:
+    """Match a prefix against a message, with a fallback
+
+    This is the main prefix function that is used by the bot
+    """
+    # If nothing was matched, return "didier" as a fallback
+    return match_prefix(client, message) or "didier"

@@ -31,6 +31,7 @@ __all__ = [
     "CustomCommandAlias",
     "DadJoke",
     "Deadline",
+    "EasterEgg",
     "Link",
     "MemeTemplate",
     "NightlyData",
@@ -142,6 +143,18 @@ class Deadline(Base):
     deadline: datetime = Column(DateTime(timezone=True), nullable=False)
 
     course: UforaCourse = relationship("UforaCourse", back_populates="deadlines", uselist=False, lazy="selectin")
+
+
+class EasterEgg(Base):
+    """An easter egg response"""
+
+    __tablename__ = "easter_eggs"
+
+    easter_egg_id: int = Column(Integer, primary_key=True)
+    match: str = Column(Text, nullable=False)
+    response: str = Column(Text, nullable=False)
+    exact: bool = Column(Boolean, nullable=False, server_default="1")
+    startswith: bool = Column(Boolean, nullable=False, server_default="1")
 
 
 class Link(Base):
