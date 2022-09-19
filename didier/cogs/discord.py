@@ -53,7 +53,7 @@ class Discord(commands.Cog):
         async with self.client.postgres_session as session:
             birthday = await birthdays.get_birthday_for_user(session, user_id)
 
-        name: Optional[str] = user and f"{user.display_name}'s"
+        name: Optional[str] = f"{user.display_name}'s" if user is not None else None
 
         if birthday is None:
             return await ctx.reply(f"I don't know {name or 'your'} birthday.", mention_author=False)
@@ -87,12 +87,12 @@ class Discord(commands.Cog):
     async def bookmark(self, ctx: commands.Context, *, label: Optional[str] = None):
         """Post the message bookmarked with `label`.
 
-        The `label` argument can contain spaces and does not require quotes around it. For example:
+        The `label`-argument can contain spaces and does not require quotes around it. For example:
         ```
         didier bookmark some label with multiple words
         ```
 
-        If no argument for `label` is provided, this is a shortcut to `bookmark search`.
+        When no value for `label` is provided, this is a shortcut to `bookmark search`.
         """
         # No label: shortcut to display bookmarks
         if label is None:
@@ -113,7 +113,8 @@ class Discord(commands.Cog):
         Instead of the link to a message, you can also reply to the message you wish to bookmark. In this case,
         the `message`-argument can be left out.
 
-        `label` can not be names (or aliases) of subcommands.
+        `label` can not be names (or aliases) of subcommands. However, names with spaces are allowed. If you wish
+        to use a name with spaces, it must be wrapped in "quotes".
         """
         # If no message was passed, allow replying to the message that should be bookmarked
         if message is None and ctx.message.reference is not None:
@@ -167,6 +168,11 @@ class Discord(commands.Cog):
 
         If a value for `query` was provided, results will be filtered down to only labels that include `query`.
         Otherwise, all bookmarks are displayed.
+
+        The `query`-argument can contain spaces and does not require quotes around it. For example:
+        ```
+        didier bookmark search some query with multiple words
+        ```
         """
         async with self.client.postgres_session as session:
             results = await bookmarks.get_bookmarks(session, ctx.author.id, query=query)

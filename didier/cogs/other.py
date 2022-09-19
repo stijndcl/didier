@@ -13,16 +13,18 @@ from didier.data.scrapers import google
 
 
 class Other(commands.Cog):
-    """Cog for commands that don't really belong anywhere else"""
+    """Commands that don't really belong anywhere else."""
 
     client: Didier
 
     def __init__(self, client: Didier):
         self.client = client
 
-    @commands.hybrid_command(name="define", description="Urban Dictionary", aliases=["Ud", "Urban"], usage="[Term]")
+    @commands.hybrid_command(
+        name="define", aliases=["ud", "urban"], description="Look up the definition of a word on the Urban Dictionary"
+    )
     async def define(self, ctx: commands.Context, *, query: str):
-        """Look up the definition of a word on the Urban Dictionary"""
+        """Look up the definition of `query` on the Urban Dictionary."""
         async with ctx.typing():
             status_code, definitions = await urban_dictionary.lookup(self.client.http_session, query)
             if not definitions:
@@ -30,10 +32,17 @@ class Other(commands.Cog):
 
             await ctx.reply(embed=definitions[0].to_embed(), mention_author=False)
 
-    @commands.hybrid_command(name="google", description="Google search", usage="[Query]")
+    @commands.hybrid_command(name="google", description="Google search")
     @app_commands.describe(query="Search query")
     async def google(self, ctx: commands.Context, *, query: str):
-        """Google something"""
+        """Show the Google search results for `query`.
+
+        The `query`-argument can contain spaces and does not require quotes around it. For example:
+        ```
+        didier query didier source github
+        didier query "didier source github"
+        ```
+        """
         async with ctx.typing():
             results = await google.google_search(self.client.http_session, query)
             embed = GoogleSearch(results).to_embed()
@@ -43,9 +52,9 @@ class Other(commands.Cog):
         async with self.client.postgres_session as session:
             return await get_link_by_name(session, name.lower())
 
-    @commands.command(name="Link", aliases=["Links"], usage="[Name]")
+    @commands.command(name="Link", aliases=["Links"])
     async def link_msg(self, ctx: commands.Context, name: str):
-        """Message command to get the link to something"""
+        """Get the link to the resource named `name`."""
         link = await self._get_link(name)
         if link is None:
             return await ctx.reply(f"Found no links matching `{name}`.", mention_author=False)
@@ -53,10 +62,10 @@ class Other(commands.Cog):
         target_message = await self.client.get_reply_target(ctx)
         await target_message.reply(link.url, mention_author=False)
 
-    @app_commands.command(name="link", description="Get the link to something")
-    @app_commands.describe(name="The name of the link")
+    @app_commands.command(name="link")
+    @app_commands.describe(name="The name of the resource")
     async def link_slash(self, interaction: discord.Interaction, name: str):
-        """Slash command to get the link to something"""
+        """Get the link to something."""
         link = await self._get_link(name)
         if link is None:
             return await interaction.response.send_message(f"Found no links matching `{name}`.", ephemeral=True)

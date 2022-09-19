@@ -17,7 +17,7 @@ class Meta(commands.Cog):
 
     @commands.command(name="marco")
     async def marco(self, ctx: commands.Context):
-        """Ping command to get Didier's latency."""
+        """Get Didier's latency."""
         return await ctx.reply(f"Polo! {round(self.client.latency * 1000)}ms", mention_author=False)
 
     @commands.command(name="source", aliases=["src"])
@@ -25,6 +25,13 @@ class Meta(commands.Cog):
         """Get a link to the source code of Didier.
 
         If a value for `command_name` is passed, the source for `command_name` is shown instead.
+
+        Example usage:
+        ```
+        didier source
+        didier source dinks
+        didier source source
+        ```
         """
         repo_home = "https://github.com/stijndcl/didier"
 

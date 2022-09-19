@@ -1,6 +1,6 @@
 import math
 import re
-from typing import Optional
+from typing import Optional, Union
 
 __all__ = ["abbreviate", "leading", "pluralize", "re_find_all", "re_replace_with_list", "get_edu_year_name"]
 
@@ -46,7 +46,7 @@ def pluralize(word: str, amount: int, plural_form: Optional[str] = None) -> str:
     return plural_form or (word + "s")
 
 
-def re_find_all(pattern: str, string: str, flags: re.RegexFlag = 0) -> list[str]:
+def re_find_all(pattern: str, string: str, flags: Union[int, re.RegexFlag] = 0) -> list[str]:
     """Find all matches of a regex in a string"""
     matches = []
 

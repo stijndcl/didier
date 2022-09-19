@@ -43,6 +43,9 @@ class School(commands.Cog):
 
         If no day is provided, this defaults to the schedule for the current day. When invoked during a weekend,
         it will skip forward to the next weekday instead.
+
+        Schedules are personalized based on your roles in the server. If your schedule doesn't look right, make sure
+        that you've got the correct roles selected. In case you do, ping D STIJN.
         """
         if day_dt is None:
             day_dt = date.today()
@@ -68,9 +71,9 @@ class School(commands.Cog):
     )
     @app_commands.rename(day_dt="date")
     async def menu(self, ctx: commands.Context, day_dt: Optional[app_commands.Transform[date, DateTransformer]] = None):
-        """Show the menu in the Ghent University restaurants.
+        """Show the menu in the Ghent University restaurants on `date`.
 
-        If no day is provided, this defaults to the schedule for the current day.
+        If no value for `date` is provided, this defaults to the schedule for the current day.
         Menus are shown in Dutch by default, as a lot of dishes have very weird translations.
         """
         if day_dt is None:
@@ -85,11 +88,22 @@ class School(commands.Cog):
             await ctx.reply(embed=embed, mention_author=False)
 
     @commands.hybrid_command(
-        name="fiche", description="Sends the link to the study guide for [Course]", aliases=["guide", "studiefiche"]
+        name="fiche", description="Sends the link to study guides", aliases=["guide", "studiefiche"]
     )
     @app_commands.describe(course="The name of the course to fetch the study guide for (aliases work too)")
     async def study_guide(self, ctx: commands.Context, course: str, *, flags: StudyGuideFlags):
-        """Create links to study guides"""
+        """Sends the link to the study guide for `course`.
+
+        The value for `course` can contain spaces, but must be wrapped in "quotes".
+
+        Aliases (nicknames) for courses are also accepted, given that they are known and in the database.
+
+        Example usage:
+        ```
+        didier fiche ad2
+        didier fiche "algoritmen en datastructuren 2"
+        ```
+        """
         async with self.client.postgres_session as session:
             ufora_course = await ufora_courses.get_course_by_name(session, course)
 
