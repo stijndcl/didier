@@ -22,7 +22,7 @@ from didier.views.modals import CreateBookmark
 
 
 class Discord(commands.Cog):
-    """Cog for commands related to Discord, servers, and members"""
+    """Commands related to Discord itself, which work with resources like servers and members."""
 
     client: Didier
 
@@ -45,7 +45,10 @@ class Discord(commands.Cog):
 
     @commands.group(name="birthday", aliases=["bd", "birthdays"], case_insensitive=True, invoke_without_command=True)
     async def birthday(self, ctx: commands.Context, user: discord.User = None):
-        """Command to check the birthday of a user"""
+        """Command to check the birthday of `user`.
+
+        Not passing an argument for `user` will show yours instead.
+        """
         user_id = (user and user.id) or ctx.author.id
         async with self.client.postgres_session as session:
             birthday = await birthdays.get_birthday_for_user(session, user_id)
@@ -59,18 +62,22 @@ class Discord(commands.Cog):
         return await ctx.reply(f"{name or 'Your'} birthday is set to **{day}/{month}**.", mention_author=False)
 
     @birthday.command(name="set", aliases=["config"])
-    async def birthday_set(self, ctx: commands.Context, date_str: str):
-        """Command to set your birthday"""
+    async def birthday_set(self, ctx: commands.Context, day: str):
+        """Set your birthday to `day`.
+
+        Parsing of the `day`-parameter happens in the following order: `DD/MM/YYYY`, `DD/MM/YY`, `DD/MM`.
+        Other formats will not be accepted.
+        """
         try:
             default_year = 2001
-            date = str_to_date(date_str, formats=["%d/%m/%Y", "%d/%m/%y", "%d/%m"])
+            date = str_to_date(day, formats=["%d/%m/%Y", "%d/%m/%y", "%d/%m"])
 
             # If no year was passed, make it 2001 by default
-            if date_str.count("/") == 1:
+            if day.count("/") == 1:
                 date.replace(year=default_year)
 
         except ValueError:
-            return await ctx.reply(f"`{date_str}` is not a valid date.", mention_author=False)
+            return await ctx.reply(f"`{day}` is not a valid date.", mention_author=False)
 
         async with self.client.postgres_session as session:
             await birthdays.add_birthday(session, ctx.author.id, date)
@@ -78,7 +85,15 @@ class Discord(commands.Cog):
 
     @commands.group(name="bookmark", aliases=["bm", "bookmarks"], case_insensitive=True, invoke_without_command=True)
     async def bookmark(self, ctx: commands.Context, *, label: Optional[str] = None):
-        """Post a bookmarked message"""
+        """Post the message bookmarked with `label`.
+
+        The `label` argument can contain spaces and does not require quotes around it. For example:
+        ```
+        didier bookmark some label with multiple words
+        ```
+
+        If no argument for `label` is provided, this is a shortcut to `bookmark search`.
+        """
         # No label: shortcut to display bookmarks
         if label is None:
             return await self.bookmark_search(ctx, query=None)
@@ -93,7 +108,13 @@ class Discord(commands.Cog):
 
     @bookmark.command(name="create", aliases=["new"])
     async def bookmark_create(self, ctx: commands.Context, label: str, message: Optional[discord.Message]):
-        """Create a new bookmark"""
+        """Create a new bookmark for message `message` with label `label`.
+
+        Instead of the link to a message, you can also reply to the message you wish to bookmark. In this case,
+        the `message`-parameter can be left out.
+
+        `label` can not be names (or aliases) of subcommands.
+        """
         # If no message was passed, allow replying to the message that should be bookmarked
         if message is None and ctx.message.reference is not None:
             message = await self.client.resolve_message(ctx.message.reference)
@@ -117,7 +138,10 @@ class Discord(commands.Cog):
 
     @bookmark.command(name="delete", aliases=["rm"])
     async def bookmark_delete(self, ctx: commands.Context, bookmark_id: str):
-        """Delete a bookmark by its id"""
+        """Delete the bookmark with id `bookmark_id`.
+
+        You can only delete your own bookmarks.
+        """
         # The bookmarks are displayed with a hashtag in front of the id
         # so strip it out in case people want to try and use this
         bookmark_id = bookmark_id.removeprefix("#")
@@ -139,7 +163,11 @@ class Discord(commands.Cog):
 
     @bookmark.command(name="search", aliases=["list", "ls"])
     async def bookmark_search(self, ctx: commands.Context, *, query: Optional[str] = None):
-        """Search through the list of bookmarks"""
+        """Search through the list of bookmarks.
+
+        If a value for `query` was provided, results will be filtered down to only labels that include `query`.
+        Otherwise, all bookmarks are displayed.
+        """
         async with self.client.postgres_session as session:
             results = await bookmarks.get_bookmarks(session, ctx.author.id, query=query)
 
@@ -159,15 +187,25 @@ class Discord(commands.Cog):
         modal = CreateBookmark(self.client, message.jump_url)
         await interaction.response.send_modal(modal)
 
-    @commands.command(name="join", usage="[Thread]")
+    @commands.command(name="join")
     async def join(self, ctx: commands.Context, thread: discord.Thread):
-        """Make Didier join a thread"""
+        """Make Didier join `thread`.
+
+        This command should generally not be necessary, as Didier automatically joins threads. However, it's possible
+        that Didier is offline at the moment of a thread being created.
+
+        Alternatively, you can also `@mention` Didier to pull him into the thread instead.
+        """
         if thread.me is not None:
             return await ctx.reply()
 
-    @commands.command(name="pin", usage="[Message]")
+    @commands.command(name="pin")
     async def pin(self, ctx: commands.Context, message: Optional[discord.Message] = None):
-        """Pin a message in the current channel"""
+        """Pin `message` in the current channel.
+
+        Instead of the link to a message, you can also reply to the message you wish to pin. In this case,
+        the `message`-parameter can be left out.
+        """
         # If no message was passed, allow replying to the message that should be pinned
         if message is None and ctx.message.reference is not None:
             message = await self.client.resolve_message(ctx.message.reference)

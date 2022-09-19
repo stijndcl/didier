@@ -17,7 +17,7 @@ from didier.utils.types.string import pluralize
 
 
 class Currency(commands.Cog):
-    """Everything Dinks-related"""
+    """Everything Dinks-related."""
 
     client: Didier
 
@@ -33,7 +33,7 @@ class Currency(commands.Cog):
         user: discord.User,
         amount: typing.Annotated[int, abbreviated_number],
     ):
-        """Award a user a given amount of Didier Dinks"""
+        """Award a user `amount` Didier Dinks."""
         async with self.client.postgres_session as session:
             await crud.add_dinks(session, user.id, amount)
             plural = pluralize("Didier Dink", amount)
@@ -44,7 +44,7 @@ class Currency(commands.Cog):
 
     @commands.group(name="bank", aliases=["b"], case_insensitive=True, invoke_without_command=True)
     async def bank(self, ctx: commands.Context):
-        """Show your Didier Bank information"""
+        """Show your Didier Bank information."""
         async with self.client.postgres_session as session:
             bank = await crud.get_bank(session, ctx.author.id)
 
@@ -59,7 +59,7 @@ class Currency(commands.Cog):
 
     @bank.group(name="upgrade", aliases=["u", "upgrades"], case_insensitive=True, invoke_without_command=True)
     async def bank_upgrades(self, ctx: commands.Context):
-        """List the upgrades you can buy & their prices"""
+        """List the upgrades you can buy & their prices."""
         async with self.client.postgres_session as session:
             bank = await crud.get_bank(session, ctx.author.id)
 
@@ -79,7 +79,7 @@ class Currency(commands.Cog):
 
     @bank_upgrades.command(name="capacity", aliases=["c"])
     async def bank_upgrade_capacity(self, ctx: commands.Context):
-        """Upgrade the capacity level of your bank"""
+        """Upgrade the capacity level of your bank."""
         async with self.client.postgres_session as session:
             try:
                 await crud.upgrade_capacity(session, ctx.author.id)
@@ -90,7 +90,7 @@ class Currency(commands.Cog):
 
     @bank_upgrades.command(name="interest", aliases=["i"])
     async def bank_upgrade_interest(self, ctx: commands.Context):
-        """Upgrade the interest level of your bank"""
+        """Upgrade the interest level of your bank."""
         async with self.client.postgres_session as session:
             try:
                 await crud.upgrade_interest(session, ctx.author.id)
@@ -101,7 +101,7 @@ class Currency(commands.Cog):
 
     @bank_upgrades.command(name="rob", aliases=["r"])
     async def bank_upgrade_rob(self, ctx: commands.Context):
-        """Upgrade the rob level of your bank"""
+        """Upgrade the rob level of your bank."""
         async with self.client.postgres_session as session:
             try:
                 await crud.upgrade_rob(session, ctx.author.id)
@@ -112,7 +112,7 @@ class Currency(commands.Cog):
 
     @commands.hybrid_command(name="dinks")
     async def dinks(self, ctx: commands.Context):
-        """Check your Didier Dinks"""
+        """Check your Didier Dinks."""
         async with self.client.postgres_session as session:
             bank = await crud.get_bank(session, ctx.author.id)
             plural = pluralize("Didier Dink", bank.dinks)
@@ -120,7 +120,7 @@ class Currency(commands.Cog):
 
     @commands.command(name="invest", aliases=["deposit", "dep"])
     async def invest(self, ctx: commands.Context, amount: typing.Annotated[typing.Union[str, int], abbreviated_number]):
-        """Invest a given `amount` Didier Dinks.
+        """Invest `amount` Didier Dinks into your bank.
 
         The `amount`-parameter can take both raw numbers, and abbreviations of big numbers. Passing `all` as the
         value will invest all of your Didier Dinks.
