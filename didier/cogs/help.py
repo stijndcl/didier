@@ -1,3 +1,4 @@
+import inspect
 import re
 from typing import Mapping, Optional, Type
 
@@ -86,7 +87,9 @@ class CustomHelpCommand(commands.MinimalHelpCommand):
             if is_optional:
                 name = f"[{name}]"
 
-            if issubclass(param.annotation, PosixFlags):
+            # If there are options/flags, add them
+            # The hardcoded name-check is done for performance reasons
+            if name == "flags" and inspect.isclass(param.annotation) and issubclass(param.annotation, PosixFlags):
                 signature_list.append("[--OPTIONS]")
             else:
                 signature_list.append(name)
