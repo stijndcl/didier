@@ -18,7 +18,7 @@ class Fun(commands.Cog):
     client: Didier
 
     # Slash groups
-    memes_slash = app_commands.Group(name="meme", description="Commands to generate memes", guild_only=False)
+    memes_slash = app_commands.Group(name="meme", description="Commands to generate memes.", guild_only=False)
 
     def __init__(self, client: Didier):
         self.client = client
@@ -31,57 +31,62 @@ class Fun(commands.Cog):
 
     @commands.hybrid_command(
         name="dadjoke",
-        aliases=["Dad", "Dj"],
-        description="Why does Yoda's code always crash? Because there is no try.",
+        aliases=["dad", "dj"],
     )
     async def dad_joke(self, ctx: commands.Context):
-        """Get a random dad joke"""
+        """Why does Yoda's code always crash? Because there is no try."""
         async with self.client.postgres_session as session:
             joke = await get_random_dad_joke(session)
             return await ctx.reply(joke.joke, mention_author=False)
 
-    @commands.group(name="Memegen", aliases=["Meme", "Memes"], invoke_without_command=True, case_insensitive=True)
-    async def memegen_msg(self, ctx: commands.Context, meme_name: str, *, fields: str):
-        """Command group for meme-related commands"""
+    @commands.group(name="memegen", aliases=["meme", "memes"], invoke_without_command=True, case_insensitive=True)
+    async def memegen_msg(self, ctx: commands.Context, template: str, *, fields: str):
+        """Generate a meme with template `template` and fields `fields`.
+
+        The arguments are parsed based on spaces. Arguments that contain spaces should be wrapped in "quotes".
+
+        Example: `memegen a b c d` will be parsed as `template: "a"`, `fields: ["b", "c", "d"]`
+
+        Example: `memegen "a b" "c d"` will be parsed as `template: "a b"`, `fields: ["c d"]`
+        """
         async with ctx.typing():
-            meme = await self._do_generate_meme(meme_name, shlex.split(fields))
+            meme = await self._do_generate_meme(template, shlex.split(fields))
             return await ctx.reply(meme, mention_author=False)
 
-    @memegen_msg.command(name="Preview", aliases=["P"])
-    async def memegen_preview_msg(self, ctx: commands.Context, meme_name: str):
-        """Generate a preview for a meme, to see how the fields are structured"""
+    @memegen_msg.command(name="preview", aliases=["p"])
+    async def memegen_preview_msg(self, ctx: commands.Context, template: str):
+        """Generate a preview for the meme template `template`, to see how the fields are structured."""
         async with ctx.typing():
             fields = [f"Field #{i + 1}" for i in range(20)]
-            meme = await self._do_generate_meme(meme_name, fields)
+            meme = await self._do_generate_meme(template, fields)
             return await ctx.reply(meme, mention_author=False)
 
-    @memes_slash.command(name="generate", description="Generate a meme")
-    async def memegen_slash(self, interaction: discord.Interaction, meme: str):
-        """Slash command to generate a meme"""
+    @memes_slash.command(name="generate")
+    async def memegen_slash(self, interaction: discord.Interaction, template: str):
+        """Generate a meme with template `template`."""
         async with self.client.postgres_session as session:
-            result = expect(await get_meme_by_name(session, meme), entity_type="meme", argument=meme)
+            result = expect(await get_meme_by_name(session, template), entity_type="meme", argument=template)
 
         modal = GenerateMeme(self.client, result)
         await interaction.response.send_modal(modal)
 
-    @memes_slash.command(
-        name="preview", description="Generate a preview for a meme, to see how the fields are structured"
-    )
-    async def memegen_preview_slash(self, interaction: discord.Interaction, meme: str):
-        """Slash command to generate a meme preview"""
+    @memes_slash.command(name="preview")
+    @app_commands.describe(template="The meme template to use in the preview.")
+    async def memegen_preview_slash(self, interaction: discord.Interaction, template: str):
+        """Generate a preview for a meme, to see how the fields are structured."""
         await interaction.response.defer()
 
         fields = [f"Field #{i + 1}" for i in range(20)]
-        meme_url = await self._do_generate_meme(meme, fields)
+        meme_url = await self._do_generate_meme(template, fields)
 
         await interaction.followup.send(meme_url, ephemeral=True)
 
-    @memegen_slash.autocomplete("meme")
-    @memegen_preview_slash.autocomplete("meme")
-    async def _memegen_slash_autocomplete_meme(
+    @memegen_slash.autocomplete("template")
+    @memegen_preview_slash.autocomplete("template")
+    async def _memegen_slash_autocomplete_template(
         self, _: discord.Interaction, current: str
     ) -> list[app_commands.Choice[str]]:
-        """Autocompletion for the 'meme'-parameter"""
+        """Autocompletion for the 'template'-parameter"""
         return self.client.database_caches.memes.get_autocomplete_suggestions(current)
 
 
