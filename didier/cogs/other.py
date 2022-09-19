@@ -7,7 +7,7 @@ from discord.ext import commands
 from database.crud.links import get_link_by_name
 from database.schemas import Link
 from didier import Didier
-from didier.data.apis import urban_dictionary
+from didier.data.apis import inspirobot, urban_dictionary
 from didier.data.embeds.google import GoogleSearch
 from didier.data.scrapers import google
 
@@ -47,6 +47,13 @@ class Other(commands.Cog):
             results = await google.google_search(self.client.http_session, query)
             embed = GoogleSearch(results).to_embed()
             await ctx.reply(embed=embed, mention_author=False)
+
+    @commands.hybrid_command(name="inspire", description="Generate an InspiroBot quote.")
+    async def inspire(self, ctx: commands.Context):
+        """Generate an [InspiroBot](https://inspirobot.me/) quote."""
+        async with ctx.typing():
+            link = await inspirobot.get_inspirobot_quote(self.client.http_session)
+            await ctx.reply(link, mention_author=False, ephemeral=False)
 
     async def _get_link(self, name: str) -> Optional[Link]:
         async with self.client.postgres_session as session:
