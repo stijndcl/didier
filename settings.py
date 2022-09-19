@@ -12,6 +12,10 @@ __all__ = [
     "SANDBOX",
     "TESTING",
     "LOGFILE",
+    "SEMESTER",
+    "YEAR",
+    "MENU_TIMEOUT",
+    "EASTER_EGG_CHANCE",
     "POSTGRES_DB",
     "POSTGRES_USER",
     "POSTGRES_PASS",
@@ -24,12 +28,10 @@ __all__ = [
     "DISCORD_BOOS_REACT",
     "DISCORD_CUSTOM_COMMAND_PREFIX",
     "UFORA_ANNOUNCEMENTS_CHANNEL",
-    "BA3_ROLE",
     "UFORA_RSS_TOKEN",
     "URBAN_DICTIONARY_TOKEN",
     "IMGFLIP_NAME",
     "IMGFLIP_PASSWORD",
-    "BA3_SCHEDULE_URL",
     "ScheduleType",
     "ScheduleInfo",
     "SCHEDULE_DATA",
@@ -43,6 +45,7 @@ LOGFILE: str = env.str("LOGFILE", "didier.log")
 SEMESTER: int = env.int("SEMESTER", 2)
 YEAR: int = env.int("YEAR", 3)
 MENU_TIMEOUT: int = env.int("MENU_TIMEOUT", 30)
+EASTER_EGG_CHANCE: int = env.int("EASTER_EGG_CHANCE", 15)
 
 """Database"""
 # PostgreSQL
