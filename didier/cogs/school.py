@@ -27,21 +27,23 @@ class School(commands.Cog):
     def __init__(self, client: Didier):
         self.client = client
 
-    @commands.hybrid_command(name="deadlines", description="Show upcoming deadlines")
+    @commands.hybrid_command(name="deadlines")
     async def deadlines(self, ctx: commands.Context):
-        """Show upcoming deadlines"""
+        """Show upcoming deadlines."""
         async with self.client.postgres_session as session:
             deadlines = await get_deadlines(session)
 
         embed = Deadlines(deadlines).to_embed()
         await ctx.reply(embed=embed, mention_author=False, ephemeral=False)
 
-    @commands.hybrid_command(
-        name="les", description="Show your personalized schedule for a given day.", aliases=["Sched", "Schedule"]
-    )
+    @commands.hybrid_command(name="les", aliases=["sched", "schedule"])
     @app_commands.rename(day_dt="date")
     async def les(self, ctx: commands.Context, day_dt: Optional[app_commands.Transform[date, DateTransformer]] = None):
-        """Show your personalized schedule for a given day."""
+        """Show your personalized schedule for a given day.
+
+        If no day is provided, this defaults to the schedule for the current day. When invoked during a weekend,
+        it will skip forward to the next weekday instead.
+        """
         if day_dt is None:
             day_dt = date.today()
 
@@ -62,14 +64,14 @@ class School(commands.Cog):
 
     @commands.hybrid_command(
         name="menu",
-        description="Show the menu in the Ghent University restaurants.",
-        aliases=["Eten", "Food"],
+        aliases=["eten", "food"],
     )
     @app_commands.rename(day_dt="date")
     async def menu(self, ctx: commands.Context, day_dt: Optional[app_commands.Transform[date, DateTransformer]] = None):
         """Show the menu in the Ghent University restaurants.
 
-        Menus are Dutch, as a lot of dishes have very weird translations
+        If no day is provided, this defaults to the schedule for the current day.
+        Menus are shown in Dutch by default, as a lot of dishes have very weird translations.
         """
         if day_dt is None:
             day_dt = date.today()

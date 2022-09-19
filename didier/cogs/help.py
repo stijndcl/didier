@@ -1,3 +1,4 @@
+import re
 from typing import Mapping, Optional
 
 import discord
@@ -64,6 +65,30 @@ class CustomHelpCommand(commands.MinimalHelpCommand):
         return f"Found no command named `{string}`."
 
     @overrides
+    def get_command_signature(self, command: commands.Command, /) -> str:
+        signature_list = [command.name]
+
+        # Perform renaming for hybrid commands
+        if hasattr(command.callback, "__discord_app_commands_param_rename__"):
+            renames = command.callback.__discord_app_commands_param_rename__
+        else:
+            renames = {}
+
+        sig = command.params
+
+        for name, param in sig.items():
+            name = renames.get(name, name)
+            is_optional = param.default is not param.empty
+
+            # Wrap optional arguments in square brackets
+            if is_optional:
+                name = f"[{name}]"
+
+            signature_list.append(name)
+
+        return " ".join(signature_list)
+
+    @overrides
     async def send_bot_help(self, mapping: Mapping[Optional[commands.Cog], list[commands.Command]], /):
         embed = self._help_embed_base("Categories")
         filtered_cogs = await self._filter_cogs(list(mapping.keys()))
@@ -122,10 +147,15 @@ class CustomHelpCommand(commands.MinimalHelpCommand):
 
         This allows re-using this logic for Group commands that can be invoked by themselves.
         """
-        embed.description = command.help
+        # Regex borrowed from https://stackoverflow.com/a/59843498/13568999
+        # Remove single newlines but keep double newlines
+        # This allows short lines in the docstring, but joins them together for the help description
+        embed.description = re.sub(
+            r"([^\S\n]*\n(?:[^\S\n]*\n)+[^\S\n]*)|[^\S\n]*\n[^\S\n]*", lambda x: x.group(1) or " ", command.help
+        )
 
-        if command.usage:
-            embed.add_field(name="Signature", value=f"{command.name} {command.usage}", inline=False)
+        signature = self.get_command_signature(command)
+        embed.add_field(name="Signature", value=signature, inline=False)
 
         if command.aliases:
             embed.add_field(name="Aliases", value=", ".join(command.aliases), inline=False)
