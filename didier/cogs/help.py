@@ -7,6 +7,7 @@ from overrides import overrides
 
 from didier import Didier
 from didier.utils.discord.colours import error_red
+from didier.utils.types.string import re_find_all, re_replace_with_list
 
 
 class CustomHelpCommand(commands.MinimalHelpCommand):
@@ -142,17 +143,34 @@ class CustomHelpCommand(commands.MinimalHelpCommand):
         embed = discord.Embed(title=title.title(), colour=discord.Colour.blue())
         return embed
 
+    def _clean_command_help(self, command: commands.Command) -> str:
+        """Clean up a help docstring
+
+        This will strip out single newlines, because these are only there for readability and line length.
+        These are instead replaced with spaces.
+
+        Code in codeblocks is ignored, as it is used to create examples.
+        """
+        description = command.help
+        codeblocks = re_find_all(r"\n?```.*?```", description, flags=re.DOTALL)
+
+        # Regex borrowed from https://stackoverflow.com/a/59843498/13568999
+        description = re.sub(
+            r"([^\S\n]*\n(?:[^\S\n]*\n)+[^\S\n]*)|[^\S\n]*\n[^\S\n]*", lambda x: x.group(1) or " ", description
+        )
+
+        # Replace codeblocks with their original form
+        if codeblocks:
+            description = re_replace_with_list(r"```.*?```", description, codeblocks)
+
+        return description
+
     def _add_command_help(self, embed: discord.Embed, command: commands.Command):
         """Add command-related information to an embed
 
         This allows re-using this logic for Group commands that can be invoked by themselves.
         """
-        # Regex borrowed from https://stackoverflow.com/a/59843498/13568999
-        # Remove single newlines but keep double newlines
-        # This allows short lines in the docstring, but joins them together for the help description
-        embed.description = re.sub(
-            r"([^\S\n]*\n(?:[^\S\n]*\n)+[^\S\n]*)|[^\S\n]*\n[^\S\n]*", lambda x: x.group(1) or " ", command.help
-        )
+        embed.description = self._clean_command_help(command)
 
         signature = self.get_command_signature(command)
         embed.add_field(name="Signature", value=signature, inline=False)

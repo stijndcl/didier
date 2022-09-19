@@ -120,7 +120,19 @@ class Currency(commands.Cog):
 
     @commands.command(name="invest", aliases=["deposit", "dep"])
     async def invest(self, ctx: commands.Context, amount: typing.Annotated[typing.Union[str, int], abbreviated_number]):
-        """Invest a given amount of Didier Dinks"""
+        """Invest a given `amount` Didier Dinks.
+
+        The `amount`-parameter can take both raw numbers, and abbreviations of big numbers. Passing `all` as the
+        value will invest all of your Didier Dinks.
+
+        Example usage:
+        ```
+        didier invest all
+        didier invest 500
+        didier invest 25k
+        didier invest 5.3b
+        ```
+        """
         async with self.client.postgres_session as session:
             invested = await crud.invest(session, ctx.author.id, amount)
             plural = pluralize("Didier Dink", invested)
@@ -134,7 +146,7 @@ class Currency(commands.Cog):
 
     @commands.hybrid_command(name="nightly")
     async def nightly(self, ctx: commands.Context):
-        """Claim nightly Didier Dinks"""
+        """Claim nightly Didier Dinks."""
         async with self.client.postgres_session as session:
             try:
                 await crud.claim_nightly(session, ctx.author.id)

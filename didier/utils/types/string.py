@@ -1,7 +1,8 @@
 import math
+import re
 from typing import Optional
 
-__all__ = ["abbreviate", "leading", "pluralize", "get_edu_year_name"]
+__all__ = ["abbreviate", "leading", "pluralize", "re_find_all", "re_replace_with_list", "get_edu_year_name"]
 
 
 def abbreviate(text: str, max_length: int) -> str:
@@ -43,6 +44,29 @@ def pluralize(word: str, amount: int, plural_form: Optional[str] = None) -> str:
         return word
 
     return plural_form or (word + "s")
+
+
+def re_find_all(pattern: str, string: str, flags: re.RegexFlag = 0) -> list[str]:
+    """Find all matches of a regex in a string"""
+    matches = []
+
+    while True:
+        match = re.search(pattern, string, flags=flags)
+        if not match:
+            break
+
+        matches.append(match.group(0))
+        string = string[match.end() :]
+
+    return matches
+
+
+def re_replace_with_list(pattern: str, string: str, replacements: list[str]) -> str:
+    """Replace all matches of a pattern one by one using a list of replacements"""
+    for replacement in replacements:
+        string = re.sub(pattern, replacement, string, count=1)
+
+    return string
 
 
 def get_edu_year_name(year: int) -> str:  # pragma: no cover
