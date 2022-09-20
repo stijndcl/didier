@@ -27,6 +27,7 @@ __all__ = [
     "Bank",
     "Birthday",
     "Bookmark",
+    "CommandStats",
     "CustomCommand",
     "CustomCommandAlias",
     "DadJoke",
@@ -93,6 +94,18 @@ class Bookmark(Base):
     user_id: int = Column(BigInteger, ForeignKey("users.user_id"))
 
     user: User = relationship("User", back_populates="bookmarks", uselist=False, lazy="selectin")
+
+
+class CommandStats(Base):
+    """Metrics on how often commands are used"""
+
+    __tablename__ = "command_stats"
+    command_stats_id: int = Column(Integer, primary_key=True)
+    command: str = Column(Text, nullable=False)
+    timestamp: datetime = Column(DateTime(timezone=True), nullable=False)
+    user_id: int = Column(BigInteger, nullable=False)
+    slash: bool = Column(Boolean, nullable=False)
+    context_menu: bool = Column(Boolean, nullable=False)
 
 
 class CustomCommand(Base):

@@ -2,6 +2,7 @@ import logging
 import os
 import pathlib
 from functools import cached_property
+from typing import Union
 
 import discord
 from aiohttp import ClientSession
@@ -10,7 +11,7 @@ from discord.ext import commands
 from sqlalchemy.ext.asyncio import AsyncSession
 
 import settings
-from database.crud import custom_commands
+from database.crud import command_stats, custom_commands
 from database.engine import DBSession
 from database.utils.caches import CacheManager
 from didier.data.embeds.error_embed import create_error_embed
@@ -18,6 +19,7 @@ from didier.data.embeds.schedules import Schedule, parse_schedule
 from didier.exceptions import HTTPException, NoMatch
 from didier.utils.discord.prefix import get_prefix
 from didier.utils.easter_eggs import detect_easter_egg
+from didier.utils.types.datetime import tz_aware_now
 
 __all__ = ["Didier"]
 
@@ -194,30 +196,6 @@ class Didier(commands.Bot):
         """Log a warning message"""
         await self._log(logging.WARNING, message, log_to_discord)
 
-    async def on_ready(self):
-        """Event triggered when the bot is ready"""
-        print(settings.DISCORD_READY_MESSAGE)
-
-    async def on_message(self, message: discord.Message, /) -> None:
-        """Event triggered when a message is sent"""
-        # Ignore messages by bots
-        if message.author.bot:
-            return
-
-        # Boos react to people that say Dider
-        if "dider" in message.content.lower() and message.author.id != self.user.id:
-            await message.add_reaction(settings.DISCORD_BOOS_REACT)
-
-        # Potential custom command
-        if await self._try_invoke_custom_command(message):
-            return
-
-        await self.process_commands(message)
-
-        easter_egg = await detect_easter_egg(self, message, self.database_caches.easter_eggs)
-        if easter_egg is not None:
-            await message.reply(easter_egg, mention_author=False)
-
     async def _try_invoke_custom_command(self, message: discord.Message) -> bool:
         """Check if the message tries to invoke a custom command
 
@@ -241,9 +219,16 @@ class Didier(commands.Bot):
         # Nothing found
         return False
 
-    async def on_thread_create(self, thread: discord.Thread):
-        """Event triggered when a new thread is created"""
-        await thread.join()
+    async def on_app_command_completion(
+        self,
+        interaction: discord.Interaction,
+        command: Union[discord.app_commands.Command, discord.app_commands.ContextMenu],
+    ):
+        """Event triggered when an app command completes successfully"""
+        ctx = await commands.Context.from_interaction(interaction)
+
+        async with self.postgres_session as session:
+            await command_stats.register_command_invocation(session, ctx, command, tz_aware_now())
 
     async def on_app_command_error(self, interaction: discord.Interaction, exception: AppCommandError):
         """Event triggered when an application command errors"""
@@ -257,8 +242,18 @@ class Didier(commands.Bot):
             else:
                 return await interaction.followup.send(str(exception.original), ephemeral=True)
 
+    async def on_command_completion(self, ctx: commands.Context):
+        """Event triggered when a message command completes successfully"""
+        # Hybrid command invocation triggers both this handler and on_app_command_completion
+        # We handle it in the correct place
+        if ctx.interaction is not None:
+            return
+
+        async with self.postgres_session as session:
+            await command_stats.register_command_invocation(session, ctx, ctx.command, tz_aware_now())
+
     async def on_command_error(self, ctx: commands.Context, exception: commands.CommandError, /):
-        """Event triggered when a regular command errors"""
+        """Event triggered when a message command errors"""
         # If working locally, print everything to your console
         if settings.SANDBOX:
             await super().on_command_error(ctx, exception)
@@ -310,3 +305,32 @@ class Didier(commands.Bot):
             embed = create_error_embed(ctx, exception)
             channel = self.get_channel(settings.ERRORS_CHANNEL)
             await channel.send(embed=embed)
+
+    async def on_message(self, message: discord.Message, /) -> None:
+        """Event triggered when a message is sent"""
+        # Ignore messages by bots
+        if message.author.bot:
+            return
+
+        # Boos react to people that say Dider
+        if "dider" in message.content.lower() and message.author.id != self.user.id:
+            await message.add_reaction(settings.DISCORD_BOOS_REACT)
+
+        # Potential custom command
+        if await self._try_invoke_custom_command(message):
+            return
+
+        await self.process_commands(message)
+
+        easter_egg = await detect_easter_egg(self, message, self.database_caches.easter_eggs)
+        if easter_egg is not None:
+            await message.reply(easter_egg, mention_author=False)
+
+    async def on_ready(self):
+        """Event triggered when the bot is ready"""
+        print(settings.DISCORD_READY_MESSAGE)
+
+    async def on_thread_create(self, thread: discord.Thread):
+        """Event triggered when a new thread is created"""
+        # Join threads automatically
+        await thread.join()
