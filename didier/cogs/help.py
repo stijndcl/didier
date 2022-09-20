@@ -188,7 +188,7 @@ class CustomHelpCommand(commands.MinimalHelpCommand):
         embed.add_field(name="Signature", value=signature, inline=False)
 
         if command.aliases:
-            embed.add_field(name="Aliases", value=", ".join(command.aliases), inline=False)
+            embed.add_field(name="Aliases", value=", ".join(sorted(command.aliases)), inline=False)
 
     def _get_cog(self, cogs: list[commands.Cog], name: str) -> Optional[commands.Cog]:
         """Try to find a cog, case-insensitively"""

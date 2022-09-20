@@ -1,6 +1,7 @@
 import logging
 import os
 import pathlib
+import re
 from functools import cached_property
 from typing import Union
 
@@ -284,22 +285,30 @@ class Didier(commands.Bot):
         ):
             return await ctx.reply(str(exception.original), mention_author=False)
 
-        # Print everything that we care about to the logs/stderr
-        await super().on_command_error(ctx, exception)
-
         if isinstance(exception, commands.MessageNotFound):
             return await ctx.reply("This message could not be found.", ephemeral=True, delete_after=10)
+
+        if isinstance(exception, (commands.MissingRequiredArgument,)):
+            message = str(exception)
+
+            match = re.search(r"(.*) is a required argument that is missing\.", message)
+            if match.groups():
+                message = f"Found no value for the `{match.groups()[0]}`-argument."
+
+            return await ctx.reply(message, ephemeral=True, delete_after=10)
 
         if isinstance(
             exception,
             (
                 commands.BadArgument,
-                commands.MissingRequiredArgument,
                 commands.UnexpectedQuoteError,
                 commands.ExpectedClosingQuoteError,
             ),
         ):
             return await ctx.reply("Invalid arguments.", ephemeral=True, delete_after=10)
+
+        # Print everything that we care about to the logs/stderr
+        await super().on_command_error(ctx, exception)
 
         if settings.ERRORS_CHANNEL is not None:
             embed = create_error_embed(ctx, exception)

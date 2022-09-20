@@ -1,10 +1,21 @@
 import discord
 
-__all__ = ["error_red", "ghent_university_blue", "ghent_university_yellow", "google_blue", "urban_dictionary_green"]
+__all__ = [
+    "error_red",
+    "github_white",
+    "ghent_university_blue",
+    "ghent_university_yellow",
+    "google_blue",
+    "urban_dictionary_green",
+]
 
 
 def error_red() -> discord.Colour:
     return discord.Colour.red()
+
+
+def github_white() -> discord.Colour:
+    return discord.Colour.from_rgb(250, 250, 250)
 
 
 def ghent_university_blue() -> discord.Colour:

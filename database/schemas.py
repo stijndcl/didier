@@ -33,6 +33,7 @@ __all__ = [
     "DadJoke",
     "Deadline",
     "EasterEgg",
+    "GitHubLink",
     "Link",
     "MemeTemplate",
     "NightlyData",
@@ -103,9 +104,11 @@ class CommandStats(Base):
     command_stats_id: int = Column(Integer, primary_key=True)
     command: str = Column(Text, nullable=False)
     timestamp: datetime = Column(DateTime(timezone=True), nullable=False)
-    user_id: int = Column(BigInteger, nullable=False)
+    user_id: int = Column(BigInteger, ForeignKey("users.user_id"))
     slash: bool = Column(Boolean, nullable=False)
     context_menu: bool = Column(Boolean, nullable=False)
+
+    user: User = relationship("User", back_populates="command_stats", uselist=False, lazy="selectin")
 
 
 class CustomCommand(Base):
@@ -168,6 +171,18 @@ class EasterEgg(Base):
     response: str = Column(Text, nullable=False)
     exact: bool = Column(Boolean, nullable=False, server_default="1")
     startswith: bool = Column(Boolean, nullable=False, server_default="1")
+
+
+class GitHubLink(Base):
+    """A user's GitHub link"""
+
+    __tablename__ = "github_links"
+
+    github_link_id: int = Column(Integer, primary_key=True)
+    url: str = Column(Text, nullable=False, unique=True)
+    user_id: int = Column(BigInteger, ForeignKey("users.user_id"))
+
+    user: User = relationship("User", back_populates="github_links", uselist=False, lazy="selectin")
 
 
 class Link(Base):
@@ -278,6 +293,12 @@ class User(Base):
     )
     bookmarks: list[Bookmark] = relationship(
         "Bookmark", back_populates="user", uselist=True, lazy="selectin", cascade="all, delete-orphan"
+    )
+    command_stats: list[CommandStats] = relationship(
+        "CommandStats", back_populates="user", uselist=True, lazy="selectin", cascade="all, delete-orphan"
+    )
+    github_links: list[GitHubLink] = relationship(
+        "GitHubLink", back_populates="user", uselist=True, lazy="selectin", cascade="all, delete-orphan"
     )
     nightly_data: NightlyData = relationship(
         "NightlyData", back_populates="user", uselist=False, lazy="selectin", cascade="all, delete-orphan"

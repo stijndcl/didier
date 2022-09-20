@@ -5,6 +5,7 @@ from discord import app_commands
 from discord.ext import commands
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from database.crud.users import get_or_add_user
 from database.schemas import CommandStats
 
 __all__ = ["register_command_invocation"]
@@ -19,6 +20,8 @@ async def register_command_invocation(
     """Create an entry for a command invocation"""
     if command is None:
         return
+
+    await get_or_add_user(session, ctx.author.id)
 
     # Check the type of invocation
     context_menu = isinstance(command, app_commands.ContextMenu)

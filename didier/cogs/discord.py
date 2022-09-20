@@ -4,7 +4,7 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
-from database.crud import birthdays, bookmarks
+from database.crud import birthdays, bookmarks, github
 from database.exceptions import (
     DuplicateInsertException,
     Forbidden,
@@ -15,6 +15,7 @@ from didier import Didier
 from didier.exceptions import expect
 from didier.menus.bookmarks import BookmarkSource
 from didier.menus.common import Menu
+from didier.utils.discord import colours
 from didier.utils.discord.assets import get_author_avatar
 from didier.utils.types.datetime import str_to_date
 from didier.utils.types.string import leading
@@ -192,6 +193,40 @@ class Discord(commands.Cog):
         """Create a bookmark out of this message"""
         modal = CreateBookmark(self.client, message.jump_url)
         await interaction.response.send_modal(modal)
+
+    @commands.group(name="github", aliases=["gh", "git"], case_insensitive=True, invoke_without_command=True)
+    async def github(self, ctx: commands.Context, user: discord.User):
+        """Show a user's GitHub links"""
+        embed = discord.Embed(colour=colours.github_white(), title="GitHub Links")
+        embed.set_author(name=user.display_name, icon_url=user.avatar.url or user.default_avatar.url)
+
+        embed.set_footer(text="Links can be added using `didier github add <link>`.")
+
+        async with self.client.postgres_session as session:
+            links = await github.get_github_links(session, user.id)
+
+        if not links:
+            embed.description = "This user has not set any GitHub links yet."
+        else:
+            regular_links = []
+            ugent_links = []
+
+            for link in links:
+                if "github.ugent.be" in link.url.lower():
+                    ugent_links.append(link)
+                else:
+                    regular_links.append(link)
+
+            regular_links.sort()
+            ugent_links.sort()
+
+            if ugent_links:
+                embed.add_field(name="Ghent University", value="\n".join(ugent_links), inline=False)
+
+            if regular_links:
+                embed.add_field(name="Other", value="\n".join(regular_links), inline=False)
+
+        return await ctx.reply(embed=embed, mention_author=False)
 
     @commands.command(name="join")
     async def join(self, ctx: commands.Context, thread: discord.Thread):
