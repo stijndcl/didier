@@ -49,9 +49,9 @@ EASTER_EGG_CHANCE: int = env.int("EASTER_EGG_CHANCE", 15)
 
 """Database"""
 # PostgreSQL
-POSTGRES_DB: str = env.str("POSTGRES_DB", "didier")
+POSTGRES_DB: str = env.str("POSTGRES_DB", "didier_dev")
 POSTGRES_USER: str = env.str("POSTGRES_USER", "postgres")
-POSTGRES_PASS: str = env.str("POSTGRES_PASS", "")
+POSTGRES_PASS: str = env.str("POSTGRES_PASS", "postgres")
 POSTGRES_HOST: str = env.str("POSTGRES_HOST", "localhost")
 POSTGRES_PORT: int = env.int("POSTGRES_PORT", "5432")
 
