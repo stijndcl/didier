@@ -23,12 +23,14 @@ def _get_traceback(exception: Exception) -> str:
         if line.strip():
             error_string += "\n"
 
-    return abbreviate(error_string, Limits.EMBED_FIELD_VALUE_LENGTH)
+    return abbreviate(error_string, Limits.EMBED_FIELD_VALUE_LENGTH - 8)
 
 
 def create_error_embed(ctx: commands.Context, exception: Exception) -> discord.Embed:
     """Create an embed for the traceback of an exception"""
-    description = _get_traceback(exception)
+    # Wrap the traceback in a codeblock for readability
+    description = _get_traceback(exception).strip()
+    description = f"```\n{description}\n```"
 
     if ctx.guild is None:
         origin = "DM"
@@ -40,7 +42,7 @@ def create_error_embed(ctx: commands.Context, exception: Exception) -> discord.E
     embed = discord.Embed(title="Error", colour=discord.Colour.red())
     embed.add_field(name="Command", value=f"{ctx.message.content}", inline=True)
     embed.add_field(name="Context", value=invocation, inline=True)
-    embed.add_field(name="Exception", value=abbreviate(str(exception), Limits.EMBED_FIELD_VALUE_LENGTH), inline=False)
+    embed.add_field(name="Exception", value=str(exception), inline=False)
     embed.add_field(name="Traceback", value=description, inline=False)
 
     return embed
