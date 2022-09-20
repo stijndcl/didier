@@ -1,9 +1,14 @@
 from typing import Optional
 
+import sqlalchemy.exc
 from sqlalchemy import delete, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from database.exceptions import Forbidden, NoResultFoundException
+from database.exceptions import (
+    DuplicateInsertException,
+    Forbidden,
+    NoResultFoundException,
+)
 from database.schemas import GitHubLink
 
 __all__ = ["add_github_link", "delete_github_link_by_id", "get_github_links"]
@@ -11,10 +16,13 @@ __all__ = ["add_github_link", "delete_github_link_by_id", "get_github_links"]
 
 async def add_github_link(session: AsyncSession, user_id: int, url: str) -> GitHubLink:
     """Add a new GitHub link into the database"""
-    gh_link = GitHubLink(user_id=user_id, url=url)
-    session.add(gh_link)
-    await session.commit()
-    await session.refresh(gh_link)
+    try:
+        gh_link = GitHubLink(user_id=user_id, url=url)
+        session.add(gh_link)
+        await session.commit()
+        await session.refresh(gh_link)
+    except sqlalchemy.exc.IntegrityError:
+        raise DuplicateInsertException
 
     return gh_link
 

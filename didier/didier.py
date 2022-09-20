@@ -292,7 +292,7 @@ class Didier(commands.Bot):
             message = str(exception)
 
             match = re.search(r"(.*) is a required argument that is missing\.", message)
-            if match.groups():
+            if match is not None and match.groups():
                 message = f"Found no value for the `{match.groups()[0]}`-argument."
 
             return await ctx.reply(message, ephemeral=True, delete_after=10)

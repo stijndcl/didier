@@ -195,12 +195,20 @@ class Discord(commands.Cog):
         await interaction.response.send_modal(modal)
 
     @commands.group(name="github", aliases=["gh", "git"], case_insensitive=True, invoke_without_command=True)
-    async def github(self, ctx: commands.Context, user: discord.User):
-        """Show a user's GitHub links"""
-        embed = discord.Embed(colour=colours.github_white(), title="GitHub Links")
-        embed.set_author(name=user.display_name, icon_url=user.avatar.url or user.default_avatar.url)
+    async def github_group(self, ctx: commands.Context, user: Optional[discord.User] = None):
+        """Show a user's GitHub links.
 
-        embed.set_footer(text="Links can be added using `didier github add <link>`.")
+        If no user is provided, this shows your links instead.
+        """
+        # Default to author
+        user = user or ctx.author
+
+        embed = discord.Embed(colour=colours.github_white(), title="GitHub Links")
+        embed.set_author(
+            name=user.display_name, icon_url=user.avatar.url if user.avatar is not None else user.default_avatar.url
+        )
+
+        embed.set_footer(text="Links can be added using didier github add <link>.")
 
         async with self.client.postgres_session as session:
             links = await github.get_github_links(session, user.id)
@@ -213,9 +221,9 @@ class Discord(commands.Cog):
 
             for link in links:
                 if "github.ugent.be" in link.url.lower():
-                    ugent_links.append(link)
+                    ugent_links.append(f"`#{link.github_link_id}`: {link.url}")
                 else:
-                    regular_links.append(link)
+                    regular_links.append(f"`#{link.github_link_id}`: {link.url}")
 
             regular_links.sort()
             ugent_links.sort()
@@ -227,6 +235,42 @@ class Discord(commands.Cog):
                 embed.add_field(name="Other", value="\n".join(regular_links), inline=False)
 
         return await ctx.reply(embed=embed, mention_author=False)
+
+    @github_group.command(name="add", aliases=["create", "insert"])
+    async def github_add(self, ctx: commands.Context, link: str):
+        """Add a new link into the database."""
+        # Remove wrapping <brackets> which can be used to escape Discord embeds
+        link = link.removeprefix("<").removesuffix(">")
+
+        async with self.client.postgres_session as session:
+            try:
+                gh_link = await github.add_github_link(session, ctx.author.id, link)
+            except DuplicateInsertException:
+                return await ctx.reply("This link has already been registered by someone.", mention_author=False)
+
+        await self.client.confirm_message(ctx.message)
+        return await ctx.reply(f"Successfully inserted link `#{gh_link.github_link_id}`.", mention_author=False)
+
+    @github_group.command(name="delete", aliases=["del", "remove", "rm"])
+    async def github_delete(self, ctx: commands.Context, link_id: str):
+        """Delete the link with it `link_id` from the database.
+
+        You can only delete your own links.
+        """
+        try:
+            link_id_int = int(link_id.removeprefix("#"))
+        except ValueError:
+            return await ctx.reply(f"`{link_id}` is not a valid link id.", mention_author=False)
+
+        async with self.client.postgres_session as session:
+            try:
+                await github.delete_github_link_by_id(session, ctx.author.id, link_id_int)
+            except NoResultFoundException:
+                return await ctx.reply(f"Found no GitHub link with id `#{link_id_int}`.", mention_author=False)
+            except Forbidden:
+                return await ctx.reply(f"You don't own GitHub link `#{link_id_int}`.", mention_author=False)
+
+        return await ctx.reply(f"Successfully deleted GitHub link `#{link_id_int}`.", mention_author=False)
 
     @commands.command(name="join")
     async def join(self, ctx: commands.Context, thread: discord.Thread):
