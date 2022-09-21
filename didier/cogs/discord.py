@@ -16,9 +16,10 @@ from didier.exceptions import expect
 from didier.menus.bookmarks import BookmarkSource
 from didier.menus.common import Menu
 from didier.utils.discord import colours
-from didier.utils.discord.assets import get_author_avatar
+from didier.utils.discord.assets import get_author_avatar, get_user_avatar
+from didier.utils.discord.constants import Limits
 from didier.utils.types.datetime import str_to_date
-from didier.utils.types.string import leading
+from didier.utils.types.string import abbreviate, leading
 from didier.views.modals import CreateBookmark
 
 
@@ -204,9 +205,7 @@ class Discord(commands.Cog):
         user = user or ctx.author
 
         embed = discord.Embed(colour=colours.github_white(), title="GitHub Links")
-        embed.set_author(
-            name=user.display_name, icon_url=user.avatar.url if user.avatar is not None else user.default_avatar.url
-        )
+        embed.set_author(name=user.display_name, icon_url=get_user_avatar(user))
 
         embed.set_footer(text="Links can be added using didier github add <link>.")
 
@@ -322,6 +321,39 @@ class Discord(commands.Cog):
         await message.pin(reason=f"Didier Pin by {interaction.user.display_name}")
         await message.add_reaction("📌")
         return await interaction.response.send_message("📌", ephemeral=True)
+
+    @commands.hybrid_command(name="snipe")
+    async def snipe(self, ctx: commands.Context):
+        """Publicly shame people when they edit or delete one of their messages.
+
+        Note that uncached messages will not be sniped.
+        """
+        if ctx.guild is None:
+            return await ctx.reply("Snipe only works in servers.", mention_author=False, ephemeral=True)
+
+        sniped_data = self.client.sniped.get(ctx.channel.id, None)
+        if sniped_data is None:
+            return await ctx.reply(
+                "There's no one to make fun of in this channel.", mention_author=False, ephemeral=True
+            )
+
+        embed = discord.Embed(colour=discord.Colour.blue())
+
+        embed.set_author(name=sniped_data[0].author.display_name, icon_url=get_user_avatar(sniped_data[0].author))
+
+        if sniped_data[1] is not None:
+            embed.title = "Edit Snipe"
+            embed.add_field(
+                name="Before", value=abbreviate(sniped_data[0].content, Limits.EMBED_FIELD_VALUE_LENGTH), inline=False
+            )
+            embed.add_field(
+                name="After", value=abbreviate(sniped_data[1].content, Limits.EMBED_FIELD_VALUE_LENGTH), inline=False
+            )
+        else:
+            embed.title = "Delete Snipe"
+            embed.add_field(name="Message", value=sniped_data[0].content)
+
+        return await ctx.reply(embed=embed, mention_author=False)
 
 
 async def setup(client: Didier):

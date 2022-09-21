@@ -3,7 +3,7 @@ import os
 import pathlib
 import re
 from functools import cached_property
-from typing import Union
+from typing import Union, Optional
 
 import discord
 from aiohttp import ClientSession
@@ -20,6 +20,7 @@ from didier.data.embeds.schedules import Schedule, parse_schedule
 from didier.exceptions import HTTPException, NoMatch
 from didier.utils.discord.prefix import get_prefix
 from didier.utils.easter_eggs import detect_easter_egg
+from didier.utils.discord.snipe import should_snipe
 from didier.utils.types.datetime import tz_aware_now
 
 __all__ = ["Didier"]
@@ -36,6 +37,7 @@ class Didier(commands.Bot):
     initial_extensions: tuple[str, ...] = ()
     http_session: ClientSession
     schedules: dict[settings.ScheduleType, Schedule] = {}
+    sniped: dict[int, tuple[discord.Message, Optional[discord.Message]]] = {}
     wordle_words: set[str] = set()
 
     def __init__(self):
@@ -334,6 +336,20 @@ class Didier(commands.Bot):
         easter_egg = await detect_easter_egg(self, message, self.database_caches.easter_eggs)
         if easter_egg is not None:
             await message.reply(easter_egg, mention_author=False)
+
+    async def on_message_delete(self, message: discord.Message):
+        """Event triggered when a message is deleted"""
+        if not should_snipe(message):
+            return
+
+        self.sniped[message.channel.id] = (message, None,)
+
+    async def on_message_edit(self, before: discord.Message, after: discord.Message):
+        """Event triggered when a message is edited"""
+        if not should_snipe(before):
+            return
+
+        self.sniped[before.channel.id] = (before, after,)
 
     async def on_ready(self):
         """Event triggered when the bot is ready"""
