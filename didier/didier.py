@@ -3,7 +3,7 @@ import os
 import pathlib
 import re
 from functools import cached_property
-from typing import Union, Optional
+from typing import Optional, Union
 
 import discord
 from aiohttp import ClientSession
@@ -19,8 +19,8 @@ from didier.data.embeds.error_embed import create_error_embed
 from didier.data.embeds.schedules import Schedule, parse_schedule
 from didier.exceptions import HTTPException, NoMatch
 from didier.utils.discord.prefix import get_prefix
-from didier.utils.easter_eggs import detect_easter_egg
 from didier.utils.discord.snipe import should_snipe
+from didier.utils.easter_eggs import detect_easter_egg
 from didier.utils.types.datetime import tz_aware_now
 
 __all__ = ["Didier"]
@@ -342,14 +342,20 @@ class Didier(commands.Bot):
         if not should_snipe(message):
             return
 
-        self.sniped[message.channel.id] = (message, None,)
+        self.sniped[message.channel.id] = (
+            message,
+            None,
+        )
 
     async def on_message_edit(self, before: discord.Message, after: discord.Message):
         """Event triggered when a message is edited"""
         if not should_snipe(before):
             return
 
-        self.sniped[before.channel.id] = (before, after,)
+        self.sniped[before.channel.id] = (
+            before,
+            after,
+        )
 
     async def on_ready(self):
         """Event triggered when the bot is ready"""

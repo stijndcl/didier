@@ -1,6 +1,6 @@
-from typing import Union
-from dataclasses import dataclass
 import re
+from dataclasses import dataclass
+from typing import Union
 
 __all__ = ["STEAM_CODE"]
 
@@ -8,6 +8,7 @@ __all__ = ["STEAM_CODE"]
 @dataclass
 class Regex:
     """Dataclass for a type of pattern"""
+
     pattern: str
     flags: Union[int, re.RegexFlag] = 0
 

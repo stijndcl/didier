@@ -2,7 +2,6 @@ import discord
 
 from didier.utils.regexes import STEAM_CODE
 
-
 __all__ = ["should_snipe"]
 
 
