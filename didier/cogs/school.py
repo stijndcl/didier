@@ -47,12 +47,12 @@ class School(commands.Cog):
         Schedules are personalized based on your roles in the server. If your schedule doesn't look right, make sure
         that you've got the correct roles selected. In case you do, ping D STIJN.
         """
-        if day_dt is None:
-            day_dt = date.today()
-
-        day_dt = skip_weekends(day_dt)
-
         async with ctx.typing():
+            if day_dt is None:
+                day_dt = date.today()
+
+            day_dt = skip_weekends(day_dt)
+
             try:
                 member_instance = to_main_guild_member(self.client, ctx.author)
 

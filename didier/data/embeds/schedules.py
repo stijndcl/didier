@@ -190,8 +190,7 @@ async def parse_schedule_from_content(content: str, *, database_session: AsyncSe
         if code not in course_codes:
             course = await get_course_by_code(database_session, code)
             if course is None:
-                # raise ValueError(f"Unable to find course with code {code} (event {event.name})")  # noqa: E800
-                continue  # TODO uncomment the line above after all courses have been added
+                continue
 
             course_codes[code] = course
 
