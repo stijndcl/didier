@@ -8,7 +8,7 @@ __all__ = ["create_logging_embed"]
 def create_logging_embed(level: int, message: str) -> discord.Embed:
     """Create an embed to send to the logging channel"""
     colours = {
-        logging.DEBUG: discord.Colour.light_gray(),
+        logging.DEBUG: discord.Colour.light_gray,
         logging.ERROR: discord.Colour.red(),
         logging.INFO: discord.Colour.blue(),
         logging.WARNING: discord.Colour.yellow(),
