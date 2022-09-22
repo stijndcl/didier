@@ -1,6 +1,6 @@
 import logging
 from contextlib import asynccontextmanager
-from typing import AsyncGenerator
+from typing import AsyncGenerator, Optional
 
 from aiohttp import ClientResponse, ClientSession, ContentTypeError
 
@@ -19,10 +19,10 @@ def request_successful(response: ClientResponse) -> bool:
 
 @asynccontextmanager
 async def ensure_get(
-    http_session: ClientSession, endpoint: str, *, log_exceptions: bool = True
+    http_session: ClientSession, endpoint: str, *, params: Optional[dict] = None, log_exceptions: bool = True
 ) -> AsyncGenerator[dict, None]:
     """Context manager that automatically raises an exception if a GET-request fails"""
-    async with http_session.get(endpoint) as response:
+    async with http_session.get(endpoint, params=params) as response:
         try:
             content = await response.json()
         except ContentTypeError:
