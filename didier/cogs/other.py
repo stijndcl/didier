@@ -7,7 +7,7 @@ from discord.ext import commands
 from database.crud.links import get_link_by_name
 from database.schemas import Link
 from didier import Didier
-from didier.data.apis import inspirobot, urban_dictionary
+from didier.data.apis import disease_sh, inspirobot, urban_dictionary
 from didier.data.embeds.google import GoogleSearch
 from didier.data.scrapers import google
 
@@ -20,16 +20,29 @@ class Other(commands.Cog):
     def __init__(self, client: Didier):
         self.client = client
 
+    @commands.hybrid_command(name="corona", aliases=["covid", "rona"])
+    async def covid(self, ctx: commands.Context, country: str = "Belgium"):
+        """Show Covid-19 info for a specific country.
+
+        By default, this will fetch the numbers for Belgium.
+
+        To get worldwide stats, use `all`, `global`, `world`, or `worldwide`.
+        """
+        async with ctx.typing():
+            if country.lower() in ["all", "global", "world", "worldwide"]:
+                data = await disease_sh.get_global_info(self.client.http_session)
+            else:
+                data = await disease_sh.get_country_info(self.client.http_session, country)
+
+            await ctx.reply(str(data), mention_author=False)
+
     @commands.hybrid_command(
         name="define", aliases=["ud", "urban"], description="Look up the definition of a word on the Urban Dictionary"
     )
     async def define(self, ctx: commands.Context, *, query: str):
         """Look up the definition of `query` on the Urban Dictionary."""
         async with ctx.typing():
-            status_code, definitions = await urban_dictionary.lookup(self.client.http_session, query)
-            if not definitions:
-                return await ctx.reply(f"Something went wrong (status {status_code})")
-
+            definitions = await urban_dictionary.lookup(self.client.http_session, query)
             await ctx.reply(embed=definitions[0].to_embed(), mention_author=False)
 
     @commands.hybrid_command(name="google", description="Google search")
