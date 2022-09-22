@@ -2,6 +2,7 @@ import datetime
 import random
 import traceback
 
+import discord
 from discord.ext import commands, tasks  # type: ignore # Strange & incorrect Mypy error
 from overrides import overrides
 
@@ -77,7 +78,14 @@ class Tasks(commands.Cog):
 
         Invoking the group itself shows the time until the next iteration
         """
-        raise NotImplementedError()
+        embed = discord.Embed(colour=discord.Colour.blue(), title="Tasks")
+
+        for name, task in self._tasks.items():
+            next_iter = task.next_iteration
+            timestamp = f"<t:{round(next_iter.timestamp())}:R>" if next_iter is not None else "N/A"
+            embed.add_field(name=name, value=timestamp)
+
+        await ctx.reply(embed=embed, mention_author=False)
 
     @tasks_group.command(name="Force", case_insensitive=True, usage="[Task]")
     async def force_task(self, ctx: commands.Context, name: str):
