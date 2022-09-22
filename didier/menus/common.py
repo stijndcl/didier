@@ -52,6 +52,10 @@ class PageSource(ABC, Generic[T]):
         """Method that builds the list of embeds from the input data"""
         raise NotImplementedError
 
+    def get_page_data(self, page: int) -> list[T]:
+        """Get the chunk of the dataset for page [page]"""
+        return self.dataset[page : page + self.per_page]
+
 
 class Menu(discord.ui.View):
     """Base class for a menu"""

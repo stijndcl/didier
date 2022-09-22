@@ -5,10 +5,12 @@ from discord import app_commands
 from discord.ext import commands
 
 from database.crud.dad_jokes import get_random_dad_joke
-from database.crud.memes import get_meme_by_name
+from database.crud.memes import get_all_memes, get_meme_by_name
 from didier import Didier
 from didier.data.apis.imgflip import generate_meme
 from didier.exceptions.no_match import expect
+from didier.menus.common import Menu
+from didier.menus.memes import MemeSource
 from didier.views.modals import GenerateMeme
 
 
@@ -57,6 +59,19 @@ class Fun(commands.Cog):
         async with ctx.typing():
             meme = await self._do_generate_meme(template, shlex.split(fields))
             return await ctx.reply(meme, mention_author=False)
+
+    @memegen_msg.command(name="list", aliases=["ls"])
+    async def memegen_ls_msg(self, ctx: commands.Context):
+        """Get a list of all available meme templates.
+
+        This command does _not_ have a /slash variant, as the memegen /slash commands provide autocompletion.
+        """
+        async with self.client.postgres_session as session:
+            results = await get_all_memes(session)
+
+        source = MemeSource(ctx, results)
+        menu = Menu(source)
+        await menu.start(ctx)
 
     @memegen_msg.command(name="preview", aliases=["p"])
     async def memegen_preview_msg(self, ctx: commands.Context, template: str):

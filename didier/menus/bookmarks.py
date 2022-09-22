@@ -22,7 +22,7 @@ class BookmarkSource(PageSource[Bookmark]):
 
             description = ""
 
-            for bookmark in self.dataset[page : page + self.per_page]:
+            for bookmark in self.get_page_data(page):
                 description += f"`#{bookmark.bookmark_id}`: [{bookmark.label}]({bookmark.jump_url})\n"
 
             embed.description = description.strip()

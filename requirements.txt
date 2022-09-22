@@ -3,7 +3,6 @@ alembic==1.8.0
 asyncpg==0.25.0
 beautifulsoup4==4.11.1
 discord.py==2.0.1
-git+https://github.com/Rapptz/discord-ext-menus@8686b5d
 environs==9.5.0
 feedparser==6.0.10
 ics==0.7.2
