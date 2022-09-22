@@ -10,6 +10,7 @@ from didier import Didier
 from didier.data.apis import disease_sh, inspirobot, urban_dictionary
 from didier.data.embeds.google import GoogleSearch
 from didier.data.scrapers import google
+from didier.utils.discord.autocompletion.country import autocomplete_country
 
 
 class Other(commands.Cog):
@@ -34,7 +35,12 @@ class Other(commands.Cog):
             else:
                 data = await disease_sh.get_country_info(self.client.http_session, country)
 
-            await ctx.reply(str(data), mention_author=False)
+            await ctx.reply(embed=data.to_embed(), mention_author=False)
+
+    @covid.autocomplete("country")
+    async def _covid_country_autocomplete(self, interaction: discord.Interaction, value: str):
+        """Autocompletion for the 'country'-parameter"""
+        return autocomplete_country(value)[:25]
 
     @commands.hybrid_command(
         name="define", aliases=["ud", "urban"], description="Look up the definition of a word on the Urban Dictionary"
