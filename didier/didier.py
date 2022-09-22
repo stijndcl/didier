@@ -16,6 +16,7 @@ from database.crud import command_stats, custom_commands
 from database.engine import DBSession
 from database.utils.caches import CacheManager
 from didier.data.embeds.error_embed import create_error_embed
+from didier.data.embeds.logging_embed import create_logging_embed
 from didier.data.embeds.schedules import Schedule, parse_schedule
 from didier.exceptions import HTTPException, NoMatch
 from didier.utils.discord.prefix import get_prefix
@@ -181,15 +182,16 @@ class Didier(commands.Bot):
     async def _log(self, level: int, message: str, log_to_discord: bool = True):
         """Log a message to the logging file, and optionally to the configured channel"""
         methods = {
+            logging.DEBUG: logger.debug,
             logging.ERROR: logger.error,
+            logging.INFO: logger.info,
             logging.WARNING: logger.warning,
         }
 
         methods.get(level, logger.error)(message)
         if log_to_discord:
-            # TODO pretty embed
-            #  different colours per level?
-            await self.error_channel.send(message)
+            embed = create_logging_embed(level, message)
+            await self.error_channel.send(embed=embed)
 
     async def log_error(self, message: str, log_to_discord: bool = True):
         """Log an error message"""
