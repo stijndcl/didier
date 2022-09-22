@@ -48,6 +48,11 @@ class Fun(commands.Cog):
         Example: `memegen a b c d` will be parsed as `template: "a"`, `fields: ["b", "c", "d"]`
 
         Example: `memegen "a b" "c d"` will be parsed as `template: "a b"`, `fields: ["c d"]`
+
+        In case a template only has 1 field, quotes aren't required and your arguments will be combined into one field.
+
+        Example: if template `a` only has 1 field,
+        `memegen a b c d` will be parsed as `template: "a"`, `fields: ["bcd"]`
         """
         async with ctx.typing():
             meme = await self._do_generate_meme(template, shlex.split(fields))
