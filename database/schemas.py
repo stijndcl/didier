@@ -37,6 +37,7 @@ __all__ = [
     "Link",
     "MemeTemplate",
     "NightlyData",
+    "Reminder",
     "Task",
     "UforaAnnouncement",
     "UforaCourse",
@@ -219,6 +220,18 @@ class NightlyData(Base):
     user: User = relationship("User", back_populates="nightly_data", uselist=False, lazy="selectin")
 
 
+class Reminder(Base):
+    """Something that a user should be reminded of"""
+
+    __tablename__ = "reminders"
+
+    reminder_id: int = Column(Integer, primary_key=True)
+    user_id: int = Column(BigInteger, ForeignKey("users.user_id"))
+    category: enums.ReminderCategory = Column(Enum(enums.ReminderCategory), nullable=False)
+
+    user: User = relationship("User", back_populates="reminders", uselist=False, lazy="selectin")
+
+
 class Task(Base):
     """A Didier task"""
 
@@ -302,6 +315,9 @@ class User(Base):
     )
     nightly_data: NightlyData = relationship(
         "NightlyData", back_populates="user", uselist=False, lazy="selectin", cascade="all, delete-orphan"
+    )
+    reminders: list[Reminder] = relationship(
+        "Reminder", back_populates="user", uselist=True, lazy="selectin", cascade="all, delete-orphan"
     )
     wordle_guesses: list[WordleGuess] = relationship(
         "WordleGuess", back_populates="user", uselist=True, lazy="selectin", cascade="all, delete-orphan"

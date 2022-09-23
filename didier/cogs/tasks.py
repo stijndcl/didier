@@ -9,10 +9,16 @@ from overrides import overrides
 import settings
 from database import enums
 from database.crud.birthdays import get_birthdays_on_day
+from database.crud.reminders import get_all_reminders_for_category
 from database.crud.ufora_announcements import remove_old_announcements
 from database.crud.wordle import set_daily_word
+from database.schemas import Reminder
 from didier import Didier
-from didier.data.embeds.schedules import Schedule, parse_schedule_from_content
+from didier.data.embeds.schedules import (
+    Schedule,
+    get_schedule_for_day,
+    parse_schedule_from_content,
+)
 from didier.data.embeds.ufora.announcements import fetch_ufora_announcements
 from didier.decorators.tasks import timed_task
 from didier.utils.discord.checks import is_owner
@@ -44,6 +50,7 @@ class Tasks(commands.Cog):
         self._tasks = {
             "birthdays": self.check_birthdays,
             "schedules": self.pull_schedules,
+            "reminders": self.reminders,
             "ufora": self.pull_ufora_announcements,
             "remove_ufora": self.remove_old_ufora_announcements,
             "wordle": self.reset_wordle_word,
@@ -61,6 +68,7 @@ class Tasks(commands.Cog):
             self.remove_old_ufora_announcements.start()
 
         # Start other tasks
+        self.reminders.start()
         self.reset_wordle_word.start()
         self.pull_schedules.start()
 
@@ -135,7 +143,7 @@ class Tasks(commands.Cog):
         async with self.client.postgres_session as session:
             for data in settings.SCHEDULE_DATA:
                 if data.schedule_url is None:
-                    return
+                    continue
 
                 async with self.client.http_session.get(data.schedule_url) as response:
                     # If a schedule couldn't be fetched, log it and move on
@@ -180,6 +188,51 @@ class Tasks(commands.Cog):
     async def _before_ufora_announcements(self):
         await self.client.wait_until_ready()
 
+    async def _send_les_reminders(self, entries: list[Reminder]):
+        today = datetime.date(year=2022, month=9, day=26)
+
+        # Create the main schedule for the day once here, to avoid doing it repeatedly
+        daily_schedule = get_schedule_for_day(self.client, today)
+
+        # No class today
+        if not daily_schedule:
+            return
+
+        for entry in entries:
+            member = self.client.main_guild.get_member(entry.user_id)
+            if not member:
+                continue
+
+            roles = {role.id for role in member.roles}
+            personal_schedule = daily_schedule.personalize(roles)
+
+            # No class today
+            if not personal_schedule:
+                continue
+
+            await member.send(embed=personal_schedule.to_embed(day=today))
+
+    # @tasks.loop(time=SOCIALLY_ACCEPTABLE_TIME)
+    @tasks.loop(hours=3)
+    async def reminders(self, **kwargs):
+        """Send daily reminders to people"""
+        _ = kwargs
+
+        async with self.client.postgres_session as session:
+            for category in enums.ReminderCategory:
+                entries = await get_all_reminders_for_category(session, category)
+                if not entries:
+                    continue
+
+                # This is slightly ugly, but it's the best way to go about it
+                # There won't be a lot of categories anyway
+                if category == enums.ReminderCategory:
+                    await self._send_les_reminders(entries)
+
+    @reminders.before_loop
+    async def _before_reminders(self):
+        await self.client.wait_until_ready()
+
     @tasks.loop(hours=24)
     async def remove_old_ufora_announcements(self):
         """Remove all announcements that are over 1 week old, once per day"""
@@ -200,6 +253,7 @@ class Tasks(commands.Cog):
     @check_birthdays.error
     @pull_schedules.error
     @pull_ufora_announcements.error
+    @reminders.error
     @remove_old_ufora_announcements.error
     @reset_wordle_word.error
     async def _on_tasks_error(self, error: BaseException):

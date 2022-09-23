@@ -1,11 +1,14 @@
 import enum
 
-__all__ = ["TaskType"]
+__all__ = ["ReminderCategory", "TaskType"]
 
 
-# There is a bug in typeshed that causes an incorrect PyCharm warning
-# https://github.com/python/typeshed/issues/8286
-# noinspection PyArgumentList
+class ReminderCategory(enum.IntEnum):
+    """Enum for reminder categories"""
+
+    LES = enum.auto()
+
+
 class TaskType(enum.IntEnum):
     """Enum for the different types of tasks"""
 
