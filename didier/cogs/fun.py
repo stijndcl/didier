@@ -11,6 +11,7 @@ from didier import Didier
 from didier.data.apis.imgflip import generate_meme
 from didier.exceptions.no_match import expect
 from didier.menus.memes import MemeSource
+from didier.utils.discord import constants
 from didier.views.modals import GenerateMeme
 
 
@@ -24,6 +25,22 @@ class Fun(commands.Cog):
 
     def __init__(self, client: Didier):
         self.client = client
+
+    @commands.hybrid_command(name="clap")
+    async def clap(self, ctx: commands.Context, *, text: str):
+        """Clap a message with emojis for extra dramatic effect"""
+        chars = list(filter(lambda c: c.isalnum(), text))
+
+        if not chars:
+            return await ctx.reply("👏", mention_author=False)
+
+        text = "👏".join(list(map(lambda c: constants.EMOJI_MAP.get(c), chars)))
+        text = f"👏{text}👏"
+
+        if len(text) > constants.Limits.MESSAGE_LENGTH:
+            return await ctx.reply("Message is too long.", mention_author=False)
+
+        return await ctx.reply(text, mention_author=False)
 
     async def _do_generate_meme(self, meme_name: str, fields: list[str]) -> str:
         async with self.client.postgres_session as session:
