@@ -1,6 +1,5 @@
 import datetime
 import random
-import traceback
 
 import discord
 from discord.ext import commands, tasks  # type: ignore # Strange & incorrect Mypy error
@@ -212,8 +211,7 @@ class Tasks(commands.Cog):
 
             await member.send(embed=personal_schedule.to_embed(day=today))
 
-    # @tasks.loop(time=SOCIALLY_ACCEPTABLE_TIME)
-    @tasks.loop(hours=3)
+    @tasks.loop(time=SOCIALLY_ACCEPTABLE_TIME)
     async def reminders(self, **kwargs):
         """Send daily reminders to people"""
         _ = kwargs
@@ -258,8 +256,7 @@ class Tasks(commands.Cog):
     @reset_wordle_word.error
     async def _on_tasks_error(self, error: BaseException):
         """Error handler for all tasks"""
-        print("".join(traceback.format_exception(type(error), error, error.__traceback__)))
-        self.client.dispatch("task_error")
+        self.client.dispatch("task_error", error)
 
 
 async def setup(client: Didier):

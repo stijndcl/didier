@@ -363,6 +363,13 @@ class Didier(commands.Bot):
         """Event triggered when the bot is ready"""
         print(settings.DISCORD_READY_MESSAGE)
 
+    async def on_task_error(self, exception: Exception):
+        """Event triggered when a task raises an exception"""
+        if settings.ERRORS_CHANNEL is not None:
+            embed = create_error_embed(None, exception)
+            channel = self.get_channel(settings.ERRORS_CHANNEL)
+            await channel.send(embed=embed)
+
     async def on_thread_create(self, thread: discord.Thread):
         """Event triggered when a new thread is created"""
         # Join threads automatically
