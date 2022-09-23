@@ -226,7 +226,7 @@ class Tasks(commands.Cog):
 
                 # This is slightly ugly, but it's the best way to go about it
                 # There won't be a lot of categories anyway
-                if category == enums.ReminderCategory:
+                if category == enums.ReminderCategory.LES:
                     await self._send_les_reminders(entries)
 
     @reminders.before_loop
