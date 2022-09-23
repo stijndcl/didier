@@ -188,7 +188,7 @@ class Tasks(commands.Cog):
         await self.client.wait_until_ready()
 
     async def _send_les_reminders(self, entries: list[Reminder]):
-        today = datetime.date(year=2022, month=9, day=26)
+        today = tz_aware_now().date()
 
         # Create the main schedule for the day once here, to avoid doing it repeatedly
         daily_schedule = get_schedule_for_day(self.client, today)
