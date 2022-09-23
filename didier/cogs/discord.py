@@ -14,7 +14,6 @@ from database.exceptions import (
 from didier import Didier
 from didier.exceptions import expect
 from didier.menus.bookmarks import BookmarkSource
-from didier.menus.common import Menu
 from didier.utils.discord import colours
 from didier.utils.discord.assets import get_author_avatar, get_user_avatar
 from didier.utils.discord.constants import Limits
@@ -186,9 +185,7 @@ class Discord(commands.Cog):
             embed.description = "You haven't created any bookmarks yet."
             return await ctx.reply(embed=embed, mention_author=False)
 
-        source = BookmarkSource(ctx, results)
-        menu = Menu(source)
-        await menu.start(ctx)
+        await BookmarkSource(ctx, results).start()
 
     async def _bookmark_ctx(self, interaction: discord.Interaction, message: discord.Message):
         """Create a bookmark out of this message"""

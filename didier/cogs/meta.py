@@ -4,9 +4,11 @@ from typing import Optional
 
 from discord.ext import commands
 
+from database.crud.custom_commands import get_all_commands
 from database.crud.reminders import toggle_reminder
 from database.enums import ReminderCategory
 from didier import Didier
+from didier.menus.custom_commands import CustomCommandSource
 
 
 class Meta(commands.Cog):
@@ -16,6 +18,15 @@ class Meta(commands.Cog):
 
     def __init__(self, client: Didier):
         self.client = client
+
+    @commands.command(name="custom")
+    async def custom(self, ctx: commands.Context):
+        """Get a list of all custom commands that are registered."""
+        async with self.client.postgres_session as session:
+            custom_commands = await get_all_commands(session)
+
+        custom_commands.sort(key=lambda c: c.name.lower())
+        await CustomCommandSource(ctx, custom_commands).start()
 
     @commands.command(name="marco")
     async def marco(self, ctx: commands.Context):

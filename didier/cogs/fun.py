@@ -1,4 +1,5 @@
 import shlex
+from typing import Optional
 
 import discord
 from discord import app_commands
@@ -9,7 +10,6 @@ from database.crud.memes import get_all_memes, get_meme_by_name
 from didier import Didier
 from didier.data.apis.imgflip import generate_meme
 from didier.exceptions.no_match import expect
-from didier.menus.common import Menu
 from didier.menus.memes import MemeSource
 from didier.views.modals import GenerateMeme
 
@@ -42,7 +42,7 @@ class Fun(commands.Cog):
             return await ctx.reply(joke.joke, mention_author=False)
 
     @commands.group(name="memegen", aliases=["meme", "memes"], invoke_without_command=True, case_insensitive=True)
-    async def memegen_msg(self, ctx: commands.Context, template: str, *, fields: str):
+    async def memegen_msg(self, ctx: commands.Context, template: Optional[str] = None, *, fields: Optional[str] = None):
         """Generate a meme with template `template` and fields `fields`.
 
         The arguments are parsed based on spaces. Arguments that contain spaces should be wrapped in "quotes".
@@ -55,7 +55,17 @@ class Fun(commands.Cog):
 
         Example: if template `a` only has 1 field,
         `memegen a b c d` will be parsed as `template: "a"`, `fields: ["bcd"]`
+
+        When no arguments are provided, this is a shortcut to `memegen list`.
+
+        When only a template is provided, this is a shortcut to `memegen preview`.
         """
+        if template is None:
+            return await self.memegen_ls_msg(ctx)
+
+        if fields is None:
+            return await self.memegen_preview_msg(ctx, template)
+
         async with ctx.typing():
             meme = await self._do_generate_meme(template, shlex.split(fields))
             return await ctx.reply(meme, mention_author=False)
@@ -69,9 +79,7 @@ class Fun(commands.Cog):
         async with self.client.postgres_session as session:
             results = await get_all_memes(session)
 
-        source = MemeSource(ctx, results)
-        menu = Menu(source)
-        await menu.start(ctx)
+        await MemeSource(ctx, results).start()
 
     @memegen_msg.command(name="preview", aliases=["p"])
     async def memegen_preview_msg(self, ctx: commands.Context, template: str):

@@ -1,5 +1,4 @@
 import discord
-from discord.ext import commands
 from overrides import overrides
 
 from database.schemas import MemeTemplate
@@ -12,7 +11,7 @@ class MemeSource(PageSource[MemeTemplate]):
     """PageSource for meme templates"""
 
     @overrides
-    def create_embeds(self, ctx: commands.Context):
+    def create_embeds(self):
         for page in range(self.page_count):
             # The colour of the embed is (69,4,20) with the values +100 because they were too dark
             embed = discord.Embed(title="Meme Templates", colour=discord.Colour.from_rgb(169, 14, 120))

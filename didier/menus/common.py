@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from abc import ABC, abstractmethod
 from typing import Generic, Optional, TypeVar, cast
 
@@ -11,50 +13,6 @@ __all__ = ["Menu", "PageSource"]
 
 
 T = TypeVar("T")
-
-
-class PageSource(ABC, Generic[T]):
-    """Base class that handles the embeds displayed in a menu"""
-
-    dataset: list[T]
-    embeds: list[discord.Embed]
-    page_count: int
-    per_page: int
-
-    def __init__(self, ctx: commands.Context, dataset: list[T], *, per_page: int = 10):
-        self.embeds = []
-        self.dataset = dataset
-        self.per_page = per_page
-        self.page_count = self._get_page_count()
-        self.create_embeds(ctx)
-        self._add_embed_page_footers()
-
-    def _get_page_count(self) -> int:
-        """Calculate the amount of pages required"""
-        if len(self.dataset) % self.per_page == 0:
-            return len(self.dataset) // self.per_page
-
-        return (len(self.dataset) // self.per_page) + 1
-
-    def __getitem__(self, index: int) -> discord.Embed:
-        return self.embeds[index]
-
-    def __len__(self):
-        return self.page_count
-
-    def _add_embed_page_footers(self):
-        """Add the current page in the footer of every embed"""
-        for i, embed in enumerate(self.embeds):
-            embed.set_footer(text=f"{i + 1}/{self.page_count}")
-
-    @abstractmethod
-    def create_embeds(self, ctx: commands.Context):
-        """Method that builds the list of embeds from the input data"""
-        raise NotImplementedError
-
-    def get_page_data(self, page: int) -> list[T]:
-        """Get the chunk of the dataset for page [page]"""
-        return self.dataset[page : page + self.per_page]
 
 
 class Menu(discord.ui.View):
@@ -166,3 +124,58 @@ class Menu(discord.ui.View):
         """Button to show the last page"""
         self.current_page = len(self.source) - 1
         await self.display_current_state(interaction)
+
+
+class PageSource(ABC, Generic[T]):
+    """Base class that handles the embeds displayed in a menu"""
+
+    ctx: commands.Context
+    dataset: list[T]
+    embeds: list[discord.Embed]
+    page_count: int
+    per_page: int
+
+    def __init__(self, ctx: commands.Context, dataset: list[T], *, per_page: int = 10):
+        self.ctx = ctx
+        self.embeds = []
+        self.dataset = dataset
+        self.per_page = per_page
+        self.page_count = self._get_page_count()
+        self.create_embeds()
+        self._add_embed_page_footers()
+
+    def _get_page_count(self) -> int:
+        """Calculate the amount of pages required"""
+        if len(self.dataset) % self.per_page == 0:
+            return len(self.dataset) // self.per_page
+
+        return (len(self.dataset) // self.per_page) + 1
+
+    def __getitem__(self, index: int) -> discord.Embed:
+        return self.embeds[index]
+
+    def __len__(self):
+        return self.page_count
+
+    def _add_embed_page_footers(self):
+        """Add the current page in the footer of every embed"""
+        for i, embed in enumerate(self.embeds):
+            embed.set_footer(text=f"{i + 1}/{self.page_count}")
+
+    @abstractmethod
+    def create_embeds(self):
+        """Method that builds the list of embeds from the input data"""
+        raise NotImplementedError
+
+    def get_page_data(self, page: int) -> list[T]:
+        """Get the chunk of the dataset for page [page]"""
+        return self.dataset[page : page + self.per_page]
+
+    async def start(self, *, ephemeral: bool = False, timeout: Optional[int] = None) -> Menu:
+        """Shortcut to creating (and starting) a Menu with this source
+
+        This returns the created menu
+        """
+        menu = Menu(self, ephemeral=ephemeral, timeout=timeout)
+        await menu.start(self.ctx)
+        return menu
