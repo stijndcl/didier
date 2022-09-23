@@ -61,6 +61,21 @@ class Schedule(EmbedBaseModel):
 
         return Schedule(personal_slots)
 
+    def simplify(self):
+        """Merge sequential slots in the same location into one
+
+        Note: this is done in-place instead of returning a new schedule!
+        (The operation is O(n^2))
+
+        Example:
+            13:00 - 14:30: AD3 in S9
+            14:30 - 1600: AD3 in S9
+        """
+        for first in self.slots:
+            for second in self.slots:
+                if first == second:
+                    continue
+
     @overrides
     def to_embed(self, **kwargs) -> discord.Embed:
         day: date = kwargs.get("day", date.today())
@@ -111,6 +126,9 @@ class ScheduleSlot:
         room, building, campus = re.search(r"(.*)\. (?:Gebouw )?(.*)\. (?:Campus )?(.*)\. ", self.location).groups()
         room = room.replace("PC / laptoplokaal ", "PC-lokaal")
         self.location = f"{campus} {building} {room}"
+
+        # The same course can only start once at the same moment,
+        # so this is guaranteed to be unique
         self._hash = hash(f"{self.course.course_id} {str(self.start_time)}")
 
     @property
@@ -133,6 +151,26 @@ class ScheduleSlot:
             return False
 
         return self._hash == other._hash
+
+    def could_merge_with(self, other: ScheduleSlot) -> bool:
+        """Check if two slots are actually one with a 15-min break in-between
+
+        If they are, merge the two into one (this edits the first slot in-place!)
+        """
+        if self.course.course_id != other.course.course_id:
+            return False
+
+        if self.location != other.location:
+            return False
+
+        if self.start_time == other.end_time:
+            other.end_time = self.end_time
+            return True
+        elif self.end_time == other.start_time:
+            self.end_time = other.end_time
+            return True
+
+        return False
 
 
 def get_schedule_for_day(client: Didier, day_dt: date) -> Optional[Schedule]:
@@ -204,6 +242,10 @@ async def parse_schedule_from_content(content: str, *, database_session: AsyncSe
             end_time=parse_time_string(str(event.end)),
             location=event.location,
         )
+
+        # Slot extends another one, don't add it
+        if any(s.could_merge_with(slot) for s in slots):
+            continue
 
         slots.add(slot)
 
