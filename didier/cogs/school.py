@@ -11,7 +11,7 @@ from didier import Didier
 from didier.data.apis.hydra import fetch_menu
 from didier.data.embeds.deadlines import Deadlines
 from didier.data.embeds.hydra import no_menu_found
-from didier.data.embeds.schedules import Schedule, get_schedule_for_user
+from didier.data.embeds.schedules import Schedule, get_schedule_for_day
 from didier.exceptions import HTTPException, NotInMainGuildException
 from didier.utils.discord.converters.time import DateTransformer
 from didier.utils.discord.flags.school import StudyGuideFlags
@@ -55,10 +55,11 @@ class School(commands.Cog):
 
             try:
                 member_instance = to_main_guild_member(self.client, ctx.author)
+                roles = {role.id for role in member_instance.roles}
 
                 # Always make sure there is at least one schedule in case it returns None
                 # this allows proper error messages
-                schedule = get_schedule_for_user(self.client, member_instance, day_dt) or Schedule()
+                schedule = (get_schedule_for_day(self.client, day_dt) or Schedule()).personalize(roles)
 
                 return await ctx.reply(embed=schedule.to_embed(day=day_dt), mention_author=False)
 

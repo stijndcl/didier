@@ -4,6 +4,8 @@ from typing import Optional
 
 from discord.ext import commands
 
+from database.crud.reminders import toggle_reminder
+from database.enums import ReminderCategory
 from didier import Didier
 
 
@@ -19,6 +21,31 @@ class Meta(commands.Cog):
     async def marco(self, ctx: commands.Context):
         """Get Didier's latency."""
         return await ctx.reply(f"Polo! {round(self.client.latency * 1000)}ms", mention_author=False)
+
+    @commands.command(name="remind", aliases=["remindme"])
+    async def remind(self, ctx: commands.Context, category: str):
+        """Make Didier send you reminders every day."""
+        category = category.lower()
+
+        available_categories = [
+            (
+                "les",
+                ReminderCategory.LES,
+            )
+        ]
+
+        for name, category_mapping in available_categories:
+            if name == category:
+                async with self.client.postgres_session as session:
+                    new_value = await toggle_reminder(session, ctx.author.id, category_mapping)
+
+                toggle = "on" if new_value else "off"
+                return await ctx.reply(
+                    f"Reminders for category `{name}` have been toggled {toggle}.", mention_author=False
+                )
+
+        # No match found
+        return await ctx.reply(f"`{category}` is not a supported category.", mention_author=False)
 
     @commands.command(name="source", aliases=["src"])
     async def source(self, ctx: commands.Context, *, command_name: Optional[str] = None):
