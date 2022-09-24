@@ -40,7 +40,7 @@ class DatabaseCache(ABC):
         """Filter the cache to find everything that matches the search query"""
         query = query.lower()
         # Return the original (non-transformed) version of the data for pretty display in Discord
-        suggestions = [self.data[index] for index, value in enumerate(self.data_transformed) if query in value]
+        suggestions = [self.data[index] for index, value in enumerate(self.data_transformed) if query in value][:25]
 
         return [app_commands.Choice(name=suggestion, value=suggestion.lower()) for suggestion in suggestions]
 
@@ -128,7 +128,7 @@ class UforaCourseCache(DatabaseCache):
             if query in alias:
                 results.add(course)
 
-        suggestions = sorted(list(results))
+        suggestions = sorted(list(results))[:25]
         return [app_commands.Choice(name=suggestion, value=suggestion.lower()) for suggestion in suggestions]
 
 
