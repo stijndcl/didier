@@ -254,6 +254,8 @@ class UforaCourse(Base):
     compulsory: bool = Column(Boolean, server_default="1", nullable=False)
     role_id: Optional[int] = Column(BigInteger, nullable=True, unique=False)
     overarching_role_id: Optional[int] = Column(BigInteger, nullable=True, unique=False)
+    # This is not the greatest fix, but there can only ever be two, so it will do the job
+    alternative_overarching_role_id: Optional[int] = Column(BigInteger, nullable=True, unique=False)
     log_announcements: bool = Column(Boolean, server_default="0", nullable=False)
 
     announcements: list[UforaAnnouncement] = relationship(

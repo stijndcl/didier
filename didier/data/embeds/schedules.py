@@ -54,8 +54,16 @@ class Schedule(EmbedBaseModel):
 
         personal_slots = set()
         for slot in self.slots:
+            alt_id = slot.alternative_overarching_role_id
+
+            # Check if the user has a course selected in their roles
             role_found = slot.role_id is not None and slot.role_id in roles
-            overarching_role_found = slot.overarching_role_id is not None and slot.overarching_role_id in roles
+
+            # Some engineering master courses are present in multiple different places,
+            # so this is necessary
+            overarching_role_found = (slot.overarching_role_id is not None and slot.overarching_role_id in roles) or (
+                alt_id is not None and alt_id in roles
+            )
             if role_found or overarching_role_found:
                 personal_slots.add(slot)
 
@@ -130,6 +138,11 @@ class ScheduleSlot:
         # The same course can only start once at the same moment,
         # so this is guaranteed to be unique
         self._hash = hash(f"{self.course.course_id} {str(self.start_time)}")
+
+    @property
+    def alternative_overarching_role_id(self) -> Optional[int]:
+        """Shortcut to getting the alternative overarching role id for this slot"""
+        return self.course.alternative_overarching_role_id
 
     @property
     def overarching_role_id(self) -> Optional[int]:
