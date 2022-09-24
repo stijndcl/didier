@@ -29,12 +29,12 @@ class Fun(commands.Cog):
     @commands.hybrid_command(name="clap")
     async def clap(self, ctx: commands.Context, *, text: str):
         """Clap a message with emojis for extra dramatic effect"""
-        chars = list(filter(lambda c: c.isalnum(), text))
+        chars = list(filter(lambda c: c in constants.EMOJI_MAP, text))
 
         if not chars:
             return await ctx.reply("👏", mention_author=False)
 
-        text = "👏".join(list(map(lambda c: constants.EMOJI_MAP.get(c), chars)))
+        text = "👏".join(list(map(lambda c: constants.EMOJI_MAP[c], chars)))
         text = f"👏{text}👏"
 
         if len(text) > constants.Limits.MESSAGE_LENGTH:
