@@ -104,6 +104,30 @@ async def main():
             alternative_overarching_role_id=1023278462733127710,
         )
 
+        inleiding_tot_elektrotechniek = UforaCourse(
+            code="C003806",
+            name="Inleiding tot de Elektrotechniek",
+            year=3,
+            compulsory=True,
+            overarching_role_id=891744390035415111,
+        )
+
+        inleiding_tot_telecommunicatie = UforaCourse(
+            code="C003787",
+            name="Inleiding tot de Telecommunicatie",
+            year=3,
+            compulsory=True,
+            overarching_role_id=891744390035415111,
+        )
+
+        wiskundige_modellering = UforaCourse(
+            code="C003788",
+            name="Wiskundige Modellering in de Ingenieurswetenschappen",
+            year=3,
+            compulsory=True,
+            overarching_role_id=891744390035415111,
+        )
+
         session.add_all(
             [
                 artificiele_intelligentie,
@@ -116,6 +140,9 @@ async def main():
                 modelleren_en_simuleren,
                 informatiebeveiliging,
                 parallelle_computersystemen,
+                inleiding_tot_elektrotechniek,
+                inleiding_tot_telecommunicatie,
+                wiskundige_modellering,
             ]
         )
         await session.commit()
@@ -137,6 +164,10 @@ async def main():
         parallel_computer_systems = UforaCourseAlias(
             parallelle_computersystemen.course_id, alias="Parallel Computer Systems"
         )
+        elektro = UforaCourseAlias(course_id=inleiding_tot_elektrotechniek.course_id, alias="Elektro")
+        elektrotechniek = UforaCourseAlias(course_id=inleiding_tot_elektrotechniek.course_id, alias="Elektrotechniek")
+        telecom = UforaCourseAlias(course_id=inleiding_tot_telecommunicatie.course_id, alias="Telecom")
+        wimo = UforaCourseAlias(course_id=wiskundige_modellering.course_id, alias="WiMo")
 
         session.add_all(
             [
@@ -154,7 +185,13 @@ async def main():
                 information_security,
                 pcs,
                 parallel_computer_systems,
+                elektro,
+                elektrotechniek,
+                telecom,
+                wimo,
             ]
         )
 
         await session.commit()
+
+        """1st Master CS"""

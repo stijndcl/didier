@@ -70,8 +70,10 @@ UFORA_ANNOUNCEMENTS_CHANNEL: Optional[int] = env.int("UFORA_ANNOUNCEMENTS_CHANNE
 
 """Discord Role ID's"""
 BA3_ROLE: Optional[int] = env.int("BA3_ROLE", 891743208248324196)
-MA_CS_ROLE: Optional[int] = env.int("MA_CS_ROLE", None)
-MA_CS_ENG_ROLE: Optional[int] = env.int("MA_CS_ENG_ROLE", None)
+MA_CS_1_ROLE: Optional[int] = env.int("MA_CS_1_ROLE", 1023293447387496570)
+MA_CS_2_ROLE: Optional[int] = env.int("MA_CS_2_ROLE", 1023302736210567208)
+MA_CS_ENG_1_ROLE: Optional[int] = env.int("MA_CS_ENG_1_ROLE", 1023278462733127710)
+MA_CS_ENG_2_ROLE: Optional[int] = env.int("MA_CS_ENG_2_ROLE", 1023300434800164914)
 
 """API Keys"""
 UFORA_RSS_TOKEN: Optional[str] = env.str("UFORA_RSS_TOKEN", None)
@@ -81,8 +83,10 @@ IMGFLIP_PASSWORD: Optional[str] = env.str("IMGFLIP_PASSWORD", None)
 
 """Schedule URLs"""
 BA3_SCHEDULE_URL: Optional[str] = env.str("BA3_SCHEDULE_URL", None)
-MA_CS_SCHEDULE_URL: Optional[str] = env.str("MA_CS_SCHEDULE_URL", None)
-MA_CS_ENG_SCHEDULE_URL: Optional[str] = env.str("MA_CS_ENG_SCHEDULE_URL", None)
+MA_CS_1_SCHEDULE_URL: Optional[str] = env.str("MA_CS_1_SCHEDULE_URL", None)
+MA_CS_2_SCHEDULE_URL: Optional[str] = env.str("MA_CS_2_SCHEDULE_URL", None)
+MA_CS_ENG_1_SCHEDULE_URL: Optional[str] = env.str("MA_CS_ENG_1_SCHEDULE_URL", None)
+MA_CS_ENG_2_SCHEDULE_URL: Optional[str] = env.str("MA_CS_ENG_2_SCHEDULE_URL", None)
 
 
 """Computed properties"""
@@ -92,8 +96,10 @@ class ScheduleType(str, Enum):
     """Enum to differentiate schedules"""
 
     BA3 = "ba3"
-    MA_CS = "ma_cs"
-    MA_CS_ENG = "ma_cs_eng"
+    MA_CS_1 = "ma_cs_1"
+    MA_CS_2 = "ma_cs_2"
+    MA_CS_ENG_1 = "ma_cs_eng_1"
+    MA_CS_ENG_2 = "ma_cs_eng_2"
 
 
 @dataclass
@@ -107,6 +113,8 @@ class ScheduleInfo:
 
 SCHEDULE_DATA = [
     ScheduleInfo(name=ScheduleType.BA3, role_id=BA3_ROLE, schedule_url=BA3_SCHEDULE_URL),
-    ScheduleInfo(name=ScheduleType.MA_CS, role_id=MA_CS_ROLE, schedule_url=MA_CS_SCHEDULE_URL),
-    ScheduleInfo(name=ScheduleType.MA_CS_ENG, role_id=MA_CS_ENG_ROLE, schedule_url=MA_CS_ENG_SCHEDULE_URL),
+    ScheduleInfo(name=ScheduleType.MA_CS_1, role_id=MA_CS_1_ROLE, schedule_url=MA_CS_1_SCHEDULE_URL),
+    ScheduleInfo(name=ScheduleType.MA_CS_2, role_id=MA_CS_2_ROLE, schedule_url=MA_CS_2_SCHEDULE_URL),
+    ScheduleInfo(name=ScheduleType.MA_CS_ENG_1, role_id=MA_CS_ENG_1_ROLE, schedule_url=MA_CS_ENG_1_SCHEDULE_URL),
+    ScheduleInfo(name=ScheduleType.MA_CS_ENG_2, role_id=MA_CS_ENG_2_ROLE, schedule_url=MA_CS_ENG_2_SCHEDULE_URL),
 ]
