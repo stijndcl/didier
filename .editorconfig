@@ -3,4 +3,4 @@ root = true
 [{*.yml, *.yaml}]
 indent_size = 2
 indent_style = space
-max_line_length=80
+max_line_length=120

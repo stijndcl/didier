@@ -1,0 +1,46 @@
+default_language_version:
+    python: python3.9.5
+
+repos:
+-   repo: https://github.com/ambv/black
+    rev: 22.3.0
+    hooks:
+    - id: black
+
+-   repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.3.0
+    hooks:
+      - id: check-json
+      - id: end-of-file-fixer
+      - id: pretty-format-json
+      - id: trailing-whitespace
+
+-   repo: https://github.com/pycqa/isort
+    rev: 5.10.1
+    hooks:
+    -   id: isort
+
+-   repo: https://github.com/PyCQA/autoflake
+    rev: v1.4
+    hooks:
+    -   id: autoflake
+        name: autoflake (python)
+        args:
+        - "--remove-all-unused-imports"
+        - "--in-place"
+        - "--ignore-init-module-imports"
+
+-   repo: https://github.com/PyCQA/flake8
+    rev: 4.0.1
+    hooks:
+    -   id: flake8
+        exclude: ^(alembic|.github)
+        args: [--config, .flake8]
+        additional_dependencies:
+          - "flake8-bandit"
+          - "flake8-bugbear"
+          - "flake8-docstrings"
+          - "flake8-dunder-all"
+          - "flake8-eradicate"
+          - "flake8-isort"
+          - "flake8-simplify"

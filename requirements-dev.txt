@@ -1,0 +1,22 @@
+black==22.3.0
+coverage[toml]==6.4.1
+freezegun==1.2.1
+mypy==0.961
+pre-commit==2.20.0
+pytest==7.1.2
+pytest-asyncio==0.18.3
+pytest-env==0.6.2
+sqlalchemy2-stubs==0.0.2a23
+types-beautifulsoup4==4.11.3
+types-python-dateutil==2.8.19
+types-pytz==2021.3.8
+
+# Flake8 + plugins
+flake8==4.0.1
+flake8-bandit==3.0.0
+flake8-bugbear==22.7.1
+flake8-docstrings==1.6.0
+flake8-dunder-all==0.2.1
+flake8-eradicate==1.2.1
+flake8-isort==4.1.1
+flake8-simplify==0.19.2

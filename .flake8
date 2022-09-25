@@ -1,0 +1,44 @@
+[flake8]
+# Don't lint non-Python files
+exclude =
+    .git,
+    .github,
+    .mypy_cache,
+    .pytest_cache,
+    __pycache__,
+    alembic,
+    htmlcov,
+    venv
+# Disable rules that we don't care about (or conflict with others)
+extend-ignore =
+    # Missing docstring in public module
+    D100, D104,
+    # Missing docstring in magic method
+    D105,
+    # Missing docstring in __init__
+    D107,
+    # First line of docstrings should end with a period
+    D400,
+    # First line of docstrings should be in imperative mood
+    D401,
+    # Whitespace before ":"
+    E203,
+    # Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+    S311,
+# Don't require docstrings when overriding a method,
+# the base method should have a docstring but the rest not
+ignore-decorators=overrides
+max-line-length = 120
+# Disable some rules for entire files
+per-file-ignores =
+    # DALL000: Missing __all__, main isn't supposed to be imported
+    main.py: DALL000,
+    # DALL000: Missing __all__, Cogs aren't modules
+    ./didier/cogs/*: DALL000,
+    # DALL000: Missing __all__, tests aren't supposed to be imported
+    # S101: Use of assert, this is the point of tests
+    ./tests/*: DALL000 S101,
+    # D103: Missing docstring in public function
+    # All of the colours methods are just oneliners to create a colour,
+    # there's no point adding docstrings (function names are enough)
+    ./didier/utils/discord/colours.py: D103,

@@ -1,0 +1,16 @@
+version: '3.9'
+services:
+  postgres:
+    image: postgres:14
+    container_name: didier
+    restart: always
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB:-didier_dev}
+      - POSTGRES_USER=${POSTGRES_USER:-postgres}
+      - POSTGRES_PASSWORD=${POSTGRES_PASS:-postgres}
+    ports:
+      - "${POSTGRES_PORT:-5432}:${POSTGRES_PORT:-5432}"
+    volumes:
+      - postgres:/var/lib/postgresql/data
+volumes:
+  postgres:

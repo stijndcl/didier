@@ -1,0 +1,58 @@
+[tool.black]
+line-length = 120
+
+[tool.coverage.run]
+concurrency = [
+    "greenlet"
+]
+source = [
+    "didier",
+    "database"
+]
+omit = [
+    "./tests/*",
+    "./database/migrations.py",
+    "./didier/cogs/*",
+    "./didier/didier.py",
+    "./didier/data/constants.py",
+    "./didier/data/embeds/*",
+    "./didier/data/flags/*",
+    "./didier/menus/*",
+    "./didier/utils/discord/colours.py",
+    "./didier/utils/discord/constants.py",
+    "./didier/utils/discord/flags/*",
+    "./didier/views/modals/*"
+]
+
+[tool.isort]
+profile = "black"
+
+[tool.mypy]
+files = [
+    "database/**/*.py",
+    "didier/**/*.py",
+    "main.py"
+]
+plugins = [
+    "pydantic.mypy",
+    "sqlalchemy.ext.mypy.plugin"
+]
+[[tool.mypy.overrides]]
+module = ["discord.*", "feedparser.*", "ics.*", "markdownify.*"]
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+env = [
+    "TESTING = 1",
+    "POSTGRES_DB = didier_pytest",
+    "POSTGRES_USER = pytest",
+    "POSTGRES_PASS = pytest",
+    "POSTGRES_HOST = localhost",
+    "POSTGRES_PORT = 5433",
+    "DISCORD_TOKEN = token",
+    "DISCORD_MAIN_GUILD = 123456789101112131415"
+]
+markers = [
+    "postgres: tests that use PostgreSQL"
+]
