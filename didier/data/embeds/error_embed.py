@@ -20,7 +20,7 @@ def _get_traceback(exception: Exception) -> str:
             break
 
         # Escape Discord Markdown formatting
-        error_string += line.replace(r"*", r"\*").replace(r"_", r"\_")
+        error_string += line
         if line.strip():
             error_string += "\n"
 
@@ -45,7 +45,12 @@ def create_error_embed(ctx: Optional[commands.Context], exception: Exception) ->
 
         invocation = f"{ctx.author.display_name} in {origin}"
 
-        embed.add_field(name="Command", value=f"{ctx.message.content}", inline=True)
+        if ctx.interaction is not None and ctx.interaction.command is not None:
+            command = ctx.interaction.command.name
+        else:
+            command = ctx.message.content or "N/A"
+
+        embed.add_field(name="Command", value=command, inline=True)
         embed.add_field(name="Context", value=invocation, inline=True)
 
     if message:
