@@ -29,7 +29,6 @@ __all__ = [
     "DISCORD_CUSTOM_COMMAND_PREFIX",
     "UFORA_ANNOUNCEMENTS_CHANNEL",
     "UFORA_RSS_TOKEN",
-    "URBAN_DICTIONARY_TOKEN",
     "IMGFLIP_NAME",
     "IMGFLIP_PASSWORD",
     "ScheduleType",
@@ -77,7 +76,6 @@ MA_CS_ENG_2_ROLE: Optional[int] = env.int("MA_CS_ENG_2_ROLE", 102330043480016491
 
 """API Keys"""
 UFORA_RSS_TOKEN: Optional[str] = env.str("UFORA_RSS_TOKEN", None)
-URBAN_DICTIONARY_TOKEN: Optional[str] = env.str("URBAN_DICTIONARY_TOKEN", None)
 IMGFLIP_NAME: Optional[str] = env.str("IMGFLIP_NAME", None)
 IMGFLIP_PASSWORD: Optional[str] = env.str("IMGFLIP_PASSWORD", None)
 

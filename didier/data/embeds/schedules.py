@@ -131,9 +131,11 @@ class ScheduleSlot:
     def __post_init__(self):
         """Fix some properties to display more nicely"""
         # Re-format the location data
-        room, building, campus = re.search(r"(.*)\. (?:Gebouw )?(.*)\. (?:Campus )?(.*)\. ", self.location).groups()
-        room = room.replace("PC / laptoplokaal ", "PC-lokaal")
-        self.location = f"{campus} {building} {room}"
+        match = re.search(r"(.*)\. (?:Gebouw )?(.*)\. (?:Campus )?(.*)\. ", self.location)
+        if match is not None:
+            room, building, campus = match.groups()
+            room = room.replace("PC / laptoplokaal ", "PC-lokaal")
+            self.location = f"{campus} {building} {room}"
 
         # The same course can only start once at the same moment,
         # so this is guaranteed to be unique
