@@ -63,12 +63,20 @@ class Discord(commands.Cog):
         return await ctx.reply(f"{name or 'Your'} birthday is set to **{day}/{month}**.", mention_author=False)
 
     @birthday.command(name="set", aliases=["config"])
-    async def birthday_set(self, ctx: commands.Context, day: str):
+    async def birthday_set(self, ctx: commands.Context, day: str, user: Optional[discord.User] = None):
         """Set your birthday to `day`.
 
         Parsing of the `day`-argument happens in the following order: `DD/MM/YYYY`, `DD/MM/YY`, `DD/MM`.
         Other formats will not be accepted.
         """
+        # Let owners set other people's birthdays
+        if user is not None and not await self.client.is_owner(ctx.author):
+            return await ctx.reply("You don't have permission to set other people's birthdays.", mention_author=False)
+
+        # For regular users: default to your own birthday
+        if user is None:
+            user = ctx.author
+
         try:
             default_year = 2001
             date = str_to_date(day, formats=["%d/%m/%Y", "%d/%m/%y", "%d/%m"])
@@ -81,7 +89,7 @@ class Discord(commands.Cog):
             return await ctx.reply(f"`{day}` is not a valid date.", mention_author=False)
 
         async with self.client.postgres_session as session:
-            await birthdays.add_birthday(session, ctx.author.id, date)
+            await birthdays.add_birthday(session, user.id, date)
             await self.client.confirm_message(ctx.message)
 
     @commands.group(name="bookmark", aliases=["bm", "bookmarks"], case_insensitive=True, invoke_without_command=True)
