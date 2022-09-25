@@ -222,7 +222,7 @@ async def parse_schedule_from_content(content: str, *, database_session: AsyncSe
     calendar = Calendar(content)
     events = list(calendar.events)
     course_codes: dict[str, UforaCourse] = {}
-    slots: set[ScheduleSlot] = set()
+    slots: list[ScheduleSlot] = []
 
     for event in events:
         code = parse_course_code(event.name)
@@ -248,9 +248,10 @@ async def parse_schedule_from_content(content: str, *, database_session: AsyncSe
         if any(s.could_merge_with(slot) for s in slots):
             continue
 
-        slots.add(slot)
+        slots.append(slot)
 
-    return Schedule(slots=slots)
+    # Cast to set at the END because the __hash__ can change while merging with others
+    return Schedule(slots=set(slots))
 
 
 async def parse_schedule(name: ScheduleType, *, database_session: AsyncSession) -> Optional[Schedule]:
