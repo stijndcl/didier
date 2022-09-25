@@ -169,7 +169,7 @@ class PageSource(ABC, Generic[T]):
 
     def get_page_data(self, page: int) -> list[T]:
         """Get the chunk of the dataset for page [page]"""
-        return self.dataset[page : page + self.per_page]
+        return self.dataset[page * self.per_page : (page + 1) * self.per_page]
 
     async def start(self, *, ephemeral: bool = False, timeout: Optional[int] = None) -> Menu:
         """Shortcut to creating (and starting) a Menu with this source
