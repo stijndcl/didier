@@ -10,6 +10,10 @@ __all__ = ["generate_meme"]
 
 def generate_boxes(meme: MemeTemplate, fields: list[str]) -> list[str]:
     """Generate the template boxes for Imgflip"""
+    # If no fields were passed, generate a template instead
+    if not fields:
+        fields = [f"Field #{i + 1}" for i in range(meme.field_count)]
+
     # If a meme only has 1 field, join all the arguments together into one string
     if meme.field_count == 1:
         fields = [" ".join(fields)]

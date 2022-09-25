@@ -102,8 +102,7 @@ class Fun(commands.Cog):
     async def memegen_preview_msg(self, ctx: commands.Context, template: str):
         """Generate a preview for the meme template `template`, to see how the fields are structured."""
         async with ctx.typing():
-            fields = [f"Field #{i + 1}" for i in range(20)]
-            meme = await self._do_generate_meme(template, fields)
+            meme = await self._do_generate_meme(template, [])
             return await ctx.reply(meme, mention_author=False)
 
     @memes_slash.command(name="generate")
@@ -121,8 +120,7 @@ class Fun(commands.Cog):
         """Generate a preview for a meme, to see how the fields are structured."""
         await interaction.response.defer(ephemeral=True)
 
-        fields = [f"Field #{i + 1}" for i in range(20)]
-        meme_url = await self._do_generate_meme(template, fields)
+        meme_url = await self._do_generate_meme(template, [])
 
         await interaction.followup.send(meme_url, ephemeral=True)
 
