@@ -119,7 +119,7 @@ class Fun(commands.Cog):
     @app_commands.describe(template="The meme template to use in the preview.")
     async def memegen_preview_slash(self, interaction: discord.Interaction, template: str):
         """Generate a preview for a meme, to see how the fields are structured."""
-        await interaction.response.defer()
+        await interaction.response.defer(ephemeral=True)
 
         fields = [f"Field #{i + 1}" for i in range(20)]
         meme_url = await self._do_generate_meme(template, fields)
