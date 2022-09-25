@@ -215,9 +215,14 @@ class Didier(commands.Bot):
         if not message.content.startswith(settings.DISCORD_CUSTOM_COMMAND_PREFIX):
             return False
 
+        # Remove the prefix
+        content = message.content[len(settings.DISCORD_CUSTOM_COMMAND_PREFIX) :].strip()
+
+        # Message was just "?" (or whatever the prefix was configured to)
+        if not content:
+            return False
+
         async with self.postgres_session as session:
-            # Remove the prefix
-            content = message.content[len(settings.DISCORD_CUSTOM_COMMAND_PREFIX) :]
             command = await custom_commands.get_command(session, content)
 
             # Command found
