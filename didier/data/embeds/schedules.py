@@ -52,7 +52,7 @@ class Schedule(EmbedBaseModel):
         if not self.slots:
             return Schedule()
 
-        personal_slots = set()
+        personal_slots = []
         for slot in self.slots:
             alt_id = slot.alternative_overarching_role_id
 
@@ -65,24 +65,9 @@ class Schedule(EmbedBaseModel):
                 alt_id is not None and alt_id in roles
             )
             if role_found or overarching_role_found:
-                personal_slots.add(slot)
+                personal_slots.append(slot)
 
-        return Schedule(personal_slots)
-
-    def simplify(self):
-        """Merge sequential slots in the same location into one
-
-        Note: this is done in-place instead of returning a new schedule!
-        (The operation is O(n^2))
-
-        Example:
-            13:00 - 14:30: AD3 in S9
-            14:30 - 1600: AD3 in S9
-        """
-        for first in self.slots:
-            for second in self.slots:
-                if first == second:
-                    continue
+        return Schedule(set(personal_slots))
 
     @overrides
     def to_embed(self, **kwargs) -> discord.Embed:
@@ -179,7 +164,8 @@ class ScheduleSlot:
             return False
 
         if self.start_time == other.end_time:
-            other.end_time = self.end_time
+            self.start_time = other.start_time
+            self._hash = hash(f"{self.course.course_id} {str(self.start_time)}")
             return True
         elif self.end_time == other.start_time:
             self.end_time = other.end_time
