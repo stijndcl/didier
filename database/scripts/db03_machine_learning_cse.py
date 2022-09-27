@@ -13,6 +13,7 @@ async def main():
         mlcse = UforaCourse(
             code="E061330",
             name="Machine Learning (CSE)",
+            year=5,
             role_id=1024355572256092170,
             overarching_role_id=1023300434800164914,
         )
