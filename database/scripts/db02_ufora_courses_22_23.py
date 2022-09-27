@@ -290,7 +290,7 @@ async def main():
             year=5,
             compulsory=True,
             role_id=1023303199609860268,
-            overarching_role_id=1023293447387496570,
+            overarching_role_id=1023302736210567208,
         )
 
         big_data_science = UforaCourse(
@@ -299,7 +299,7 @@ async def main():
             year=5,
             compulsory=True,
             role_id=1023303190046851153,
-            overarching_role_id=1023293447387496570,
+            overarching_role_id=1023302736210567208,
         )
 
         bedrijfsstage = UforaCourse(
@@ -308,7 +308,7 @@ async def main():
             year=5,
             compulsory=True,
             role_id=1023303201807679598,
-            overarching_role_id=1023293447387496570,
+            overarching_role_id=1023302736210567208,
         )
 
         masterproef = UforaCourse(
@@ -317,7 +317,7 @@ async def main():
             year=5,
             compulsory=True,
             role_id=1023319264851144754,
-            overarching_role_id=1023293447387496570,
+            overarching_role_id=1023302736210567208,
             alternative_overarching_role_id=1023300434800164914,
         )
 
