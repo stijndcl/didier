@@ -215,7 +215,7 @@ async def main():
         machine_learning = UforaCourse(
             course_id=630807,
             code="C003758",
-            name="Machine Learning",
+            name="Machine Learning (CS)",
             year=4,
             compulsory=True,
             role_id=1023294041825235087,
