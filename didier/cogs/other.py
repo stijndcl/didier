@@ -9,6 +9,7 @@ from database.schemas import Link
 from didier import Didier
 from didier.data.apis import disease_sh, inspirobot, urban_dictionary
 from didier.data.embeds.google import GoogleSearch
+from didier.data.embeds.urban_dictionary import Definition
 from didier.data.scrapers import google
 from didier.utils.discord.autocompletion.country import autocomplete_country
 
@@ -49,7 +50,10 @@ class Other(commands.Cog):
         """Look up the definition of `query` on the Urban Dictionary."""
         async with ctx.typing():
             definitions = await urban_dictionary.lookup(self.client.http_session, query)
-            await ctx.reply(embed=definitions[0].to_embed(), mention_author=False)
+            await ctx.reply(
+                embed=definitions[0].to_embed() if definitions else Definition.no_result_found_embed(),
+                mention_author=False,
+            )
 
     @commands.hybrid_command(name="google", description="Google search")
     @app_commands.describe(query="Search query")

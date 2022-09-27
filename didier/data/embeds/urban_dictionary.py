@@ -59,3 +59,12 @@ class Definition(EmbedPydantic):
         embed.add_field(name="Link", value=f"[Urban Dictionary]({self.permalink})", inline=True)
 
         return embed
+
+    @staticmethod
+    def no_result_found_embed() -> discord.Embed:
+        """Embed shown when no definitions could be found"""
+        embed = discord.Embed(title="Urban Dictionary", colour=colours.error_red())
+
+        embed.description = "No definitions could be found."
+
+        return embed
