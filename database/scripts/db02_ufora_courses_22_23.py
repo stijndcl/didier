@@ -86,6 +86,7 @@ async def main():
             name="Modelleren en Simuleren",
             year=3,
             compulsory=True,
+            role_id=1024573730418069565,
             overarching_role_id=891744461405687808,
             log_announcements=True,
         )
