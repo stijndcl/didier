@@ -107,7 +107,7 @@ class UforaNotification(EmbedBaseModel):
             f"{leading('0', str(self.published_dt.month))}"
             "/"
             f"{self.published_dt.year} "
-            f"om {leading('0', str(self.published_dt.hour))}"
+            f"{leading('0', str(self.published_dt.hour))}"
             ":"
             f"{leading('0', str(self.published_dt.minute))}"
             ":"
