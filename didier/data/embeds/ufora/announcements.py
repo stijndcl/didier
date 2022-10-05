@@ -2,11 +2,11 @@ import re
 from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Optional
+from zoneinfo import ZoneInfo
 
 import async_timeout
 import discord
 import feedparser
-import pytz
 from aiohttp import ClientSession
 from markdownify import markdownify as md
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -16,7 +16,7 @@ from database.crud import ufora_announcements as crud
 from database.schemas import UforaCourse
 from didier.data.embeds.base import EmbedBaseModel
 from didier.utils.discord.colours import ghent_university_blue
-from didier.utils.types.datetime import int_to_weekday
+from didier.utils.types.datetime import LOCAL_TIMEZONE, int_to_weekday
 from didier.utils.types.string import leading
 
 __all__ = [
@@ -89,13 +89,7 @@ class UforaNotification(EmbedBaseModel):
         # We will hereby cut it out and pray the timezone will always be UTC+0
         published = self.content["published"].rsplit(" ", 1)[0]
         time_string = "%a, %d %b %Y %H:%M:%S"
-        dt = datetime.strptime(published, time_string).astimezone(pytz.timezone("Europe/Brussels"))
-
-        # Apply timezone offset in a hacky way
-        offset = dt.utcoffset()
-        if offset is not None:
-            dt += offset
-
+        dt = datetime.strptime(published, time_string).replace(tzinfo=ZoneInfo("GMT")).astimezone(LOCAL_TIMEZONE)
         return dt
 
     def _get_published(self) -> str:
