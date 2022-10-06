@@ -83,7 +83,7 @@ class Schedule(EmbedBaseModel):
             embed.description = (
                 "No planned classes found.\n\n"
                 "In case this doesn't seem right, "
-                "make sure that you've got the roles of all of courses that you're taking on.\n\n"
+                "make sure that you've got the roles of all the courses that you're taking on.\n\n"
                 "In case it does, enjoy your day off!"
             )
 
