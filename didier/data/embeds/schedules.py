@@ -18,7 +18,12 @@ from database.crud.ufora_courses import get_course_by_code
 from database.schemas import UforaCourse
 from didier.data.embeds.base import EmbedBaseModel
 from didier.utils.discord import colours
-from didier.utils.types.datetime import LOCAL_TIMEZONE, int_to_weekday, time_string
+from didier.utils.types.datetime import (
+    LOCAL_TIMEZONE,
+    int_to_weekday,
+    time_string,
+    tz_aware_today,
+)
 from didier.utils.types.string import leading
 from settings import ScheduleType
 
@@ -71,7 +76,7 @@ class Schedule(EmbedBaseModel):
 
     @overrides
     def to_embed(self, **kwargs) -> discord.Embed:
-        day: date = kwargs.get("day", date.today())
+        day: date = kwargs.get("day", tz_aware_today())
         day_str = f"{leading('0', str(day.day))}/{leading('0', str(day.month))}/{leading('0', str(day.year))}"
 
         embed = discord.Embed(title=f"Schedule - {int_to_weekday(day.weekday())} {day_str}")

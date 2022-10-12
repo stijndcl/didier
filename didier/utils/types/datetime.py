@@ -56,7 +56,7 @@ def parse_dm_string(argument: str) -> datetime.date:
     - [English Month, possibly abbreviated] DD
     """
     argument = argument.lower()
-    today = datetime.date.today()
+    today = tz_aware_today()
 
     # DD/MM
     if "/" in argument:
