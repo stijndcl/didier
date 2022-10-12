@@ -67,7 +67,7 @@ class CovidData(EmbedPydantic):
         recovered_indicator = self._trend_indicator(self.today.today_recovered, self.yesterday.today_recovered)
         embed.add_field(
             name="Recovered (Today)",
-            value=f"{self.today.recovered} **({self.today.today_recovered:,})** {recovered_indicator}".replace(
+            value=f"{self.today.recovered:,} **({self.today.today_recovered:,})** {recovered_indicator}".replace(
                 ",", "."
             ),
             inline=False,
