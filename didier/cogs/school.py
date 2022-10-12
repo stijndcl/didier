@@ -16,7 +16,7 @@ from didier.exceptions import HTTPException, NotInMainGuildException
 from didier.utils.discord.converters.time import DateTransformer
 from didier.utils.discord.flags.school import StudyGuideFlags
 from didier.utils.discord.users import to_main_guild_member
-from didier.utils.types.datetime import skip_weekends
+from didier.utils.types.datetime import skip_weekends, tz_aware_today
 
 
 class School(commands.Cog):
@@ -49,7 +49,7 @@ class School(commands.Cog):
         """
         async with ctx.typing():
             if day_dt is None:
-                day_dt = date.today()
+                day_dt = tz_aware_today()
 
             day_dt = skip_weekends(day_dt)
 
@@ -78,7 +78,7 @@ class School(commands.Cog):
         Menus are shown in Dutch by default, as a lot of dishes have very weird translations.
         """
         if day_dt is None:
-            day_dt = date.today()
+            day_dt = tz_aware_today()
 
         async with ctx.typing():
             try:

@@ -13,6 +13,7 @@ from didier.utils.types.datetime import (
     forward_to_next_weekday,
     parse_dm_string,
     str_to_weekday,
+    tz_aware_today,
 )
 
 __all__ = ["date_converter", "DateTransformer"]
@@ -25,7 +26,7 @@ def date_converter(argument: Optional[str]) -> date:
 
     # Default to today
     if not argument:
-        return date.today()
+        return tz_aware_today()
 
     argument = argument.lower()
 
@@ -35,15 +36,15 @@ def date_converter(argument: Optional[str]) -> date:
         "tmrw",
         "morgen",
     ):
-        return date.today() + timedelta(days=1)
+        return tz_aware_today() + timedelta(days=1)
 
     if argument in ("overmorgen",):
-        return date.today() + timedelta(days=2)
+        return tz_aware_today() + timedelta(days=2)
 
     # Weekdays passed in words
     with contextlib.suppress(ValueError):
         weekday = str_to_weekday(argument)
-        return forward_to_next_weekday(date.today(), weekday, allow_today=False)
+        return forward_to_next_weekday(tz_aware_today(), weekday, allow_today=False)
 
     # Date strings
     with contextlib.suppress(ValueError):

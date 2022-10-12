@@ -14,6 +14,7 @@ __all__ = [
     "str_to_weekday",
     "time_string",
     "tz_aware_now",
+    "tz_aware_today",
 ]
 
 DateType = TypeVar("DateType", datetime.date, datetime.datetime)
@@ -55,7 +56,7 @@ def parse_dm_string(argument: str) -> datetime.date:
     - [English Month, possibly abbreviated] DD
     """
     argument = argument.lower()
-    today = datetime.date.today()
+    today = tz_aware_today()
 
     # DD/MM
     if "/" in argument:
@@ -187,3 +188,8 @@ def time_string(dt_instance: datetime.datetime) -> str:
 def tz_aware_now() -> datetime.datetime:
     """Get the current date & time, but timezone-aware"""
     return datetime.datetime.utcnow().replace(tzinfo=datetime.timezone.utc).astimezone(LOCAL_TIMEZONE)
+
+
+def tz_aware_today() -> datetime.date:
+    """Get the current day, but timezone-aware"""
+    return tz_aware_now().date()
