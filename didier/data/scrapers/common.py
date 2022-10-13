@@ -6,6 +6,7 @@ from bs4 import BeautifulSoup, Tag
 __all__ = ["GameStorePage", "parse_open_graph_tags"]
 
 
+# TODO make this an ABC that all other store pages implement instead
 @dataclass
 class GameStorePage:
     """Dataclass for information on a game's store page"""
@@ -15,7 +16,7 @@ class GameStorePage:
     title: str
     xdg_open_url: Optional[str] = None
     url: Optional[str] = None
-    discount_expiry: Optional[int] = None
+    discount_expiry: Optional[int] = None  # TODO
     discounted_price: Optional[str] = None
     original_price: Optional[str] = None
     discount_percentage: Optional[str] = None

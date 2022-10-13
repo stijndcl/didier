@@ -102,8 +102,9 @@ class FreeGameEmbed(EmbedPydantic):
                     inline=False,
                 )
 
+            embed.add_field(name="Open in browser", value=f"[{self.link}]({self.link})")
+
             if self.store_page.xdg_open_url is not None:
-                embed.add_field(name="Open in browser", value=f"[{self.link}]({self.link})")
 
                 embed.add_field(
                     name="Open in app", value=f"[{self.store_page.xdg_open_url}]({self.store_page.xdg_open_url})"

@@ -32,15 +32,15 @@ def _shorten_url(url: str) -> str:
     if match is None or not match.groups():
         return url
 
-    return f"https://s.team/a/{match.groups()[0]}/"
+    return f"https://s.team/a/{match.groups()[0]}"
 
 
 def _parse_xdg_open_url(url: str) -> Optional[str]:
     match = re.search(r"/app/(\d+)/", url)
-    if match is None or match.group() is None:
+    if match is None or not match.groups():
         return None
 
-    return f"steam://store/{match.group()}"
+    return f"steam://store/{match.groups()[0]}"
 
 
 def _get_steam_discounts(soup: BeautifulSoup) -> Optional[_PriceInfo]:
@@ -110,8 +110,8 @@ async def get_steam_webpage_info(http_session: ClientSession, url: str) -> Optio
         page_tags.url = url
 
     page_tags.title = _clean_title(page_tags.title)
-    page_tags.url = _shorten_url(page_tags.url)
     page_tags.xdg_open_url = _parse_xdg_open_url(page_tags.url)
+    page_tags.url = _shorten_url(page_tags.url)
 
     price_info = _get_steam_discounts(soup)
 
