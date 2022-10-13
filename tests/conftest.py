@@ -1,5 +1,7 @@
 import asyncio
-from typing import AsyncGenerator, Generator
+import json
+import pathlib
+from typing import AsyncGenerator, Generator, Union
 from unittest.mock import MagicMock
 
 import pytest
@@ -66,3 +68,22 @@ def mock_client() -> Didier:
     mock_client.user = mock_user
 
     return mock_client
+
+
+"""Data providers"""
+
+
+def _provide(name: str) -> Union[dict, str]:
+    location = pathlib.Path(__file__).parent / "test_data" / name
+
+    with open(location, "r") as fp:
+        if name.endswith(".json"):
+            return json.load(fp)
+
+        return fp.read()
+
+
+@pytest.fixture
+def free_games_response() -> str:
+    """Fixture to get an example response from the free games RSS feed"""
+    return _provide("free_games.rss")

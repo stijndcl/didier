@@ -5,7 +5,7 @@ import feedparser
 from aiohttp import ClientSession
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from database.crud.free_games import add_free_games, filter_present_games
+from database.crud.free_games import filter_present_games
 from didier.data.embeds.free_games import SEPARATOR, FreeGameEmbed
 
 logger = logging.getLogger(__name__)
@@ -40,6 +40,12 @@ async def fetch_free_games(http_session: ClientSession, database_session: AsyncS
     filtered_ids = await filter_present_games(database_session, game_ids)
 
     # Insert new games into the database
-    await add_free_games(database_session, filtered_ids)
+    # await add_free_games(database_session, filtered_ids)  TODO uncomment
 
-    return list(filter(lambda x: x.dc_identifier in filtered_ids, games))
+    games = list(filter(lambda x: x.dc_identifier in filtered_ids, games))
+
+    # Look up additional info
+    for game in games:
+        await game.update(http_session)
+
+    return games

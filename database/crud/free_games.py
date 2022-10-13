@@ -15,6 +15,6 @@ async def add_free_games(session: AsyncSession, game_ids: list[int]):
 
 async def filter_present_games(session: AsyncSession, game_ids: list[int]) -> list[int]:
     """Filter a list of game IDs down to the ones that aren't in the database yet"""
-    query = select(FreeGame.free_game_id).where(FreeGame.free_game_id.in_(game_ids))
-    matches: list[int] = (await session.execute(query)).scalars().all()
+    statement = select(FreeGame.free_game_id).where(FreeGame.free_game_id.in_(game_ids))
+    matches: list[int] = (await session.execute(statement)).scalars().all()
     return list(set(game_ids).difference(matches))

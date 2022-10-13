@@ -90,7 +90,12 @@ class Didier(commands.Bot):
             await self.database_caches.initialize_caches(session)
 
         # Create aiohttp session
-        self.http_session = ClientSession()
+        self.http_session = ClientSession(
+            headers={
+                "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) "
+                "Chrome/105.0.0.0 Safari/537.36"
+            }
+        )
 
         # Load extensions
         await self._load_initial_extensions()
