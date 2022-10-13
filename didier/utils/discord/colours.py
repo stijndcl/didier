@@ -1,13 +1,19 @@
 import discord
 
 __all__ = [
+    "epic_games_white",
     "error_red",
     "github_white",
     "ghent_university_blue",
     "ghent_university_yellow",
     "google_blue",
+    "steam_blue",
     "urban_dictionary_green",
 ]
+
+
+def epic_games_white() -> discord.Colour:
+    return discord.Colour.from_rgb(255, 255, 255)
 
 
 def error_red() -> discord.Colour:
@@ -26,8 +32,16 @@ def ghent_university_yellow() -> discord.Colour:
     return discord.Colour.from_rgb(255, 210, 0)
 
 
+def gog_purple() -> discord.Colour:
+    return discord.Colour.purple()
+
+
 def google_blue() -> discord.Colour:
     return discord.Colour.from_rgb(66, 133, 244)
+
+
+def steam_blue() -> discord.Colour:
+    return discord.Colour.from_rgb(102, 192, 244)
 
 
 def urban_dictionary_green() -> discord.Colour:

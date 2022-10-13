@@ -33,6 +33,7 @@ __all__ = [
     "DadJoke",
     "Deadline",
     "EasterEgg",
+    "FreeGame",
     "GitHubLink",
     "Link",
     "MemeTemplate",
@@ -172,6 +173,14 @@ class EasterEgg(Base):
     response: str = Column(Text, nullable=False)
     exact: bool = Column(Boolean, nullable=False, server_default="1")
     startswith: bool = Column(Boolean, nullable=False, server_default="1")
+
+
+class FreeGame(Base):
+    """A temporarily free game"""
+
+    __tablename__ = "free_games"
+
+    free_game_id: int = Column(Integer, primary_key=True)
 
 
 class GitHubLink(Base):
