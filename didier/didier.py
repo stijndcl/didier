@@ -78,9 +78,6 @@ class Didier(commands.Bot):
         # Create directories that are ignored on GitHub
         self._create_ignored_directories()
 
-        # Load schedules
-        await self.load_schedules()
-
         # Load the Wordle dictionary
         self._load_wordle_words()
 

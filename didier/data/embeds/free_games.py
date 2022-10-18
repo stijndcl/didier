@@ -70,6 +70,8 @@ class FreeGameEmbed(EmbedPydantic):
 
         if "steam" in store:
             self.store_page = await get_steam_webpage_info(http_session, self.link)
+        elif "epic" in store:
+            self.link = "https://store.epicgames.com/free-games"
 
         if self.store_page is not None and self.store_page.url is not None:
             self.link = self.store_page.url

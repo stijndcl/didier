@@ -6,7 +6,6 @@ from bs4 import BeautifulSoup, Tag
 __all__ = ["GameStorePage", "parse_open_graph_tags"]
 
 
-# TODO make this an ABC that all other store pages implement instead
 @dataclass
 class GameStorePage:
     """Dataclass for information on a game's store page"""
