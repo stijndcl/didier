@@ -136,7 +136,7 @@ class Fun(commands.Cog):
     @commands.hybrid_command(name="xkcd")
     @app_commands.rename(comic_id="id")
     async def xkcd(self, ctx: commands.Context, comic_id: Optional[int] = None):
-        """Fetch comic `#id` from xkcd
+        """Fetch comic `#id` from xkcd.
 
         If no argument to `id` is passed, this fetches today's comic instead.
         """
