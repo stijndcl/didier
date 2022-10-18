@@ -81,7 +81,7 @@ class FreeGameEmbed(EmbedPydantic):
         embed = discord.Embed()
         embed.set_author(name=self.store)
 
-        store_image, store_colour = _get_store_info(self.store)
+        store_image, store_colour = _get_store_info(self.store or "")
         if store_image is not None:
             embed.set_thumbnail(url=store_image)
 
