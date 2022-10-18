@@ -74,15 +74,10 @@ def get_search_results(bs: BeautifulSoup) -> list[str]:
 
 async def google_search(http_client: ClientSession, query: str):
     """Get the first 10 Google search results"""
-    headers = {
-        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/537.36 (KHTML, like Gecko) "
-        "Chrome/83.0.4103.97 Safari/537.36"
-    }
-
     query = urlencode({"q": query})
 
     # Request 20 results in case of duplicates, bad matches, ...
-    async with http_client.get(f"https://www.google.com/search?{query}&num=20&hl=en", headers=headers) as response:
+    async with http_client.get(f"https://www.google.com/search?{query}&num=20&hl=en") as response:
         # Something went wrong
         if response.status != http.HTTPStatus.OK:
             return SearchData(query, response.status)

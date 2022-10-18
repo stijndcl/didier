@@ -18,7 +18,8 @@ from didier.data.embeds.schedules import (
     get_schedule_for_day,
     parse_schedule_from_content,
 )
-from didier.data.embeds.ufora.announcements import fetch_ufora_announcements
+from didier.data.rss_feeds.free_games import fetch_free_games
+from didier.data.rss_feeds.ufora import fetch_ufora_announcements
 from didier.decorators.tasks import timed_task
 from didier.utils.discord.checks import is_owner
 from didier.utils.types.datetime import LOCAL_TIMEZONE, tz_aware_now
@@ -48,6 +49,7 @@ class Tasks(commands.Cog):
 
         self._tasks = {
             "birthdays": self.check_birthdays,
+            "free_games": self.pull_free_games,
             "schedules": self.pull_schedules,
             "reminders": self.reminders,
             "ufora": self.pull_ufora_announcements,
@@ -61,12 +63,17 @@ class Tasks(commands.Cog):
         if settings.BIRTHDAY_ANNOUNCEMENT_CHANNEL is not None:
             self.check_birthdays.start()
 
+        # Only pull free gmaes if a channel was provided
+        if settings.FREE_GAMES_CHANNEL is not None:
+            self.pull_free_games.start()
+
         # Only pull announcements if a token was provided
         if settings.UFORA_RSS_TOKEN is not None and settings.UFORA_ANNOUNCEMENTS_CHANNEL is not None:
             self.pull_ufora_announcements.start()
             self.remove_old_ufora_announcements.start()
 
         # Start other tasks
+        self.init_schedules.start()
         self.reminders.start()
         self.reset_wordle_word.start()
         self.pull_schedules.start()
@@ -128,6 +135,36 @@ class Tasks(commands.Cog):
     async def _before_check_birthdays(self):
         await self.client.wait_until_ready()
 
+    @tasks.loop(count=1)
+    async def init_schedules(self, **kwargs):
+        """Tasks that loads the schedules in memory on startup"""
+        _ = kwargs
+        await self.client.load_schedules()
+
+    @init_schedules.before_loop
+    async def _before_init_schedules(self):
+        await self.client.wait_until_ready()
+
+    @tasks.loop(minutes=15)
+    async def pull_free_games(self, **kwargs):
+        """Task that checks for free games occasionally"""
+        _ = kwargs
+
+        # No channel to send the embeds to
+        if settings.FREE_GAMES_CHANNEL is None:
+            return
+
+        async with self.client.postgres_session as session:
+            games = await fetch_free_games(self.client.http_session, session)
+            channel = self.client.get_channel(settings.FREE_GAMES_CHANNEL)
+
+            for game in games:
+                await channel.send(embed=game.to_embed())
+
+    @pull_free_games.before_loop
+    async def _before_free_games(self):
+        await self.client.wait_until_ready()
+
     @tasks.loop(time=DAILY_RESET_TIME)
     @timed_task(enums.TaskType.SCHEDULES)
     async def pull_schedules(self, **kwargs):
@@ -165,6 +202,10 @@ class Tasks(commands.Cog):
 
         # Only replace cached version if all schedules succeeded
         self.client.schedules = new_schedules
+
+    @pull_schedules.before_loop
+    async def _before_pull_schedules(self):
+        await self.client.wait_until_ready()
 
     @tasks.loop(minutes=10)
     @timed_task(enums.TaskType.UFORA_ANNOUNCEMENTS)
