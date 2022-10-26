@@ -38,7 +38,9 @@ class School(commands.Cog):
 
     @commands.hybrid_command(name="les", aliases=["sched", "schedule"])
     @app_commands.rename(day_dt="date")
-    async def les(self, ctx: commands.Context, day_dt: Optional[app_commands.Transform[date, DateTransformer]] = None):
+    async def les(
+        self, ctx: commands.Context, *, day_dt: Optional[app_commands.Transform[date, DateTransformer]] = None
+    ):
         """Show your personalized schedule for a given day.
 
         If no day is provided, this defaults to the schedule for the current day. When invoked during a weekend,
@@ -71,7 +73,9 @@ class School(commands.Cog):
         aliases=["eten", "food"],
     )
     @app_commands.rename(day_dt="date")
-    async def menu(self, ctx: commands.Context, day_dt: Optional[app_commands.Transform[date, DateTransformer]] = None):
+    async def menu(
+        self, ctx: commands.Context, *, day_dt: Optional[app_commands.Transform[date, DateTransformer]] = None
+    ):
         """Show the menu in the Ghent University restaurants on `date`.
 
         If no value for `date` is provided, this defaults to the schedule for the current day.
