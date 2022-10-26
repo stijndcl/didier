@@ -8,7 +8,9 @@ import importlib
 import sys
 from typing import Callable
 
-if __name__ == "__main__":
+
+async def main():
+    """Try to parse all command-line arguments into modules and run them sequentially"""
     scripts = sys.argv[1:]
     if not scripts:
         print("No scripts provided.", file=sys.stderr)
@@ -20,8 +22,12 @@ if __name__ == "__main__":
 
         try:
             script_main: Callable = module.main
-            asyncio.run(script_main())
+            await script_main()
             print(f"Successfully ran {script}")
         except AttributeError:
             print(f'Script "{script}" not found.', file=sys.stderr)
             exit(1)
+
+
+if __name__ == "__main__":
+    asyncio.run(main())

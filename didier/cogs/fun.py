@@ -9,6 +9,7 @@ from database.crud.dad_jokes import get_random_dad_joke
 from database.crud.memes import get_all_memes, get_meme_by_name
 from didier import Didier
 from didier.data.apis.imgflip import generate_meme
+from didier.data.apis.xkcd import fetch_xkcd_post
 from didier.exceptions.no_match import expect
 from didier.menus.memes import MemeSource
 from didier.utils.discord import constants
@@ -131,6 +132,18 @@ class Fun(commands.Cog):
     ) -> list[app_commands.Choice[str]]:
         """Autocompletion for the 'template'-parameter"""
         return self.client.database_caches.memes.get_autocomplete_suggestions(current)
+
+    @commands.hybrid_command(name="xkcd")
+    @app_commands.rename(comic_id="id")
+    async def xkcd(self, ctx: commands.Context, comic_id: Optional[int] = None):
+        """Fetch comic `#id` from xkcd.
+
+        If no argument to `id` is passed, this fetches today's comic instead.
+        """
+        async with ctx.typing():
+            post = await fetch_xkcd_post(self.client.http_session, num=comic_id)
+
+        await ctx.reply(embed=post.to_embed(), mention_author=False, ephemeral=False)
 
 
 async def setup(client: Didier):

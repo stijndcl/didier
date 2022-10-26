@@ -9,6 +9,7 @@ __all__ = [
     "google_blue",
     "steam_blue",
     "urban_dictionary_green",
+    "xkcd_blue",
 ]
 
 
@@ -46,3 +47,7 @@ def steam_blue() -> discord.Colour:
 
 def urban_dictionary_green() -> discord.Colour:
     return discord.Colour.from_rgb(220, 255, 0)
+
+
+def xkcd_blue() -> discord.Colour:
+    return discord.Colour.from_rgb(150, 168, 200)

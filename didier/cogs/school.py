@@ -38,7 +38,9 @@ class School(commands.Cog):
 
     @commands.hybrid_command(name="les", aliases=["sched", "schedule"])
     @app_commands.rename(day_dt="date")
-    async def les(self, ctx: commands.Context, day_dt: Optional[app_commands.Transform[date, DateTransformer]] = None):
+    async def les(
+        self, ctx: commands.Context, *, day_dt: Optional[app_commands.Transform[date, DateTransformer]] = None
+    ):
         """Show your personalized schedule for a given day.
 
         If no day is provided, this defaults to the schedule for the current day. When invoked during a weekend,
@@ -71,7 +73,9 @@ class School(commands.Cog):
         aliases=["eten", "food"],
     )
     @app_commands.rename(day_dt="date")
-    async def menu(self, ctx: commands.Context, day_dt: Optional[app_commands.Transform[date, DateTransformer]] = None):
+    async def menu(
+        self, ctx: commands.Context, *, day_dt: Optional[app_commands.Transform[date, DateTransformer]] = None
+    ):
         """Show the menu in the Ghent University restaurants on `date`.
 
         If no value for `date` is provided, this defaults to the schedule for the current day.
@@ -116,10 +120,22 @@ class School(commands.Cog):
             mention_author=False,
         )
 
+    @commands.hybrid_command(name="ufora")
+    async def ufora(self, ctx: commands.Context, course: str):
+        """Link the Ufora page for a course."""
+        async with self.client.postgres_session as session:
+            ufora_course = await ufora_courses.get_course_by_name(session, course)
+
+        if ufora_course is None:
+            return await ctx.reply(f"Found no course matching `{course}`", ephemeral=True)
+
+        return await ctx.reply(
+            f"https://ufora.ugent.be/d2l/le/content/{ufora_course.course_id}/home", mention_author=False
+        )
+
     @study_guide.autocomplete("course")
-    async def _study_guide_course_autocomplete(
-        self, _: discord.Interaction, current: str
-    ) -> list[app_commands.Choice[str]]:
+    @ufora.autocomplete("course")
+    async def _course_autocomplete(self, _: discord.Interaction, current: str) -> list[app_commands.Choice[str]]:
         """Autocompletion for the 'course'-parameter"""
         return self.client.database_caches.ufora_courses.get_autocomplete_suggestions(current)
 
