@@ -1,3 +1,4 @@
+import re
 from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Optional
@@ -71,8 +72,14 @@ class UforaNotification(EmbedBaseModel):
 
     def _clean_content(self, text: str):
         # Escape *-characters because they mess up the layout
-        text = text.replace("*", "\\*")
-        return md(text)
+        # and non-breaking-spaces
+        text = text.replace("*", "\\*").replace("\xa0", " ")
+        text = md(text)
+
+        # Squash consecutive newlines and ignore spaces inbetween
+        subbed = re.sub(r"\n+\s?\n+", "\n\n", text)
+
+        return subbed
 
     def _published_datetime(self) -> datetime:
         """Get a datetime instance of the publication date"""
