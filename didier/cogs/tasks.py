@@ -63,7 +63,7 @@ class Tasks(commands.Cog):
         if settings.BIRTHDAY_ANNOUNCEMENT_CHANNEL is not None:
             self.check_birthdays.start()
 
-        # Only pull free gmaes if a channel was provided
+        # Only pull free games if a channel was provided
         if settings.FREE_GAMES_CHANNEL is not None:
             self.pull_free_games.start()
 
@@ -73,10 +73,8 @@ class Tasks(commands.Cog):
             self.remove_old_ufora_announcements.start()
 
         # Start other tasks
-        self.init_schedules.start()
         self.reminders.start()
         self.reset_wordle_word.start()
-        self.pull_schedules.start()
 
     @overrides
     def cog_unload(self) -> None:
@@ -133,16 +131,6 @@ class Tasks(commands.Cog):
 
     @check_birthdays.before_loop
     async def _before_check_birthdays(self):
-        await self.client.wait_until_ready()
-
-    @tasks.loop(count=1)
-    async def init_schedules(self, **kwargs):
-        """Tasks that loads the schedules in memory on startup"""
-        _ = kwargs
-        await self.client.load_schedules()
-
-    @init_schedules.before_loop
-    async def _before_init_schedules(self):
         await self.client.wait_until_ready()
 
     @tasks.loop(minutes=15)
