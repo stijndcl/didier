@@ -11,6 +11,10 @@ from didier import Didier
 async def run_bot():
     """Run Didier"""
     didier = Didier()
+
+    # Schedules are quite heavy - do this once before connecting
+    await didier.load_schedules()
+
     try:
         await didier.start(settings.DISCORD_TOKEN)
     finally:
