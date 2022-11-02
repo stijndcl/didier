@@ -7,7 +7,6 @@ from typing import Optional, Union
 
 import discord
 from aiohttp import ClientSession
-from discord.app_commands import AppCommandError
 from discord.ext import commands
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -246,17 +245,28 @@ class Didier(commands.Bot):
         async with self.postgres_session as session:
             await command_stats.register_command_invocation(session, ctx, command, tz_aware_now())
 
-    async def on_app_command_error(self, interaction: discord.Interaction, exception: AppCommandError):
+    async def on_app_command_error(self, interaction: discord.Interaction, exception: Exception):
         """Event triggered when an application command errors"""
         # If commands have their own error handler, let it handle the error instead
         if hasattr(interaction.command, "on_error"):
             return
 
-        if isinstance(exception, (NoMatch, discord.app_commands.CommandInvokeError)):
+        # Unwrap exception
+        if isinstance(exception, discord.app_commands.CommandInvokeError):
+            exception = exception.original
+
+        if isinstance(exception, (NoMatch, HTTPException)):
             if interaction.response.is_done():
-                return await interaction.response.send_message(str(exception.original), ephemeral=True)
+                return await interaction.response.send_message(str(exception), ephemeral=True)
             else:
-                return await interaction.followup.send(str(exception.original), ephemeral=True)
+                return await interaction.followup.send(str(exception), ephemeral=True)
+
+        await interaction.response.send_message("Something went wrong processing this command.", ephemeral=True)
+
+        if settings.ERRORS_CHANNEL is not None:
+            embed = create_error_embed(await commands.Context.from_interaction(interaction), exception)
+            channel = self.get_channel(settings.ERRORS_CHANNEL)
+            await channel.send(embed=embed)
 
     async def on_command_completion(self, ctx: commands.Context):
         """Event triggered when a message command completes successfully"""
@@ -279,6 +289,10 @@ class Didier(commands.Bot):
         if hasattr(ctx.command, "on_error"):
             return
 
+        # Hybrid command errors are wrapped in an additional error, so wrap it back out
+        if isinstance(exception, commands.HybridCommandError):
+            exception = exception.original
+
         # Ignore exceptions that aren't important
         if isinstance(
             exception,
@@ -291,7 +305,10 @@ class Didier(commands.Bot):
             return
 
         # Responses to things that go wrong during processing of commands
-        if isinstance(exception, commands.CommandInvokeError) and isinstance(
+        if isinstance(
+            exception,
+            (discord.app_commands.CommandInvokeError, commands.CommandInvokeError),
+        ) and isinstance(
             exception.original,
             (
                 NoMatch,
