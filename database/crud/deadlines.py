@@ -1,3 +1,4 @@
+import datetime
 from typing import Optional
 from zoneinfo import ZoneInfo
 
@@ -24,12 +25,14 @@ async def add_deadline(session: AsyncSession, course_id: int, name: str, date_st
     await session.commit()
 
 
-async def get_deadlines(session: AsyncSession, *, course: Optional[UforaCourse] = None) -> list[Deadline]:
-    """Get a list of all deadlines that are currently known
-
-    This includes deadlines that have passed already
-    """
+async def get_deadlines(
+    session: AsyncSession, *, after: Optional[datetime.date] = None, course: Optional[UforaCourse] = None
+) -> list[Deadline]:
+    """Get a list of all upcoming deadlines"""
     statement = select(Deadline)
+
+    if after is not None:
+        statement = statement.where(Deadline.deadline > after)
 
     if course is not None:
         statement = statement.where(Deadline.course_id == course.course_id)

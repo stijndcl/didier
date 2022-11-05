@@ -15,7 +15,7 @@ from didier.data.embeds.schedules import Schedule, get_schedule_for_day
 from didier.exceptions import HTTPException, NotInMainGuildException
 from didier.utils.discord.converters.time import DateTransformer
 from didier.utils.discord.flags.school import StudyGuideFlags
-from didier.utils.discord.users import to_main_guild_member
+from didier.utils.discord.users import has_course, to_main_guild_member
 from didier.utils.types.datetime import skip_weekends, tz_aware_today
 
 
@@ -30,11 +30,15 @@ class School(commands.Cog):
     @commands.hybrid_command(name="deadlines")
     async def deadlines(self, ctx: commands.Context):
         """Show upcoming deadlines."""
-        async with self.client.postgres_session as session:
-            deadlines = await get_deadlines(session)
+        async with ctx.typing():
+            async with self.client.postgres_session as session:
+                deadlines = await get_deadlines(session, after=tz_aware_today())
 
-        embed = Deadlines(deadlines).to_embed()
-        await ctx.reply(embed=embed, mention_author=False, ephemeral=False)
+            member = to_main_guild_member(self.client, ctx.author)
+            deadlines = list(filter(lambda d: has_course(member, d.course), deadlines))
+
+            embed = Deadlines(deadlines).to_embed()
+            await ctx.reply(embed=embed, mention_author=False, ephemeral=False)
 
     @commands.hybrid_command(name="les", aliases=["sched", "schedule"])
     @app_commands.rename(day_dt="date")
