@@ -150,13 +150,13 @@ class Fun(commands.Cog):
         if len(message) > constants.Limits.MESSAGE_LENGTH:
             return await interaction.followup.send("That message is too long.")
 
-        mocked_message = mock(discord.utils.escape_markdown(message))
+        message = discord.utils.escape_markdown(message)
 
         # Escaping md syntax can make the message longer than the limit
-        if len(mocked_message) > constants.Limits.MESSAGE_LENGTH:
+        if len(message) > constants.Limits.MESSAGE_LENGTH:
             return await interaction.followup.send("Because of Markdown syntax escaping, that message is too long.")
 
-        return await interaction.followup.send(mocked_message)
+        return await interaction.followup.send(mock(message))
 
     @commands.hybrid_command(name="xkcd")
     @app_commands.rename(comic_id="id")
