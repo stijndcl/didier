@@ -1,8 +1,9 @@
 import math
+import random
 import re
 from typing import Optional, Union
 
-__all__ = ["abbreviate", "leading", "pluralize", "re_find_all", "re_replace_with_list", "get_edu_year_name"]
+__all__ = ["abbreviate", "leading", "mock", "pluralize", "re_find_all", "re_replace_with_list", "get_edu_year_name"]
 
 
 def abbreviate(text: str, max_length: int) -> str:
@@ -36,6 +37,28 @@ def leading(character: str, string: str, target_length: Optional[int] = 2) -> st
     frequency = math.ceil((target_length - len(string)) / len(character))
 
     return (frequency * character) + string
+
+
+def mock(string: str) -> str:
+    """Mock an input string
+
+    The result of this is comparable to the Mocking Spongebob memes
+    """
+    replacements = {"a": "4", "b": "8", "e": "3", "i": "1", "o": "0", "s": "5"}
+    result_string = ""
+
+    for letter in string.lower():
+        # Letter should be mocked
+        if letter.isalpha() and random.random() < 0.5:
+            # Use replacement if it exists
+            if letter in replacements and random.random() < 0.5:
+                result_string += replacements[letter]
+            else:
+                result_string += letter.upper()
+        else:
+            result_string += letter
+
+    return result_string
 
 
 def pluralize(word: str, amount: int, plural_form: Optional[str] = None) -> str:

@@ -13,6 +13,7 @@ from didier.data.apis.xkcd import fetch_xkcd_post
 from didier.exceptions.no_match import expect
 from didier.menus.memes import MemeSource
 from didier.utils.discord import constants
+from didier.utils.types.string import mock
 from didier.views.modals import GenerateMeme
 
 
@@ -132,6 +133,30 @@ class Fun(commands.Cog):
     ) -> list[app_commands.Choice[str]]:
         """Autocompletion for the 'template'-parameter"""
         return self.client.database_caches.memes.get_autocomplete_suggestions(current)
+
+    @app_commands.command()
+    @app_commands.describe(message="The text to convert.")
+    async def mock(self, interaction: discord.Interaction, message: str):
+        """Mock a message.
+
+        This returns the mocked version ephemerally so that you can copy-paste it easily,
+        instead of the old version where Didier would send a public message.
+
+        The mocked message escapes all Markdown syntax.
+        """
+        await interaction.response.defer(ephemeral=True)
+
+        # Nitro users can send longer messages that Didier can't repeat back to them
+        if len(message) > constants.Limits.MESSAGE_LENGTH:
+            return await interaction.followup.send("That message is too long.")
+
+        mocked_message = mock(discord.utils.escape_markdown(message))
+
+        # Escaping md syntax can make the message longer than the limit
+        if len(mocked_message) > constants.Limits.MESSAGE_LENGTH:
+            return await interaction.followup.send("Because of Markdown syntax escaping, that message is too long.")
+
+        return await interaction.followup.send(mocked_message)
 
     @commands.hybrid_command(name="xkcd")
     @app_commands.rename(comic_id="id")
