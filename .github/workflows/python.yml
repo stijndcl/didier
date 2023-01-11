@@ -23,7 +23,7 @@ jobs:
         run: pip3 install -r requirements.txt -r requirements-dev.txt
   tests:
     needs: [dependencies]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     services:
       postgres:
         image: postgres:14
@@ -63,7 +63,7 @@ jobs:
           token: ${{ secrets.CODECOV }}
   linting:
     needs: [tests]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v3
       - name: Setup Python
@@ -83,7 +83,7 @@ jobs:
         run: flake8
   typing:
     needs: [tests]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v3
       - name: Setup Python
@@ -103,7 +103,7 @@ jobs:
         run: mypy
   formatting:
     needs: [tests]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v3
       - name: Setup Python
