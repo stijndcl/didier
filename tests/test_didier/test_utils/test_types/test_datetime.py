@@ -28,6 +28,7 @@ def test_parse_dm_string_dm_garbage():
         parse_dm_string("AC/DC")
 
 
+@freeze_time("2022-09-11")
 def test_parse_dm_string_semantic():
     """Test parsing date strings in the [DAY] [MONTH] and [MONTH] [DAY] formats"""
     result = parse_dm_string("23rd november")
