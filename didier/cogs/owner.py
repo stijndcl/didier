@@ -85,11 +85,17 @@ class Owner(commands.Cog):
             if flags.copy_globals:
                 self.client.tree.copy_global_to(guild=guild)
 
-            await self.client.tree.sync(guild=guild)
+            synced_commands = await self.client.tree.sync(guild=guild)
         else:
-            await self.client.tree.sync()
+            synced_commands = await self.client.tree.sync()
+
+        command_names = "\n".join([cmd.name for cmd in synced_commands])
 
         await ctx.message.add_reaction("🔄")
+        await ctx.reply(
+            f"Successfully synced {len(synced_commands)} application commands: ```\n{command_names}\n```",
+            mention_author=False,
+        )
 
     @commands.group(name="Add", aliases=["Create"], case_insensitive=True, invoke_without_command=False)
     async def add_msg(self, ctx: commands.Context):
