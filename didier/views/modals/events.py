@@ -1,3 +1,4 @@
+import traceback
 from zoneinfo import ZoneInfo
 
 import discord
@@ -51,4 +52,10 @@ class AddEvent(discord.ui.Modal, title="Add Event"):
                 channel_id=int(self.channel.value),
             )
 
-        return await interaction.response.send_message(f"Successfully added event `{event.event_id}`.", ephemeral=True)
+        await interaction.response.send_message(f"Successfully added event `{event.event_id}`.", ephemeral=True)
+        self.client.dispatch("event_create", event)
+
+    @overrides
+    async def on_error(self, interaction: discord.Interaction, error: Exception):  # type: ignore
+        await interaction.response.send_message("Something went wrong.", ephemeral=True)
+        traceback.print_tb(error.__traceback__)

@@ -11,13 +11,15 @@ from database.exceptions import (
     ForbiddenNameException,
     NoResultFoundException,
 )
+from database.schemas import Event
 from didier import Didier
 from didier.exceptions import expect
 from didier.menus.bookmarks import BookmarkSource
 from didier.utils.discord import colours
 from didier.utils.discord.assets import get_author_avatar, get_user_avatar
 from didier.utils.discord.constants import Limits
-from didier.utils.types.datetime import str_to_date
+from didier.utils.timer import Timer
+from didier.utils.types.datetime import str_to_date, tz_aware_now
 from didier.utils.types.string import abbreviate, leading
 from didier.views.modals import CreateBookmark
 
@@ -26,6 +28,7 @@ class Discord(commands.Cog):
     """Commands related to Discord itself, which work with resources like servers and members."""
 
     client: Didier
+    timer: Timer
 
     # Context-menu references
     _bookmark_ctx_menu: app_commands.ContextMenu
@@ -38,11 +41,37 @@ class Discord(commands.Cog):
         self._pin_ctx_menu = app_commands.ContextMenu(name="Pin", callback=self._pin_ctx)
         self.client.tree.add_command(self._bookmark_ctx_menu)
         self.client.tree.add_command(self._pin_ctx_menu)
+        self.timer = Timer(self.client)
 
     async def cog_unload(self) -> None:
         """Remove the commands when the cog is unloaded"""
         self.client.tree.remove_command(self._bookmark_ctx_menu.name, type=self._bookmark_ctx_menu.type)
         self.client.tree.remove_command(self._pin_ctx_menu.name, type=self._pin_ctx_menu.type)
+
+    @commands.Cog.listener("event_create")
+    async def on_event_create(self, event: Event):
+        """Custom listener called when an event is created"""
+        self.timer.maybe_replace_task(event)
+
+    @commands.Cog.listener("timer_end")
+    async def on_timer_end(self, event_id: int):
+        """Custom listener called when an event timer ends"""
+        async with self.client.postgres_session as session:
+            event = await events.get_event_by_id(session, event_id)
+
+            channel = self.client.get_channel(event.notification_channel)
+
+            embed = discord.Embed(title="Upcoming Events", colour=discord.Colour.blue())
+            embed.add_field(name="Event", value=event.name, inline=False)
+            embed.description = event.description
+
+            await channel.send(embed=embed)
+
+            # Remove the database entry
+            await events.delete_event_by_id(session, event.event_id)
+
+        # Set the next timer
+        self.client.loop.create_task(self.timer.update())
 
     @commands.group(name="birthday", aliases=["bd", "birthdays"], case_insensitive=True, invoke_without_command=True)
     async def birthday(self, ctx: commands.Context, user: discord.User = None):
@@ -211,7 +240,7 @@ class Discord(commands.Cog):
         async with ctx.typing():
             async with self.client.postgres_session as session:
                 if event_id is None:
-                    upcoming = await events.get_events(session)
+                    upcoming = await events.get_events(session, now=tz_aware_now())
 
                     embed = discord.Embed(title="Upcoming Events", colour=discord.Colour.blue())
                     if not upcoming:
