@@ -48,12 +48,12 @@ class Discord(commands.Cog):
         self.client.tree.remove_command(self._bookmark_ctx_menu.name, type=self._bookmark_ctx_menu.type)
         self.client.tree.remove_command(self._pin_ctx_menu.name, type=self._pin_ctx_menu.type)
 
-    @commands.Cog.listener("event_create")
+    @commands.Cog.listener()
     async def on_event_create(self, event: Event):
         """Custom listener called when an event is created"""
         self.timer.maybe_replace_task(event)
 
-    @commands.Cog.listener("timer_end")
+    @commands.Cog.listener()
     async def on_timer_end(self, event_id: int):
         """Custom listener called when an event timer ends"""
         async with self.client.postgres_session as session:
