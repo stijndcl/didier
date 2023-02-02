@@ -33,6 +33,7 @@ __all__ = [
     "DadJoke",
     "Deadline",
     "EasterEgg",
+    "Event",
     "FreeGame",
     "GitHubLink",
     "Link",
@@ -173,6 +174,18 @@ class EasterEgg(Base):
     response: str = Column(Text, nullable=False)
     exact: bool = Column(Boolean, nullable=False, server_default="1")
     startswith: bool = Column(Boolean, nullable=False, server_default="1")
+
+
+class Event(Base):
+    """A scheduled event"""
+
+    __tablename__ = "events"
+
+    event_id: int = Column(Integer, primary_key=True)
+    name: str = Column(Text, nullable=False)
+    description: Optional[str] = Column(Text, nullable=True)
+    notification_channel: int = Column(BigInteger, nullable=False)
+    timestamp: datetime = Column(DateTime(timezone=True), nullable=False)
 
 
 class FreeGame(Base):

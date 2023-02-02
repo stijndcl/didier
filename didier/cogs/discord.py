@@ -4,7 +4,7 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
-from database.crud import birthdays, bookmarks, github
+from database.crud import birthdays, bookmarks, events, github
 from database.exceptions import (
     DuplicateInsertException,
     Forbidden,
@@ -199,6 +199,52 @@ class Discord(commands.Cog):
         """Create a bookmark out of this message"""
         modal = CreateBookmark(self.client, message.jump_url)
         await interaction.response.send_modal(modal)
+
+    @commands.hybrid_command(name="events")
+    @app_commands.rename(event_id="id")
+    @app_commands.describe(event_id="The id of the event to fetch. If not passed, all events are fetched instead.")
+    async def events(self, ctx: commands.Context, event_id: Optional[int] = None):
+        """Show information about the event with id `event_id`.
+
+        If no value for `event_id` is supplied, this shows all upcoming events instead.
+        """
+        async with ctx.typing():
+            async with self.client.postgres_session as session:
+                if event_id is None:
+                    upcoming = await events.get_events(session)
+
+                    embed = discord.Embed(title="Upcoming Events", colour=discord.Colour.blue())
+                    if not upcoming:
+                        embed.colour = discord.Colour.red()
+                        embed.description = "There are currently no upcoming events scheduled."
+                        return await ctx.reply(embed=embed, mention_author=False)
+
+                    upcoming.sort(key=lambda e: e.timestamp.timestamp())
+                    description_items = []
+
+                    for event in upcoming:
+                        description_items.append(
+                            f"`{event.event_id}`: {event.name} ({discord.utils.format_dt(event.timestamp, style='R')})"
+                        )
+
+                    embed.description = "\n".join(description_items)
+                    return await ctx.reply(embed=embed, mention_author=False)
+                else:
+                    event = await events.get_event_by_id(session, event_id)
+                    if event is None:
+                        return await ctx.reply(f"Found no event with id `{event_id}`.", mention_author=False)
+
+                    embed = discord.Embed(title="Upcoming Events", colour=discord.Colour.blue())
+                    embed.add_field(name="Name", value=event.name, inline=True)
+                    embed.add_field(name="Id", value=event.event_id, inline=True)
+                    embed.add_field(
+                        name="Timer", value=discord.utils.format_dt(event.timestamp, style="R"), inline=True
+                    )
+                    embed.add_field(
+                        name="Channel", value=self.client.get_channel(event.notification_channel).mention, inline=False
+                    )
+                    embed.description = event.description
+                    return await ctx.reply(embed=embed, mention_author=False)
 
     @commands.group(name="github", aliases=["gh", "git"], case_insensitive=True, invoke_without_command=True)
     async def github_group(self, ctx: commands.Context, user: Optional[discord.User] = None):
