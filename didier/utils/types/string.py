@@ -94,6 +94,6 @@ def re_replace_with_list(pattern: str, string: str, replacements: list[str]) -> 
 
 def get_edu_year_name(year: int) -> str:  # pragma: no cover
     """Get the string representation of a university year"""
-    years = ["1st Bachelor", "2nd Bachelor", "3rd Bachelor", "1st Master", "2nd Master"]
+    years = ["1st Bachelor", "2nd Bachelor", "3rd Bachelor", "1st Master", "2nd Master", "Elective Courses (Master)"]
 
     return years[year]
