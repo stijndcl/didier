@@ -51,7 +51,7 @@ class Deadlines(EmbedBaseModel):
             embed.set_image(url="https://c.tenor.com/RUzJ3lDGQUsAAAAC/iron-man-you-can-rest-now.gif")
             return embed
 
-        for i in range(1, 6):
+        for i in range(1, 7):
             if i not in deadlines_grouped:
                 continue
 
