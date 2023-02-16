@@ -65,9 +65,12 @@ class Discord(commands.Cog):
             channel = self.client.get_channel(event.notification_channel)
             human_readable_time = event.timestamp.strftime("%A, %B %d %Y - %H:%M")
 
-            embed = discord.Embed(title="Upcoming Event", colour=discord.Colour.blue())
-            embed.description = f"{human_readable_time} (<t:{round(event.timestamp.timestamp())}:R>)"
-            embed.add_field(name=event.name, value=event.description, inline=False)
+            embed = discord.Embed(title=event.name, colour=discord.Colour.blue())
+            embed.set_author(name="Upcoming Event")
+            embed.description = event.description
+            embed.add_field(
+                name="Time", value=f"{human_readable_time} (<t:{round(event.timestamp.timestamp())}:R>)", inline=False
+            )
 
             await channel.send(embed=embed)
 
