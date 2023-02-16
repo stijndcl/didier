@@ -63,10 +63,11 @@ class Discord(commands.Cog):
                 return await self.client.log_error(f"Unable to find event with id {event_id}", log_to_discord=True)
 
             channel = self.client.get_channel(event.notification_channel)
+            human_readable_time = event.timestamp.strftime("%A, %B %d %Y - %H:%M")
 
-            embed = discord.Embed(title="Upcoming Events", colour=discord.Colour.blue())
-            embed.add_field(name="Event", value=event.name, inline=False)
-            embed.description = event.description
+            embed = discord.Embed(title="Upcoming Event", colour=discord.Colour.blue())
+            embed.description = f"{human_readable_time} (<t:{round(event.timestamp.timestamp())}:R>)"
+            embed.add_field(name=event.name, value=event.description, inline=False)
 
             await channel.send(embed=embed)
 

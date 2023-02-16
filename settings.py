@@ -16,6 +16,7 @@ __all__ = [
     "YEAR",
     "MENU_TIMEOUT",
     "EASTER_EGG_CHANCE",
+    "REMINDER_PRE",
     "POSTGRES_DB",
     "POSTGRES_USER",
     "POSTGRES_PASS",
@@ -47,6 +48,7 @@ SEMESTER: int = env.int("SEMESTER", 2)
 YEAR: int = env.int("YEAR", 3)
 MENU_TIMEOUT: int = env.int("MENU_TIMEOUT", 30)
 EASTER_EGG_CHANCE: int = env.int("EASTER_EGG_CHANCE", 15)
+REMINDER_PRE: int = env.int("REMINDER_PRE", 15)
 
 """Database"""
 # PostgreSQL
