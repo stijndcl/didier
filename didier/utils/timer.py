@@ -45,15 +45,16 @@ class Timer:
         # If there is a current (pending) task, and the new timer is sooner than the
         # pending one, cancel it
         if self._task is not None and not self._task.done():
-            if self.upcoming_timer > event.timestamp:
+            # The upcoming timer will never be None at this point, but Mypy is mad
+            if self.upcoming_timer is not None and self.upcoming_timer > event.timestamp:
                 self._task.cancel()
             else:
                 # The new task happens after the existing task, it has to wait for its turn
                 return
 
-        self._task = self.client.loop.create_task(self.end_timer(endtime=event.timestamp, event_id=event.event_id))
         self.upcoming_timer = event.timestamp
         self.upcoming_event_id = event.event_id
+        self._task = self.client.loop.create_task(self.end_timer(endtime=event.timestamp, event_id=event.event_id))
 
     async def end_timer(self, *, endtime: datetime, event_id: int):
         """Wait until a timer runs out, and then trigger an event to send the message"""

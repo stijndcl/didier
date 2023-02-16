@@ -59,6 +59,9 @@ class Discord(commands.Cog):
         async with self.client.postgres_session as session:
             event = await events.get_event_by_id(session, event_id)
 
+            if event is None:
+                return await self.client.log_error(f"Unable to find event with id {event_id}", log_to_discord=True)
+
             channel = self.client.get_channel(event.notification_channel)
 
             embed = discord.Embed(title="Upcoming Events", colour=discord.Colour.blue())
@@ -259,20 +262,22 @@ class Discord(commands.Cog):
                     embed.description = "\n".join(description_items)
                     return await ctx.reply(embed=embed, mention_author=False)
                 else:
-                    event = await events.get_event_by_id(session, event_id)
-                    if event is None:
+                    result_event = await events.get_event_by_id(session, event_id)
+                    if result_event is None:
                         return await ctx.reply(f"Found no event with id `{event_id}`.", mention_author=False)
 
                     embed = discord.Embed(title="Upcoming Events", colour=discord.Colour.blue())
-                    embed.add_field(name="Name", value=event.name, inline=True)
-                    embed.add_field(name="Id", value=event.event_id, inline=True)
+                    embed.add_field(name="Name", value=result_event.name, inline=True)
+                    embed.add_field(name="Id", value=result_event.event_id, inline=True)
                     embed.add_field(
-                        name="Timer", value=discord.utils.format_dt(event.timestamp, style="R"), inline=True
+                        name="Timer", value=discord.utils.format_dt(result_event.timestamp, style="R"), inline=True
                     )
                     embed.add_field(
-                        name="Channel", value=self.client.get_channel(event.notification_channel).mention, inline=False
+                        name="Channel",
+                        value=self.client.get_channel(result_event.notification_channel).mention,
+                        inline=False,
                     )
-                    embed.description = event.description
+                    embed.description = result_event.description
                     return await ctx.reply(embed=embed, mention_author=False)
 
     @commands.group(name="github", aliases=["gh", "git"], case_insensitive=True, invoke_without_command=True)
