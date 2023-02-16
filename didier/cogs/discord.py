@@ -4,20 +4,22 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
-from database.crud import birthdays, bookmarks, github
+from database.crud import birthdays, bookmarks, events, github
 from database.exceptions import (
     DuplicateInsertException,
     Forbidden,
     ForbiddenNameException,
     NoResultFoundException,
 )
+from database.schemas import Event
 from didier import Didier
 from didier.exceptions import expect
 from didier.menus.bookmarks import BookmarkSource
 from didier.utils.discord import colours
 from didier.utils.discord.assets import get_author_avatar, get_user_avatar
 from didier.utils.discord.constants import Limits
-from didier.utils.types.datetime import str_to_date
+from didier.utils.timer import Timer
+from didier.utils.types.datetime import str_to_date, tz_aware_now
 from didier.utils.types.string import abbreviate, leading
 from didier.views.modals import CreateBookmark
 
@@ -26,6 +28,7 @@ class Discord(commands.Cog):
     """Commands related to Discord itself, which work with resources like servers and members."""
 
     client: Didier
+    timer: Timer
 
     # Context-menu references
     _bookmark_ctx_menu: app_commands.ContextMenu
@@ -38,11 +41,40 @@ class Discord(commands.Cog):
         self._pin_ctx_menu = app_commands.ContextMenu(name="Pin", callback=self._pin_ctx)
         self.client.tree.add_command(self._bookmark_ctx_menu)
         self.client.tree.add_command(self._pin_ctx_menu)
+        self.timer = Timer(self.client)
 
     async def cog_unload(self) -> None:
         """Remove the commands when the cog is unloaded"""
         self.client.tree.remove_command(self._bookmark_ctx_menu.name, type=self._bookmark_ctx_menu.type)
         self.client.tree.remove_command(self._pin_ctx_menu.name, type=self._pin_ctx_menu.type)
+
+    @commands.Cog.listener()
+    async def on_event_create(self, event: Event):
+        """Custom listener called when an event is created"""
+        self.timer.maybe_replace_task(event)
+
+    @commands.Cog.listener()
+    async def on_timer_end(self, event_id: int):
+        """Custom listener called when an event timer ends"""
+        async with self.client.postgres_session as session:
+            event = await events.get_event_by_id(session, event_id)
+
+            if event is None:
+                return await self.client.log_error(f"Unable to find event with id {event_id}", log_to_discord=True)
+
+            channel = self.client.get_channel(event.notification_channel)
+
+            embed = discord.Embed(title="Upcoming Events", colour=discord.Colour.blue())
+            embed.add_field(name="Event", value=event.name, inline=False)
+            embed.description = event.description
+
+            await channel.send(embed=embed)
+
+            # Remove the database entry
+            await events.delete_event_by_id(session, event.event_id)
+
+        # Set the next timer
+        self.client.loop.create_task(self.timer.update())
 
     @commands.group(name="birthday", aliases=["bd", "birthdays"], case_insensitive=True, invoke_without_command=True)
     async def birthday(self, ctx: commands.Context, user: discord.User = None):
@@ -199,6 +231,54 @@ class Discord(commands.Cog):
         """Create a bookmark out of this message"""
         modal = CreateBookmark(self.client, message.jump_url)
         await interaction.response.send_modal(modal)
+
+    @commands.hybrid_command(name="events")
+    @app_commands.rename(event_id="id")
+    @app_commands.describe(event_id="The id of the event to fetch. If not passed, all events are fetched instead.")
+    async def events(self, ctx: commands.Context, event_id: Optional[int] = None):
+        """Show information about the event with id `event_id`.
+
+        If no value for `event_id` is supplied, this shows all upcoming events instead.
+        """
+        async with ctx.typing():
+            async with self.client.postgres_session as session:
+                if event_id is None:
+                    upcoming = await events.get_events(session, now=tz_aware_now())
+
+                    embed = discord.Embed(title="Upcoming Events", colour=discord.Colour.blue())
+                    if not upcoming:
+                        embed.colour = discord.Colour.red()
+                        embed.description = "There are currently no upcoming events scheduled."
+                        return await ctx.reply(embed=embed, mention_author=False)
+
+                    upcoming.sort(key=lambda e: e.timestamp.timestamp())
+                    description_items = []
+
+                    for event in upcoming:
+                        description_items.append(
+                            f"`{event.event_id}`: {event.name} ({discord.utils.format_dt(event.timestamp, style='R')})"
+                        )
+
+                    embed.description = "\n".join(description_items)
+                    return await ctx.reply(embed=embed, mention_author=False)
+                else:
+                    result_event = await events.get_event_by_id(session, event_id)
+                    if result_event is None:
+                        return await ctx.reply(f"Found no event with id `{event_id}`.", mention_author=False)
+
+                    embed = discord.Embed(title="Upcoming Events", colour=discord.Colour.blue())
+                    embed.add_field(name="Name", value=result_event.name, inline=True)
+                    embed.add_field(name="Id", value=result_event.event_id, inline=True)
+                    embed.add_field(
+                        name="Timer", value=discord.utils.format_dt(result_event.timestamp, style="R"), inline=True
+                    )
+                    embed.add_field(
+                        name="Channel",
+                        value=self.client.get_channel(result_event.notification_channel).mention,
+                        inline=False,
+                    )
+                    embed.description = result_event.description
+                    return await ctx.reply(embed=embed, mention_author=False)
 
     @commands.group(name="github", aliases=["gh", "git"], case_insensitive=True, invoke_without_command=True)
     async def github_group(self, ctx: commands.Context, user: Optional[discord.User] = None):

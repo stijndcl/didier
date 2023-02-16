@@ -13,6 +13,7 @@ from didier.utils.discord.flags.owner import EditCustomFlags, SyncOptionFlags
 from didier.views.modals import (
     AddDadJoke,
     AddDeadline,
+    AddEvent,
     AddLink,
     CreateCustomCommand,
     EditCustomCommand,
@@ -172,6 +173,15 @@ class Owner(commands.Cog):
     ) -> list[app_commands.Choice[str]]:
         """Autocompletion for the 'course'-parameter"""
         return self.client.database_caches.ufora_courses.get_autocomplete_suggestions(current)
+
+    @add_slash.command(name="event", description="Add a new event")
+    async def add_event_slash(self, interaction: discord.Interaction):
+        """Slash command to add new events"""
+        if not await self.client.is_owner(interaction.user):
+            return interaction.response.send_message("You don't have permission to run this command.", ephemeral=True)
+
+        modal = AddEvent(self.client)
+        await interaction.response.send_modal(modal)
 
     @add_slash.command(name="link", description="Add a new link")
     async def add_link_slash(self, interaction: discord.Interaction):
