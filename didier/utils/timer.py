@@ -1,15 +1,19 @@
 import asyncio
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Optional
 
 import discord.utils
 
+import settings
 from database.crud.events import get_next_event
 from database.schemas import Event
 from didier import Didier
 from didier.utils.types.datetime import tz_aware_now
 
 __all__ = ["Timer"]
+
+
+REMINDER_PREDELAY = timedelta(minutes=settings.REMINDER_PRE)
 
 
 class Timer:
@@ -58,7 +62,7 @@ class Timer:
 
     async def end_timer(self, *, endtime: datetime, event_id: int):
         """Wait until a timer runs out, and then trigger an event to send the message"""
-        await discord.utils.sleep_until(endtime)
+        await discord.utils.sleep_until(endtime - REMINDER_PREDELAY)
         self.upcoming_timer = None
         self.upcoming_event_id = None
         self.client.dispatch("timer_end", event_id)
