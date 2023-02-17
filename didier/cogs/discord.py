@@ -19,7 +19,7 @@ from didier.utils.discord import colours
 from didier.utils.discord.assets import get_author_avatar, get_user_avatar
 from didier.utils.discord.constants import Limits
 from didier.utils.timer import Timer
-from didier.utils.types.datetime import str_to_date, tz_aware_now
+from didier.utils.types.datetime import localize, str_to_date, tz_aware_now
 from didier.utils.types.string import abbreviate, leading
 from didier.views.modals import CreateBookmark
 
@@ -63,7 +63,7 @@ class Discord(commands.Cog):
                 return await self.client.log_error(f"Unable to find event with id {event_id}", log_to_discord=True)
 
             channel = self.client.get_channel(event.notification_channel)
-            human_readable_time = event.timestamp.strftime("%A, %B %d %Y - %H:%M")
+            human_readable_time = localize(event.timestamp).strftime("%A, %B %d %Y - %H:%M")
 
             embed = discord.Embed(title=event.name, colour=discord.Colour.blue())
             embed.set_author(name="Upcoming Event")

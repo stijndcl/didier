@@ -7,6 +7,7 @@ __all__ = [
     "LOCAL_TIMEZONE",
     "forward_to_next_weekday",
     "int_to_weekday",
+    "localize",
     "parse_dm_string",
     "skip_weekends",
     "str_to_date",
@@ -40,6 +41,14 @@ def forward_to_next_weekday(day_dt: DateType, target_weekday: int, *, allow_toda
 def int_to_weekday(number: int) -> str:  # pragma: no cover # it's useless to write a test for this
     """Get the Dutch name of a weekday from the number"""
     return ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"][number]
+
+
+def localize(dt_instance: datetime.datetime, *, default_timezone="UTC") -> datetime.datetime:
+    """Localize a datetime instance to my local timezone"""
+    if dt_instance.tzinfo is None:
+        dt_instance = dt_instance.replace(tzinfo=zoneinfo.ZoneInfo(default_timezone))
+
+    return dt_instance.astimezone(LOCAL_TIMEZONE)
 
 
 def parse_dm_string(argument: str) -> datetime.date:

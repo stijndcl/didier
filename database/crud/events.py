@@ -47,4 +47,4 @@ async def get_events(session: AsyncSession, *, now: datetime.datetime) -> list[E
 async def get_next_event(session: AsyncSession, *, now: datetime.datetime) -> Optional[Event]:
     """Get the first upcoming event"""
     statement = select(Event).where(Event.timestamp > now).order_by(Event.timestamp)
-    return (await session.execute(statement)).scalar_one_or_none()
+    return (await session.execute(statement)).scalars().first()
