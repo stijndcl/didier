@@ -12,7 +12,7 @@ __all__ = ["add_link", "edit_link", "get_all_links", "get_link_by_name"]
 async def get_all_links(session: AsyncSession) -> list[Link]:
     """Get a list of all links"""
     statement = select(Link)
-    return (await session.execute(statement)).scalars().all()
+    return list((await session.execute(statement)).scalars().all())
 
 
 async def add_link(session: AsyncSession, name: str, url: str) -> Link:
