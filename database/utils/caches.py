@@ -69,7 +69,7 @@ class LinkCache(DatabaseCache):
         self.clear()
 
         all_links = await links.get_all_links(database_session)
-        self.data = list(map(lambda l: l.name, all_links))
+        self.data = list(map(lambda link: link.name, all_links))
         self.data.sort()
         self.data_transformed = list(map(str.lower, self.data))
 

@@ -420,7 +420,7 @@ class Discord(commands.Cog):
         if ctx.guild is None:
             return await ctx.reply("Snipe only works in servers.", mention_author=False, ephemeral=True)
 
-        sniped_data = self.client.sniped.get(ctx.channel.id, None)
+        sniped_data = self.client.sniped.get(ctx.channel.id)
         if sniped_data is None:
             return await ctx.reply(
                 "There's no one to make fun of in this channel.", mention_author=False, ephemeral=True

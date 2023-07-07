@@ -225,7 +225,7 @@ class CustomHelpCommand(commands.MinimalHelpCommand):
 
     def _get_flags_class(self, command: commands.Command) -> Optional[Type[PosixFlags]]:
         """Check if a command has flags"""
-        flag_param = command.params.get("flags", None)
+        flag_param = command.params.get("flags")
         if flag_param is None:
             return None
 

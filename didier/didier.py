@@ -374,7 +374,7 @@ class Didier(commands.Bot):
 
         # If the edited message is currently present in the snipe cache,
         # don't update the <before>, but instead change the <after>
-        existing = self.sniped.get(before.channel.id, None)
+        existing = self.sniped.get(before.channel.id)
         if existing is not None and existing[0].id == before.id:
             before = existing[0]
 
