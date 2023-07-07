@@ -38,7 +38,6 @@ class Didier(commands.Bot):
     http_session: ClientSession
     schedules: dict[settings.ScheduleType, Schedule] = {}
     sniped: dict[int, tuple[discord.Message, Optional[discord.Message]]] = {}
-    wordle_words: set[str] = set()
 
     def __init__(self):
         activity = discord.Activity(type=discord.ActivityType.playing, name=settings.DISCORD_STATUS_MESSAGE)
@@ -76,9 +75,6 @@ class Didier(commands.Bot):
         """
         # Create directories that are ignored on GitHub
         self._create_ignored_directories()
-
-        # Load the Wordle dictionary
-        self._load_wordle_words()
 
         # Initialize caches
         self.database_caches = CacheManager()
@@ -136,12 +132,6 @@ class Didier(commands.Bot):
                 await self.load_extension(f"{load_path}.{file[:-3]}")
             elif os.path.isdir(new_path := f"{path}/{file}"):
                 await self._load_directory_extensions(new_path)
-
-    def _load_wordle_words(self):
-        """Load the dictionary of Wordle words"""
-        with open("files/dictionaries/words-english-wordle.txt", "r") as fp:
-            for line in fp:
-                self.wordle_words.add(line.strip())
 
     async def load_schedules(self):
         """Parse & load all schedules into memory"""

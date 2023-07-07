@@ -10,7 +10,6 @@ from database import enums
 from database.crud.birthdays import get_birthdays_on_day
 from database.crud.reminders import get_all_reminders_for_category
 from database.crud.ufora_announcements import remove_old_announcements
-from database.crud.wordle import set_daily_word
 from database.schemas import Reminder
 from didier import Didier
 from didier.data.embeds.schedules import (
@@ -54,7 +53,6 @@ class Tasks(commands.Cog):
             "reminders": self.reminders,
             "ufora": self.pull_ufora_announcements,
             "remove_ufora": self.remove_old_ufora_announcements,
-            "wordle": self.reset_wordle_word,
         }
 
     @overrides
@@ -74,7 +72,6 @@ class Tasks(commands.Cog):
 
         # Start other tasks
         self.reminders.start()
-        self.reset_wordle_word.start()
 
     @overrides
     def cog_unload(self) -> None:
@@ -266,34 +263,16 @@ class Tasks(commands.Cog):
         async with self.client.postgres_session as session:
             await remove_old_announcements(session)
 
-    @tasks.loop(time=DAILY_RESET_TIME)
-    async def reset_wordle_word(self, forced: bool = False):
-        """Reset the daily Wordle word"""
-        async with self.client.postgres_session as session:
-            await set_daily_word(session, random.choice(tuple(self.client.wordle_words)), forced=forced)
-            await self.client.database_caches.wordle_word.invalidate(session)
-
-    @reset_wordle_word.before_loop
-    async def _before_reset_wordle_word(self):
-        await self.client.wait_until_ready()
-
     @check_birthdays.error
     @pull_schedules.error
     @pull_ufora_announcements.error
     @reminders.error
     @remove_old_ufora_announcements.error
-    @reset_wordle_word.error
     async def _on_tasks_error(self, error: BaseException):
         """Error handler for all tasks"""
         self.client.dispatch("task_error", error)
 
 
 async def setup(client: Didier):
-    """Load the cog
-
-    Initially fetch the wordle word from the database, or reset it
-    if there hasn't been a reset yet today
-    """
-    cog = Tasks(client)
-    await client.add_cog(cog)
-    await cog.reset_wordle_word()
+    """Load the cog"""
+    await client.add_cog(Tasks(client))

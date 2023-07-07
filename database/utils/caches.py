@@ -4,8 +4,8 @@ from discord import app_commands
 from overrides import overrides
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from database.crud import easter_eggs, links, memes, ufora_courses, wordle
-from database.schemas import EasterEgg, WordleWord
+from database.crud import easter_eggs, links, memes, ufora_courses
+from database.schemas import EasterEgg
 
 __all__ = ["CacheManager", "EasterEggCache", "LinkCache", "UforaCourseCache"]
 
@@ -132,17 +132,6 @@ class UforaCourseCache(DatabaseCache):
         return [app_commands.Choice(name=suggestion, value=suggestion.lower()) for suggestion in suggestions]
 
 
-class WordleCache(DatabaseCache):
-    """Cache to store the current daily Wordle word"""
-
-    word: WordleWord
-
-    async def invalidate(self, database_session: AsyncSession):
-        word = await wordle.get_daily_word(database_session)
-        if word is not None:
-            self.word = word
-
-
 class CacheManager:
     """Class that keeps track of all caches"""
 
@@ -150,14 +139,12 @@ class CacheManager:
     links: LinkCache
     memes: MemeCache
     ufora_courses: UforaCourseCache
-    wordle_word: WordleCache
 
     def __init__(self):
         self.easter_eggs = EasterEggCache()
         self.links = LinkCache()
         self.memes = MemeCache()
         self.ufora_courses = UforaCourseCache()
-        self.wordle_word = WordleCache()
 
     async def initialize_caches(self, postgres_session: AsyncSession):
         """Initialize the contents of all caches"""
@@ -165,4 +152,3 @@ class CacheManager:
         await self.links.invalidate(postgres_session)
         await self.memes.invalidate(postgres_session)
         await self.ufora_courses.invalidate(postgres_session)
-        await self.wordle_word.invalidate(postgres_session)
