@@ -1,8 +1,7 @@
 from urllib.parse import quote_plus
 
 from sqlalchemy.engine import URL
-from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
 import settings
 
@@ -22,6 +21,4 @@ postgres_engine = create_async_engine(
     future=True,
 )
 
-DBSession = sessionmaker(
-    autocommit=False, autoflush=False, bind=postgres_engine, class_=AsyncSession, expire_on_commit=False
-)
+DBSession = async_sessionmaker(autocommit=False, autoflush=False, bind=postgres_engine, expire_on_commit=False)

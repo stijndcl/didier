@@ -32,7 +32,7 @@ async def fetch_free_games(http_session: ClientSession, database_session: AsyncS
         if SEPARATOR not in entry["title"]:
             continue
 
-        game = FreeGameEmbed.parse_obj(entry)
+        game = FreeGameEmbed.model_validate(entry)
         games.append(game)
         game_ids.append(game.dc_identifier)
 

@@ -4,17 +4,16 @@ from typing import Optional
 import discord
 from aiohttp import ClientSession
 from overrides import overrides
-from pydantic import validator
+from pydantic import field_validator
 
 from didier.data.embeds.base import EmbedPydantic
 from didier.data.scrapers.common import GameStorePage
 from didier.data.scrapers.steam import get_steam_webpage_info
 from didier.utils.discord import colours
-
-__all__ = ["SEPARATOR", "FreeGameEmbed"]
-
 from didier.utils.discord.constants import Limits
 from didier.utils.types.string import abbreviate
+
+__all__ = ["SEPARATOR", "FreeGameEmbed"]
 
 SEPARATOR = " • Free • "
 
@@ -58,7 +57,7 @@ class FreeGameEmbed(EmbedPydantic):
 
     store_page: Optional[GameStorePage] = None
 
-    @validator("title")
+    @field_validator("title")
     def _clean_title(cls, value: str) -> str:
         return html.unescape(value)
 
@@ -107,7 +106,6 @@ class FreeGameEmbed(EmbedPydantic):
             embed.add_field(name="Open in browser", value=f"[{self.link}]({self.link})")
 
             if self.store_page.xdg_open_url is not None:
-
                 embed.add_field(
                     name="Open in app", value=f"[{self.store_page.xdg_open_url}]({self.store_page.xdg_open_url})"
                 )
