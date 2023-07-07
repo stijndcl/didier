@@ -45,9 +45,6 @@ __all__ = [
     "UforaCourse",
     "UforaCourseAlias",
     "User",
-    "WordleGuess",
-    "WordleStats",
-    "WordleWord",
 ]
 
 
@@ -343,47 +340,3 @@ class User(Base):
     reminders: list[Reminder] = relationship(
         "Reminder", back_populates="user", uselist=True, lazy="selectin", cascade="all, delete-orphan"
     )
-    wordle_guesses: list[WordleGuess] = relationship(
-        "WordleGuess", back_populates="user", uselist=True, lazy="selectin", cascade="all, delete-orphan"
-    )
-    wordle_stats: WordleStats = relationship(
-        "WordleStats", back_populates="user", uselist=False, lazy="selectin", cascade="all, delete-orphan"
-    )
-
-
-class WordleGuess(Base):
-    """A user's Wordle guesses for today"""
-
-    __tablename__ = "wordle_guesses"
-
-    wordle_guess_id: int = Column(Integer, primary_key=True)
-    user_id: int = Column(BigInteger, ForeignKey("users.user_id"))
-    guess: str = Column(Text, nullable=False)
-
-    user: User = relationship("User", back_populates="wordle_guesses", uselist=False, lazy="selectin")
-
-
-class WordleStats(Base):
-    """Stats about a user's wordle performance"""
-
-    __tablename__ = "wordle_stats"
-
-    wordle_stats_id: int = Column(Integer, primary_key=True)
-    user_id: int = Column(BigInteger, ForeignKey("users.user_id"))
-    last_win: Optional[date] = Column(Date, nullable=True)
-    games: int = Column(Integer, server_default="0", nullable=False)
-    wins: int = Column(Integer, server_default="0", nullable=False)
-    current_streak: int = Column(Integer, server_default="0", nullable=False)
-    highest_streak: int = Column(Integer, server_default="0", nullable=False)
-
-    user: User = relationship("User", back_populates="wordle_stats", uselist=False, lazy="selectin")
-
-
-class WordleWord(Base):
-    """The current Wordle word"""
-
-    __tablename__ = "wordle_word"
-
-    word_id: int = Column(Integer, primary_key=True)
-    word: str = Column(Text, nullable=False)
-    day: date = Column(Date, nullable=False, unique=True)
