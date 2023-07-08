@@ -27,7 +27,7 @@ class School(commands.Cog):
     def __init__(self, client: Didier):
         self.client = client
 
-    @commands.hybrid_command(name="deadlines")
+    @commands.hybrid_command(name="deadlines")  # type: ignore[arg-type]
     async def deadlines(self, ctx: commands.Context):
         """Show upcoming deadlines."""
         async with ctx.typing():
@@ -40,7 +40,7 @@ class School(commands.Cog):
             embed = Deadlines(deadlines).to_embed()
             await ctx.reply(embed=embed, mention_author=False, ephemeral=False)
 
-    @commands.hybrid_command(name="les", aliases=["sched", "schedule"])
+    @commands.hybrid_command(name="les", aliases=["sched", "schedule"])  # type: ignore[arg-type]
     @app_commands.rename(day_dt="date")
     async def les(
         self, ctx: commands.Context, *, day_dt: Optional[app_commands.Transform[date, DateTransformer]] = None
@@ -72,10 +72,7 @@ class School(commands.Cog):
             except NotInMainGuildException:
                 return await ctx.reply(f"You are not a member of {self.client.main_guild.name}.", mention_author=False)
 
-    @commands.hybrid_command(
-        name="menu",
-        aliases=["eten", "food"],
-    )
+    @commands.hybrid_command(name="menu", aliases=["eten", "food"])  # type: ignore[arg-type]
     @app_commands.rename(day_dt="date")
     async def menu(
         self, ctx: commands.Context, *, day_dt: Optional[app_commands.Transform[date, DateTransformer]] = None
@@ -96,7 +93,7 @@ class School(commands.Cog):
                 embed = no_menu_found(day_dt)
             await ctx.reply(embed=embed, mention_author=False)
 
-    @commands.hybrid_command(
+    @commands.hybrid_command(  # type: ignore[arg-type]
         name="fiche", description="Sends the link to study guides", aliases=["guide", "studiefiche"]
     )
     @app_commands.describe(course="The name of the course to fetch the study guide for (aliases work too)")
@@ -124,7 +121,7 @@ class School(commands.Cog):
             mention_author=False,
         )
 
-    @commands.hybrid_command(name="ufora")
+    @commands.hybrid_command(name="ufora")  # type: ignore[arg-type]
     async def ufora(self, ctx: commands.Context, course: str):
         """Link the Ufora page for a course."""
         async with self.client.postgres_session as session:

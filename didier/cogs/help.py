@@ -159,6 +159,9 @@ class CustomHelpCommand(commands.MinimalHelpCommand):
         Code in codeblocks is ignored, as it is used to create examples.
         """
         description = command.help
+        if description is None:
+            return ""
+
         codeblocks = re_find_all(r"\n?```.*?```", description, flags=re.DOTALL)
 
         # Regex borrowed from https://stackoverflow.com/a/59843498/13568999
@@ -198,13 +201,10 @@ class CustomHelpCommand(commands.MinimalHelpCommand):
 
         return None
 
-    async def _filter_cogs(self, cogs: list[commands.Cog]) -> list[commands.Cog]:
+    async def _filter_cogs(self, cogs: list[Optional[commands.Cog]]) -> list[commands.Cog]:
         """Filter the list of cogs down to all those that the user can see"""
 
-        async def _predicate(cog: Optional[commands.Cog]) -> bool:
-            if cog is None:
-                return False
-
+        async def _predicate(cog: commands.Cog) -> bool:
             # Remove cogs that we never want to see in the help page because they
             # don't contain commands, or shouldn't be visible at all
             if not cog.get_commands():
@@ -220,7 +220,7 @@ class CustomHelpCommand(commands.MinimalHelpCommand):
             return True
 
         # Filter list of cogs down
-        filtered_cogs = [cog for cog in cogs if await _predicate(cog)]
+        filtered_cogs = [cog for cog in cogs if cog is not None and await _predicate(cog)]
         return list(sorted(filtered_cogs, key=lambda cog: cog.qualified_name))
 
     def _get_flags_class(self, command: commands.Command) -> Optional[Type[PosixFlags]]:

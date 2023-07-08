@@ -38,10 +38,10 @@ def create_error_embed(ctx: Optional[commands.Context], exception: Exception) ->
     embed = discord.Embed(title="Error", colour=discord.Colour.red())
 
     if ctx is not None:
-        if ctx.guild is None:
+        if ctx.guild is None or isinstance(ctx.channel, discord.DMChannel):
             origin = "DM"
         else:
-            origin = f"{ctx.channel.mention} ({ctx.guild.name})"
+            origin = f"<#{ctx.channel.id}> ({ctx.guild.name})"
 
         invocation = f"{ctx.author.display_name} in {origin}"
 

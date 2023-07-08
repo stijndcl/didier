@@ -25,7 +25,7 @@ class Currency(commands.Cog):
         super().__init__()
         self.client = client
 
-    @commands.command(name="award")
+    @commands.command(name="award")  # type: ignore[arg-type]
     @commands.check(is_owner)
     async def award(
         self,
@@ -49,7 +49,9 @@ class Currency(commands.Cog):
             bank = await crud.get_bank(session, ctx.author.id)
 
         embed = discord.Embed(title=f"{ctx.author.display_name}'s Bank", colour=discord.Colour.blue())
-        embed.set_thumbnail(url=ctx.author.avatar.url)
+
+        if ctx.author.avatar is not None:
+            embed.set_thumbnail(url=ctx.author.avatar.url)
 
         embed.add_field(name="Interest level", value=bank.interest_level)
         embed.add_field(name="Capacity level", value=bank.capacity_level)
@@ -57,7 +59,9 @@ class Currency(commands.Cog):
 
         await ctx.reply(embed=embed, mention_author=False)
 
-    @bank.group(name="upgrade", aliases=["u", "upgrades"], case_insensitive=True, invoke_without_command=True)
+    @bank.group(  # type: ignore[arg-type]
+        name="upgrade", aliases=["u", "upgrades"], case_insensitive=True, invoke_without_command=True
+    )
     async def bank_upgrades(self, ctx: commands.Context):
         """List the upgrades you can buy & their prices."""
         async with self.client.postgres_session as session:
@@ -77,7 +81,7 @@ class Currency(commands.Cog):
 
         await ctx.reply(embed=embed, mention_author=False)
 
-    @bank_upgrades.command(name="capacity", aliases=["c"])
+    @bank_upgrades.command(name="capacity", aliases=["c"])  # type: ignore[arg-type]
     async def bank_upgrade_capacity(self, ctx: commands.Context):
         """Upgrade the capacity level of your bank."""
         async with self.client.postgres_session as session:
@@ -88,7 +92,7 @@ class Currency(commands.Cog):
                 await ctx.reply("You don't have enough Didier Dinks to do this.", mention_author=False)
                 await self.client.reject_message(ctx.message)
 
-    @bank_upgrades.command(name="interest", aliases=["i"])
+    @bank_upgrades.command(name="interest", aliases=["i"])  # type: ignore[arg-type]
     async def bank_upgrade_interest(self, ctx: commands.Context):
         """Upgrade the interest level of your bank."""
         async with self.client.postgres_session as session:
@@ -99,7 +103,7 @@ class Currency(commands.Cog):
                 await ctx.reply("You don't have enough Didier Dinks to do this.", mention_author=False)
                 await self.client.reject_message(ctx.message)
 
-    @bank_upgrades.command(name="rob", aliases=["r"])
+    @bank_upgrades.command(name="rob", aliases=["r"])  # type: ignore[arg-type]
     async def bank_upgrade_rob(self, ctx: commands.Context):
         """Upgrade the rob level of your bank."""
         async with self.client.postgres_session as session:
@@ -110,7 +114,7 @@ class Currency(commands.Cog):
                 await ctx.reply("You don't have enough Didier Dinks to do this.", mention_author=False)
                 await self.client.reject_message(ctx.message)
 
-    @commands.hybrid_command(name="dinks")
+    @commands.hybrid_command(name="dinks")  # type: ignore[arg-type]
     async def dinks(self, ctx: commands.Context):
         """Check your Didier Dinks."""
         async with self.client.postgres_session as session:
@@ -118,7 +122,7 @@ class Currency(commands.Cog):
             plural = pluralize("Didier Dink", bank.dinks)
             await ctx.reply(f"**{ctx.author.display_name}** has **{bank.dinks}** {plural}.", mention_author=False)
 
-    @commands.command(name="invest", aliases=["deposit", "dep"])
+    @commands.command(name="invest", aliases=["deposit", "dep"])  # type: ignore[arg-type]
     async def invest(self, ctx: commands.Context, amount: typing.Annotated[typing.Union[str, int], abbreviated_number]):
         """Invest `amount` Didier Dinks into your bank.
 
@@ -144,7 +148,7 @@ class Currency(commands.Cog):
                     f"**{ctx.author.display_name}** has invested **{invested}** {plural}.", mention_author=False
                 )
 
-    @commands.hybrid_command(name="nightly")
+    @commands.hybrid_command(name="nightly")  # type: ignore[arg-type]
     async def nightly(self, ctx: commands.Context):
         """Claim nightly Didier Dinks."""
         async with self.client.postgres_session as session:

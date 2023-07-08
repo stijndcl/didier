@@ -1,6 +1,6 @@
 import inspect
 import os
-from typing import Optional
+from typing import Any, Optional, Union
 
 from discord.ext import commands
 
@@ -76,17 +76,23 @@ class Meta(commands.Cog):
         if command_name is None:
             return await ctx.reply(repo_home, mention_author=False)
 
+        command: Optional[Union[commands.HelpCommand, commands.Command]]
+        src: Any
+
         if command_name == "help":
             command = self.client.help_command
+            if command is None:
+                return await ctx.reply(f"Found no command named `{command_name}`.", mention_author=False)
+
             src = type(self.client.help_command)
             filename = inspect.getsourcefile(src)
         else:
             command = self.client.get_command(command_name)
+            if command is None:
+                return await ctx.reply(f"Found no command named `{command_name}`.", mention_author=False)
+
             src = command.callback.__code__
             filename = src.co_filename
-
-        if command is None:
-            return await ctx.reply(f"Found no command named `{command_name}`.", mention_author=False)
 
         lines, first_line = inspect.getsourcelines(src)
 

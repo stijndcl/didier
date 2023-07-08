@@ -111,7 +111,7 @@ class ScheduleInfo:
 
     role_id: Optional[int]
     schedule_url: Optional[str]
-    name: Optional[str] = None
+    name: ScheduleType
 
 
 SCHEDULE_DATA = [
