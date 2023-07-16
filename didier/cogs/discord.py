@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, Union, cast
 
 import discord
 from discord import app_commands
@@ -17,6 +17,7 @@ from didier.exceptions import expect
 from didier.menus.bookmarks import BookmarkSource
 from didier.utils.discord import colours
 from didier.utils.discord.assets import get_author_avatar, get_user_avatar
+from didier.utils.discord.channels import NON_MESSAGEABLE_CHANNEL_TYPES
 from didier.utils.discord.constants import Limits
 from didier.utils.timer import Timer
 from didier.utils.types.datetime import localize, str_to_date, tz_aware_now
@@ -60,9 +61,19 @@ class Discord(commands.Cog):
             event = await events.get_event_by_id(session, event_id)
 
             if event is None:
-                return await self.client.log_error(f"Unable to find event with id {event_id}", log_to_discord=True)
+                return await self.client.log_error(f"Unable to find event with id {event_id}.", log_to_discord=True)
 
             channel = self.client.get_channel(event.notification_channel)
+            if channel is None:
+                return await self.client.log_error(
+                    f"Unable to fetch channel for event `#{event_id}` (id `{event.notification_channel}`)."
+                )
+
+            if isinstance(channel, NON_MESSAGEABLE_CHANNEL_TYPES):
+                return await self.client.log_error(
+                    f"Channel for event `#{event_id}` (id `{event.notification_channel}`) is not messageable."
+                )
+
             human_readable_time = localize(event.timestamp).strftime("%A, %B %d %Y - %H:%M")
 
             embed = discord.Embed(title=event.name, colour=discord.Colour.blue())
@@ -81,7 +92,7 @@ class Discord(commands.Cog):
         self.client.loop.create_task(self.timer.update())
 
     @commands.group(name="birthday", aliases=["bd", "birthdays"], case_insensitive=True, invoke_without_command=True)
-    async def birthday(self, ctx: commands.Context, user: discord.User = None):
+    async def birthday(self, ctx: commands.Context, user: Optional[discord.User] = None):
         """Command to check the birthday of `user`.
 
         Not passing an argument for `user` will show yours instead.
@@ -98,8 +109,10 @@ class Discord(commands.Cog):
         day, month = leading("0", str(birthday.birthday.day)), leading("0", str(birthday.birthday.month))
         return await ctx.reply(f"{name or 'Your'} birthday is set to **{day}/{month}**.", mention_author=False)
 
-    @birthday.command(name="set", aliases=["config"])
-    async def birthday_set(self, ctx: commands.Context, day: str, user: Optional[discord.User] = None):
+    @birthday.command(name="set", aliases=["config"])  # type: ignore[arg-type]
+    async def birthday_set(
+        self, ctx: commands.Context, day: str, user: Optional[Union[discord.User, discord.Member]] = None
+    ):
         """Set your birthday to `day`.
 
         Parsing of the `day`-argument happens in the following order: `DD/MM/YYYY`, `DD/MM/YY`, `DD/MM`.
@@ -112,6 +125,9 @@ class Discord(commands.Cog):
         # For regular users: default to your own birthday
         if user is None:
             user = ctx.author
+
+        # Please Mypy
+        user = cast(Union[discord.User, discord.Member], user)
 
         try:
             default_year = 2001
@@ -141,7 +157,7 @@ class Discord(commands.Cog):
         """
         # No label: shortcut to display bookmarks
         if label is None:
-            return await self.bookmark_search(ctx, query=None)
+            return await self.bookmark_search(ctx, query=None)  # type: ignore[arg-type]
 
         async with self.client.postgres_session as session:
             result = expect(
@@ -151,7 +167,7 @@ class Discord(commands.Cog):
             )
             await ctx.reply(result.jump_url, mention_author=False)
 
-    @bookmark.command(name="create", aliases=["new"])
+    @bookmark.command(name="create", aliases=["new"])  # type: ignore[arg-type]
     async def bookmark_create(self, ctx: commands.Context, label: str, message: Optional[discord.Message]):
         """Create a new bookmark for message `message` with label `label`.
 
@@ -182,7 +198,7 @@ class Discord(commands.Cog):
             # Label isn't allowed
             return await ctx.reply(f"Bookmarks cannot be named `{label}`.", mention_author=False)
 
-    @bookmark.command(name="delete", aliases=["rm"])
+    @bookmark.command(name="delete", aliases=["rm"])  # type: ignore[arg-type]
     async def bookmark_delete(self, ctx: commands.Context, bookmark_id: str):
         """Delete the bookmark with id `bookmark_id`.
 
@@ -207,7 +223,7 @@ class Discord(commands.Cog):
 
         return await ctx.reply(f"Successfully deleted bookmark `#{bookmark_id_int}`.", mention_author=False)
 
-    @bookmark.command(name="search", aliases=["list", "ls"])
+    @bookmark.command(name="search", aliases=["list", "ls"])  # type: ignore[arg-type]
     async def bookmark_search(self, ctx: commands.Context, *, query: Optional[str] = None):
         """Search through the list of bookmarks.
 
@@ -236,7 +252,7 @@ class Discord(commands.Cog):
         modal = CreateBookmark(self.client, message.jump_url)
         await interaction.response.send_modal(modal)
 
-    @commands.hybrid_command(name="events")
+    @commands.hybrid_command(name="events")  # type: ignore[arg-type]
     @app_commands.rename(event_id="id")
     @app_commands.describe(event_id="The id of the event to fetch. If not passed, all events are fetched instead.")
     async def events(self, ctx: commands.Context, event_id: Optional[int] = None):
@@ -276,22 +292,25 @@ class Discord(commands.Cog):
                     embed.add_field(
                         name="Timer", value=discord.utils.format_dt(result_event.timestamp, style="R"), inline=True
                     )
-                    embed.add_field(
-                        name="Channel",
-                        value=self.client.get_channel(result_event.notification_channel).mention,
-                        inline=False,
-                    )
+
+                    channel = self.client.get_channel(result_event.notification_channel)
+                    if channel is not None and not isinstance(channel, NON_MESSAGEABLE_CHANNEL_TYPES):
+                        embed.add_field(name="Channel", value=channel.mention, inline=False)
+
                     embed.description = result_event.description
                     return await ctx.reply(embed=embed, mention_author=False)
 
     @commands.group(name="github", aliases=["gh", "git"], case_insensitive=True, invoke_without_command=True)
-    async def github_group(self, ctx: commands.Context, user: Optional[discord.User] = None):
+    async def github_group(self, ctx: commands.Context, user: Optional[Union[discord.User, discord.Member]] = None):
         """Show a user's GitHub links.
 
         If no user is provided, this shows your links instead.
         """
         # Default to author
         user = user or ctx.author
+
+        # Please Mypy
+        user = cast(Union[discord.User, discord.Member], user)
 
         embed = discord.Embed(colour=colours.github_white(), title="GitHub Links")
         embed.set_author(name=user.display_name, icon_url=get_user_avatar(user))
@@ -324,7 +343,7 @@ class Discord(commands.Cog):
 
         return await ctx.reply(embed=embed, mention_author=False)
 
-    @github_group.command(name="add", aliases=["create", "insert"])
+    @github_group.command(name="add", aliases=["create", "insert"])  # type: ignore[arg-type]
     async def github_add(self, ctx: commands.Context, link: str):
         """Add a new link into the database."""
         # Remove wrapping <brackets> which can be used to escape Discord embeds
@@ -339,7 +358,7 @@ class Discord(commands.Cog):
         await self.client.confirm_message(ctx.message)
         return await ctx.reply(f"Successfully inserted link `#{gh_link.github_link_id}`.", mention_author=False)
 
-    @github_group.command(name="delete", aliases=["del", "remove", "rm"])
+    @github_group.command(name="delete", aliases=["del", "remove", "rm"])  # type: ignore[arg-type]
     async def github_delete(self, ctx: commands.Context, link_id: str):
         """Delete the link with it `link_id` from the database.
 
@@ -411,7 +430,7 @@ class Discord(commands.Cog):
         await message.add_reaction("📌")
         return await interaction.response.send_message("📌", ephemeral=True)
 
-    @commands.hybrid_command(name="snipe")
+    @commands.hybrid_command(name="snipe")  # type: ignore[arg-type]
     async def snipe(self, ctx: commands.Context):
         """Publicly shame people when they edit or delete one of their messages.
 
@@ -420,7 +439,7 @@ class Discord(commands.Cog):
         if ctx.guild is None:
             return await ctx.reply("Snipe only works in servers.", mention_author=False, ephemeral=True)
 
-        sniped_data = self.client.sniped.get(ctx.channel.id, None)
+        sniped_data = self.client.sniped.get(ctx.channel.id)
         if sniped_data is None:
             return await ctx.reply(
                 "There's no one to make fun of in this channel.", mention_author=False, ephemeral=True

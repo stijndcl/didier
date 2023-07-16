@@ -41,7 +41,7 @@ async def get_event_by_id(session: AsyncSession, event_id: int) -> Optional[Even
 async def get_events(session: AsyncSession, *, now: datetime.datetime) -> list[Event]:
     """Get a list of all upcoming events"""
     statement = select(Event).where(Event.timestamp > now)
-    return (await session.execute(statement)).scalars().all()
+    return list((await session.execute(statement)).scalars().all())
 
 
 async def get_next_event(session: AsyncSession, *, now: datetime.datetime) -> Optional[Event]:

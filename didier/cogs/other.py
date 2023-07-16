@@ -22,7 +22,7 @@ class Other(commands.Cog):
     def __init__(self, client: Didier):
         self.client = client
 
-    @commands.hybrid_command(name="corona", aliases=["covid", "rona"])
+    @commands.hybrid_command(name="corona", aliases=["covid", "rona"])  # type: ignore[arg-type]
     async def covid(self, ctx: commands.Context, country: str = "Belgium"):
         """Show Covid-19 info for a specific country.
 
@@ -43,7 +43,7 @@ class Other(commands.Cog):
         """Autocompletion for the 'country'-parameter"""
         return autocomplete_country(value)[:25]
 
-    @commands.hybrid_command(
+    @commands.hybrid_command(  # type: ignore[arg-type]
         name="define", aliases=["ud", "urban"], description="Look up the definition of a word on the Urban Dictionary"
     )
     async def define(self, ctx: commands.Context, *, query: str):
@@ -55,7 +55,7 @@ class Other(commands.Cog):
                 mention_author=False,
             )
 
-    @commands.hybrid_command(name="google", description="Google search")
+    @commands.hybrid_command(name="google", description="Google search")  # type: ignore[arg-type]
     @app_commands.describe(query="Search query")
     async def google(self, ctx: commands.Context, *, query: str):
         """Show the Google search results for `query`.
@@ -71,7 +71,7 @@ class Other(commands.Cog):
             embed = GoogleSearch(results).to_embed()
             await ctx.reply(embed=embed, mention_author=False)
 
-    @commands.hybrid_command(name="inspire", description="Generate an InspiroBot quote.")
+    @commands.hybrid_command(name="inspire", description="Generate an InspiroBot quote.")  # type: ignore[arg-type]
     async def inspire(self, ctx: commands.Context):
         """Generate an [InspiroBot](https://inspirobot.me/) quote."""
         async with ctx.typing():
@@ -82,7 +82,7 @@ class Other(commands.Cog):
         async with self.client.postgres_session as session:
             return await get_link_by_name(session, name.lower())
 
-    @commands.command(name="Link", aliases=["Links"])
+    @commands.command(name="Link", aliases=["Links"])  # type: ignore[arg-type]
     async def link_msg(self, ctx: commands.Context, name: str):
         """Get the link to the resource named `name`."""
         link = await self._get_link(name)
@@ -92,7 +92,7 @@ class Other(commands.Cog):
         target_message = await self.client.get_reply_target(ctx)
         await target_message.reply(link.url, mention_author=False)
 
-    @app_commands.command(name="link")
+    @app_commands.command(name="link")  # type: ignore[arg-type]
     @app_commands.describe(name="The name of the resource")
     async def link_slash(self, interaction: discord.Interaction, name: str):
         """Get the link to something."""

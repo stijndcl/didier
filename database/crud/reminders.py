@@ -13,7 +13,7 @@ __all__ = ["get_all_reminders_for_category", "toggle_reminder"]
 async def get_all_reminders_for_category(session: AsyncSession, category: ReminderCategory) -> list[Reminder]:
     """Get a list of all Reminders for a given category"""
     statement = select(Reminder).where(Reminder.category == category)
-    return (await session.execute(statement)).scalars().all()
+    return list((await session.execute(statement)).scalars().all())
 
 
 async def toggle_reminder(session: AsyncSession, user_id: int, category: ReminderCategory) -> bool:

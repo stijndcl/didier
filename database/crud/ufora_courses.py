@@ -28,11 +28,11 @@ async def get_course_by_name(session: AsyncSession, query: str) -> Optional[Ufor
     # Search case-insensitively
     query = query.lower()
 
-    statement = select(UforaCourse).where(UforaCourse.name.ilike(f"%{query}%"))
-    result = (await session.execute(statement)).scalars().first()
-    if result:
-        return result
+    course_statement = select(UforaCourse).where(UforaCourse.name.ilike(f"%{query}%"))
+    course_result = (await session.execute(course_statement)).scalars().first()
+    if course_result:
+        return course_result
 
-    statement = select(UforaCourseAlias).where(UforaCourseAlias.alias.ilike(f"%{query}%"))
-    result = (await session.execute(statement)).scalars().first()
-    return result.course if result else None
+    alias_statement = select(UforaCourseAlias).where(UforaCourseAlias.alias.ilike(f"%{query}%"))
+    alias_result = (await session.execute(alias_statement)).scalars().first()
+    return alias_result.course if alias_result else None

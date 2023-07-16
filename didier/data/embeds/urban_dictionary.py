@@ -2,7 +2,7 @@ from datetime import datetime
 
 import discord
 from overrides import overrides
-from pydantic import validator
+from pydantic import field_validator
 
 from didier.data.embeds.base import EmbedPydantic
 from didier.utils.discord import colours
@@ -39,8 +39,8 @@ class Definition(EmbedPydantic):
         total_votes = self.thumbs_up + self.thumbs_down
         return round(100 * self.thumbs_up / total_votes, 2)
 
-    @validator("definition", "example")
-    def modify_long_text(cls, field):
+    @field_validator("definition", "example")
+    def modify_long_text(cls, field: str):
         """Remove brackets from fields & cut them off if they are too long"""
         field = field.replace("[", "").replace("]", "")
         return string_utils.abbreviate(field, max_length=Limits.EMBED_FIELD_VALUE_LENGTH)

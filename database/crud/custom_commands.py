@@ -59,7 +59,7 @@ async def create_alias(session: AsyncSession, command: str, alias: str) -> Custo
 async def get_all_commands(session: AsyncSession) -> list[CustomCommand]:
     """Get a list of all commands"""
     statement = select(CustomCommand)
-    return (await session.execute(statement)).scalars().all()
+    return list((await session.execute(statement)).scalars().all())
 
 
 async def get_command(session: AsyncSession, message: str) -> Optional[CustomCommand]:

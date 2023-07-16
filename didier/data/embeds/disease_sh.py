@@ -1,6 +1,6 @@
 import discord
 from overrides import overrides
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field, field_validator
 
 from didier.data.embeds.base import EmbedPydantic
 
@@ -24,7 +24,7 @@ class _CovidNumbers(BaseModel):
     active: int
     tests: int
 
-    @validator("updated")
+    @field_validator("updated")
     def updated_to_seconds(cls, value: int) -> int:
         """Turn the updated field into seconds instead of milliseconds"""
         return int(value) // 1000

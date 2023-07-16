@@ -36,6 +36,7 @@ def setup_logging():
 
     # Configure discord handler
     discord_log = logging.getLogger("discord")
+    discord_handler: logging.StreamHandler
 
     # Make dev print to stderr instead, so you don't have to watch the file
     if settings.SANDBOX:

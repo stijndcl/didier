@@ -3,12 +3,12 @@ default_language_version:
 
 repos:
 -   repo: https://github.com/ambv/black
-    rev: 22.3.0
+    rev: 23.3.0
     hooks:
     - id: black
 
 -   repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.3.0
+    rev: v4.4.0
     hooks:
       - id: check-json
       - id: end-of-file-fixer
@@ -21,7 +21,7 @@ repos:
     -   id: isort
 
 -   repo: https://github.com/PyCQA/autoflake
-    rev: v1.4
+    rev: v2.2.0
     hooks:
     -   id: autoflake
         name: autoflake (python)
@@ -31,7 +31,7 @@ repos:
         - "--ignore-init-module-imports"
 
 -   repo: https://github.com/PyCQA/flake8
-    rev: 4.0.1
+    rev: 6.0.0
     hooks:
     -   id: flake8
         exclude: ^(alembic|.github)

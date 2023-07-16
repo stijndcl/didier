@@ -28,6 +28,7 @@ omit = [
 profile = "black"
 
 [tool.mypy]
+check_untyped_defs = true
 files = [
     "database/**/*.py",
     "didier/**/*.py",
@@ -35,7 +36,6 @@ files = [
 ]
 plugins = [
     "pydantic.mypy",
-    "sqlalchemy.ext.mypy.plugin"
 ]
 [[tool.mypy.overrides]]
 module = ["discord.*", "feedparser.*", "ics.*", "markdownify.*"]

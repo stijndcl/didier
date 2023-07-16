@@ -17,7 +17,7 @@ from database.utils.caches import CacheManager
 from didier.data.embeds.error_embed import create_error_embed
 from didier.data.embeds.logging_embed import create_logging_embed
 from didier.data.embeds.schedules import Schedule, parse_schedule
-from didier.exceptions import HTTPException, NoMatch
+from didier.exceptions import GetNoneException, HTTPException, NoMatch
 from didier.utils.discord.prefix import get_prefix
 from didier.utils.discord.snipe import should_snipe
 from didier.utils.easter_eggs import detect_easter_egg
@@ -33,7 +33,7 @@ class Didier(commands.Bot):
     """DIDIER <3"""
 
     database_caches: CacheManager
-    error_channel: discord.abc.Messageable
+    error_channel: Optional[discord.abc.Messageable] = None
     initial_extensions: tuple[str, ...] = ()
     http_session: ClientSession
     schedules: dict[settings.ScheduleType, Schedule] = {}
@@ -56,12 +56,17 @@ class Didier(commands.Bot):
             command_prefix=get_prefix, case_insensitive=True, intents=intents, activity=activity, status=status
         )
 
-        self.tree.on_error = self.on_app_command_error
+        # I'm not creating a custom tree, this is the way to do it
+        self.tree.on_error = self.on_app_command_error  # type: ignore[method-assign]
 
     @cached_property
     def main_guild(self) -> discord.Guild:
         """Obtain a reference to the main guild"""
-        return self.get_guild(settings.DISCORD_MAIN_GUILD)
+        guild = self.get_guild(settings.DISCORD_MAIN_GUILD)
+        if guild is None:
+            raise GetNoneException("Main guild could not be found in the bot's cache")
+
+        return guild
 
     @property
     def postgres_session(self) -> AsyncSession:
@@ -92,12 +97,6 @@ class Didier(commands.Bot):
         # Load extensions
         await self._load_initial_extensions()
         await self._load_directory_extensions("didier/cogs")
-
-        # Configure channel to send errors to
-        if settings.ERRORS_CHANNEL is not None:
-            self.error_channel = self.get_channel(settings.ERRORS_CHANNEL)
-        else:
-            self.error_channel = self.get_user(self.owner_id)
 
     def _create_ignored_directories(self):
         """Create directories that store ignored data"""
@@ -152,18 +151,27 @@ class Didier(commands.Bot):
         original message instead
         """
         if ctx.message.reference is not None:
-            return await self.resolve_message(ctx.message.reference)
+            return await self.resolve_message(ctx.message.reference) or ctx.message
 
         return ctx.message
 
-    async def resolve_message(self, reference: discord.MessageReference) -> discord.Message:
+    async def resolve_message(self, reference: discord.MessageReference) -> Optional[discord.Message]:
         """Fetch a message from a reference"""
         # Message is in the cache, return it
         if reference.cached_message is not None:
             return reference.cached_message
 
+        if reference.message_id is None:
+            return None
+
         # For older messages: fetch them from the API
         channel = self.get_channel(reference.channel_id)
+        if channel is None or isinstance(
+            channel,
+            (discord.CategoryChannel, discord.ForumChannel, discord.abc.PrivateChannel),
+        ):  # Logically this can't happen, but we have to please Mypy
+            return None
+
         return await channel.fetch_message(reference.message_id)
 
     async def confirm_message(self, message: discord.Message):
@@ -184,7 +192,7 @@ class Didier(commands.Bot):
         }
 
         methods.get(level, logger.error)(message)
-        if log_to_discord:
+        if log_to_discord and self.error_channel is not None:
             embed = create_logging_embed(level, message)
             await self.error_channel.send(embed=embed)
 
@@ -253,10 +261,9 @@ class Didier(commands.Bot):
 
         await interaction.response.send_message("Something went wrong processing this command.", ephemeral=True)
 
-        if settings.ERRORS_CHANNEL is not None:
+        if self.error_channel is not None:
             embed = create_error_embed(await commands.Context.from_interaction(interaction), exception)
-            channel = self.get_channel(settings.ERRORS_CHANNEL)
-            await channel.send(embed=embed)
+            await self.error_channel.send(embed=embed)
 
     async def on_command_completion(self, ctx: commands.Context):
         """Event triggered when a message command completes successfully"""
@@ -281,7 +288,7 @@ class Didier(commands.Bot):
 
         # Hybrid command errors are wrapped in an additional error, so wrap it back out
         if isinstance(exception, commands.HybridCommandError):
-            exception = exception.original
+            exception = exception.original  # type: ignore[assignment]
 
         # Ignore exceptions that aren't important
         if isinstance(
@@ -332,10 +339,9 @@ class Didier(commands.Bot):
         # Print everything that we care about to the logs/stderr
         await super().on_command_error(ctx, exception)
 
-        if settings.ERRORS_CHANNEL is not None:
+        if self.error_channel is not None:
             embed = create_error_embed(ctx, exception)
-            channel = self.get_channel(settings.ERRORS_CHANNEL)
-            await channel.send(embed=embed)
+            await self.error_channel.send(embed=embed)
 
     async def on_message(self, message: discord.Message, /) -> None:
         """Event triggered when a message is sent"""
@@ -344,7 +350,7 @@ class Didier(commands.Bot):
             return
 
         # Boos react to people that say Dider
-        if "dider" in message.content.lower() and message.author.id != self.user.id:
+        if "dider" in message.content.lower() and self.user is not None and message.author.id != self.user.id:
             await message.add_reaction(settings.DISCORD_BOOS_REACT)
 
         # Potential custom command
@@ -374,7 +380,7 @@ class Didier(commands.Bot):
 
         # If the edited message is currently present in the snipe cache,
         # don't update the <before>, but instead change the <after>
-        existing = self.sniped.get(before.channel.id, None)
+        existing = self.sniped.get(before.channel.id)
         if existing is not None and existing[0].id == before.id:
             before = existing[0]
 
@@ -389,10 +395,9 @@ class Didier(commands.Bot):
 
     async def on_task_error(self, exception: Exception):
         """Event triggered when a task raises an exception"""
-        if settings.ERRORS_CHANNEL is not None:
+        if self.error_channel:
             embed = create_error_embed(None, exception)
-            channel = self.get_channel(settings.ERRORS_CHANNEL)
-            await channel.send(embed=embed)
+            await self.error_channel.send(embed=embed)
 
     async def on_thread_create(self, thread: discord.Thread):
         """Event triggered when a new thread is created"""
