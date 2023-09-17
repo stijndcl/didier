@@ -6,11 +6,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from database.crud import users
 from database.exceptions import currency as exceptions
 from database.schemas import Bank, NightlyData
-from database.utils.math.currency import (
-    capacity_upgrade_price,
-    interest_upgrade_price,
-    rob_upgrade_price,
-)
 
 __all__ = [
     "add_dinks",
@@ -18,13 +13,10 @@ __all__ = [
     "get_bank",
     "get_nightly_data",
     "invest",
-    "upgrade_capacity",
-    "upgrade_interest",
-    "upgrade_rob",
     "NIGHTLY_AMOUNT",
 ]
 
-NIGHTLY_AMOUNT = 420
+NIGHTLY_AMOUNT = 50
 
 
 async def get_bank(session: AsyncSession, user_id: int) -> Bank:
@@ -81,57 +73,3 @@ async def claim_nightly(session: AsyncSession, user_id: int):
     session.add(bank)
     session.add(nightly_data)
     await session.commit()
-
-
-async def upgrade_capacity(session: AsyncSession, user_id: int) -> int:
-    """Upgrade capacity level"""
-    bank = await get_bank(session, user_id)
-    upgrade_price = capacity_upgrade_price(bank.capacity_level)
-
-    # Can't afford this upgrade
-    if upgrade_price > bank.dinks:
-        raise exceptions.NotEnoughDinks
-
-    bank.dinks -= upgrade_price
-    bank.capacity_level += 1
-
-    session.add(bank)
-    await session.commit()
-
-    return bank.capacity_level
-
-
-async def upgrade_interest(session: AsyncSession, user_id: int) -> int:
-    """Upgrade interest level"""
-    bank = await get_bank(session, user_id)
-    upgrade_price = interest_upgrade_price(bank.interest_level)
-
-    # Can't afford this upgrade
-    if upgrade_price > bank.dinks:
-        raise exceptions.NotEnoughDinks
-
-    bank.dinks -= upgrade_price
-    bank.interest_level += 1
-
-    session.add(bank)
-    await session.commit()
-
-    return bank.interest_level
-
-
-async def upgrade_rob(session: AsyncSession, user_id: int) -> int:
-    """Upgrade rob level"""
-    bank = await get_bank(session, user_id)
-    upgrade_price = rob_upgrade_price(bank.rob_level)
-
-    # Can't afford this upgrade
-    if upgrade_price > bank.dinks:
-        raise exceptions.NotEnoughDinks
-
-    bank.dinks -= upgrade_price
-    bank.rob_level += 1
-
-    session.add(bank)
-    await session.commit()
-
-    return bank.rob_level

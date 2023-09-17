@@ -62,7 +62,7 @@ def mock(string: str) -> str:
 
 
 def pluralize(word: str, amount: int, plural_form: Optional[str] = None) -> str:
-    """Turn a word into plural"""
+    """Turn a word into plural if necessary"""
     if amount == 1:
         return word
 
