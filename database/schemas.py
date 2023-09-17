@@ -53,15 +53,6 @@ class Bank(Base):
     dinks: Mapped[int] = mapped_column(BigInteger, server_default="0", nullable=False)
     invested: Mapped[int] = mapped_column(BigInteger, server_default="0", nullable=False)
 
-    # Interest rate
-    interest_level: Mapped[int] = mapped_column(server_default="1", nullable=False)
-
-    # Maximum amount that can be stored in the bank
-    capacity_level: Mapped[int] = mapped_column(server_default="1", nullable=False)
-
-    # Maximum amount that can be robbed
-    rob_level: Mapped[int] = mapped_column(server_default="1", nullable=False)
-
     user: Mapped[User] = relationship(uselist=False, back_populates="bank", lazy="selectin")
 
 
