@@ -28,7 +28,7 @@ class Fun(commands.Cog):
     def __init__(self, client: Didier):
         self.client = client
 
-    @commands.hybrid_command(name="clap")
+    @commands.hybrid_command(name="clap")  # type: ignore[arg-type]
     async def clap(self, ctx: commands.Context, *, text: str):
         """Clap a message with emojis for extra dramatic effect"""
         chars = list(filter(lambda c: c in constants.EMOJI_MAP, text))
@@ -50,10 +50,7 @@ class Fun(commands.Cog):
             meme = await generate_meme(self.client.http_session, result, fields)
             return meme
 
-    @commands.hybrid_command(
-        name="dadjoke",
-        aliases=["dad", "dj"],
-    )
+    @commands.hybrid_command(name="dadjoke", aliases=["dad", "dj"])  # type: ignore[arg-type]
     async def dad_joke(self, ctx: commands.Context):
         """Why does Yoda's code always crash? Because there is no try."""
         async with self.client.postgres_session as session:
@@ -83,13 +80,13 @@ class Fun(commands.Cog):
             return await self.memegen_ls_msg(ctx)
 
         if fields is None:
-            return await self.memegen_preview_msg(ctx, template)
+            return await self.memegen_preview_msg(ctx, template)  # type: ignore[arg-type]
 
         async with ctx.typing():
             meme = await self._do_generate_meme(template, shlex.split(fields))
             return await ctx.reply(meme, mention_author=False)
 
-    @memegen_msg.command(name="list", aliases=["ls"])
+    @memegen_msg.command(name="list", aliases=["ls"])  # type: ignore[arg-type]
     async def memegen_ls_msg(self, ctx: commands.Context):
         """Get a list of all available meme templates.
 
@@ -100,14 +97,14 @@ class Fun(commands.Cog):
 
         await MemeSource(ctx, results).start()
 
-    @memegen_msg.command(name="preview", aliases=["p"])
+    @memegen_msg.command(name="preview", aliases=["p"])  # type: ignore[arg-type]
     async def memegen_preview_msg(self, ctx: commands.Context, template: str):
         """Generate a preview for the meme template `template`, to see how the fields are structured."""
         async with ctx.typing():
             meme = await self._do_generate_meme(template, [])
             return await ctx.reply(meme, mention_author=False)
 
-    @memes_slash.command(name="generate")
+    @memes_slash.command(name="generate")  # type: ignore[arg-type]
     async def memegen_slash(self, interaction: discord.Interaction, template: str):
         """Generate a meme."""
         async with self.client.postgres_session as session:
@@ -116,7 +113,7 @@ class Fun(commands.Cog):
         modal = GenerateMeme(self.client, result)
         await interaction.response.send_modal(modal)
 
-    @memes_slash.command(name="preview")
+    @memes_slash.command(name="preview")  # type: ignore[arg-type]
     @app_commands.describe(template="The meme template to use in the preview.")
     async def memegen_preview_slash(self, interaction: discord.Interaction, template: str):
         """Generate a preview for a meme, to see how the fields are structured."""
@@ -134,7 +131,7 @@ class Fun(commands.Cog):
         """Autocompletion for the 'template'-parameter"""
         return self.client.database_caches.memes.get_autocomplete_suggestions(current)
 
-    @app_commands.command()
+    @app_commands.command()  # type: ignore[arg-type]
     @app_commands.describe(message="The text to convert.")
     async def mock(self, interaction: discord.Interaction, message: str):
         """Mock a message.
@@ -158,7 +155,7 @@ class Fun(commands.Cog):
 
         return await interaction.followup.send(mock(message))
 
-    @commands.hybrid_command(name="xkcd")
+    @commands.hybrid_command(name="xkcd")  # type: ignore[arg-type]
     @app_commands.rename(comic_id="id")
     async def xkcd(self, ctx: commands.Context, comic_id: Optional[int] = None):
         """Fetch comic `#id` from xkcd.

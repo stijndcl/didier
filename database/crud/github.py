@@ -48,4 +48,4 @@ async def delete_github_link_by_id(session: AsyncSession, user_id: int, link_id:
 async def get_github_links(session: AsyncSession, user_id: int) -> list[GitHubLink]:
     """Get a user's GitHub links"""
     statement = select(GitHubLink).where(GitHubLink.user_id == user_id)
-    return (await session.execute(statement)).scalars().all()
+    return list((await session.execute(statement)).scalars().all())

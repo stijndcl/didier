@@ -14,4 +14,4 @@ async def lookup(http_session: ClientSession, query: str) -> list[Definition]:
     url = "https://api.urbandictionary.com/v0/define"
 
     async with ensure_get(http_session, url, params={"term": query}) as response:
-        return list(map(Definition.parse_obj, response["list"]))
+        return list(map(Definition.model_validate, response["list"]))

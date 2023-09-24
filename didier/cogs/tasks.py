@@ -1,4 +1,6 @@
+import asyncio
 import datetime
+import logging
 import random
 
 import discord
@@ -10,7 +12,6 @@ from database import enums
 from database.crud.birthdays import get_birthdays_on_day
 from database.crud.reminders import get_all_reminders_for_category
 from database.crud.ufora_announcements import remove_old_announcements
-from database.crud.wordle import set_daily_word
 from database.schemas import Reminder
 from didier import Didier
 from didier.data.embeds.schedules import (
@@ -21,8 +22,11 @@ from didier.data.embeds.schedules import (
 from didier.data.rss_feeds.free_games import fetch_free_games
 from didier.data.rss_feeds.ufora import fetch_ufora_announcements
 from didier.decorators.tasks import timed_task
+from didier.utils.discord.channels import NON_MESSAGEABLE_CHANNEL_TYPES
 from didier.utils.discord.checks import is_owner
 from didier.utils.types.datetime import LOCAL_TIMEZONE, tz_aware_now
+
+logger = logging.getLogger(__name__)
 
 # datetime.time()-instances for when every task should run
 DAILY_RESET_TIME = datetime.time(hour=0, minute=0, tzinfo=LOCAL_TIMEZONE)
@@ -54,11 +58,10 @@ class Tasks(commands.Cog):
             "reminders": self.reminders,
             "ufora": self.pull_ufora_announcements,
             "remove_ufora": self.remove_old_ufora_announcements,
-            "wordle": self.reset_wordle_word,
         }
 
     @overrides
-    def cog_load(self) -> None:
+    async def cog_load(self) -> None:
         # Only check birthdays if there's a channel to send it to
         if settings.BIRTHDAY_ANNOUNCEMENT_CHANNEL is not None:
             self.check_birthdays.start()
@@ -74,10 +77,10 @@ class Tasks(commands.Cog):
 
         # Start other tasks
         self.reminders.start()
-        self.reset_wordle_word.start()
+        asyncio.create_task(self.get_error_channel())
 
     @overrides
-    def cog_unload(self) -> None:
+    async def cog_unload(self) -> None:
         # Cancel all pending tasks
         for task in self._tasks.values():
             if task.is_running():
@@ -99,7 +102,7 @@ class Tasks(commands.Cog):
 
         await ctx.reply(embed=embed, mention_author=False)
 
-    @tasks_group.command(name="Force", case_insensitive=True, usage="[Task]")
+    @tasks_group.command(name="Force", case_insensitive=True, usage="[Task]")  # type: ignore[arg-type]
     async def force_task(self, ctx: commands.Context, name: str):
         """Command to force-run a task without waiting for the specified run time"""
         name = name.lower()
@@ -110,11 +113,30 @@ class Tasks(commands.Cog):
         await task(forced=True)
         await self.client.confirm_message(ctx.message)
 
+    async def get_error_channel(self):
+        """Get the configured channel from the cache"""
+        await self.client.wait_until_ready()
+
+        # Configure channel to send errors to
+        if settings.ERRORS_CHANNEL is not None:
+            channel = self.client.get_channel(settings.ERRORS_CHANNEL)
+
+            if isinstance(channel, NON_MESSAGEABLE_CHANNEL_TYPES):
+                logger.error(f"Configured error channel (id `{settings.ERRORS_CHANNEL}`) is not messageable.")
+            else:
+                self.client.error_channel = channel
+        elif self.client.owner_id is not None:
+            self.client.error_channel = self.client.get_user(self.client.owner_id)
+
     @tasks.loop(time=SOCIALLY_ACCEPTABLE_TIME)
     @timed_task(enums.TaskType.BIRTHDAYS)
     async def check_birthdays(self, **kwargs):
         """Check if it's currently anyone's birthday"""
         _ = kwargs
+
+        # Can't happen (task isn't started if this is None), but Mypy doesn't know
+        if settings.BIRTHDAY_ANNOUNCEMENT_CHANNEL is None:
+            return
 
         now = tz_aware_now().date()
         async with self.client.postgres_session as session:
@@ -122,10 +144,21 @@ class Tasks(commands.Cog):
 
         channel = self.client.get_channel(settings.BIRTHDAY_ANNOUNCEMENT_CHANNEL)
         if channel is None:
-            return await self.client.log_error("Unable to find channel for birthday announcements")
+            return await self.client.log_error("Unable to fetch channel for birthday announcements.")
+
+        if isinstance(channel, NON_MESSAGEABLE_CHANNEL_TYPES):
+            return await self.client.log_error(
+                f"Birthday announcement channel (id `{settings.BIRTHDAY_ANNOUNCEMENT_CHANNEL}`) is not messageable."
+            )
 
         for birthday in birthdays:
             user = self.client.get_user(birthday.user_id)
+
+            if user is None:
+                await self.client.log_error(
+                    f"Unable to fetch user with id `{birthday.user_id}` for birthday announcement"
+                )
+                continue
 
             await channel.send(random.choice(BIRTHDAY_MESSAGES).format(mention=user.mention))
 
@@ -145,6 +178,14 @@ class Tasks(commands.Cog):
         async with self.client.postgres_session as session:
             games = await fetch_free_games(self.client.http_session, session)
             channel = self.client.get_channel(settings.FREE_GAMES_CHANNEL)
+
+            if channel is None:
+                return await self.client.log_error("Unable to fetch channel for free games announcements.")
+
+            if isinstance(channel, NON_MESSAGEABLE_CHANNEL_TYPES):
+                return await self.client.log_error(
+                    f"Free games channel (id `{settings.FREE_GAMES_CHANNEL}`) is not messageable."
+                )
 
             for game in games:
                 await channel.send(embed=game.to_embed())
@@ -207,6 +248,17 @@ class Tasks(commands.Cog):
 
         async with self.client.postgres_session as db_session:
             announcements_channel = self.client.get_channel(settings.UFORA_ANNOUNCEMENTS_CHANNEL)
+
+            if announcements_channel is None:
+                return await self.client.log_error(
+                    f"Unable to fetch channel for ufora announcements (id `{settings.UFORA_ANNOUNCEMENTS_CHANNEL}`)."
+                )
+
+            if isinstance(announcements_channel, NON_MESSAGEABLE_CHANNEL_TYPES):
+                return await self.client.log_error(
+                    f"Ufora announcements channel (id `{settings.UFORA_ANNOUNCEMENTS_CHANNEL}`) is not messageable."
+                )
+
             announcements = await fetch_ufora_announcements(self.client.http_session, db_session)
 
             for announcement in announcements:
@@ -266,34 +318,16 @@ class Tasks(commands.Cog):
         async with self.client.postgres_session as session:
             await remove_old_announcements(session)
 
-    @tasks.loop(time=DAILY_RESET_TIME)
-    async def reset_wordle_word(self, forced: bool = False):
-        """Reset the daily Wordle word"""
-        async with self.client.postgres_session as session:
-            await set_daily_word(session, random.choice(tuple(self.client.wordle_words)), forced=forced)
-            await self.client.database_caches.wordle_word.invalidate(session)
-
-    @reset_wordle_word.before_loop
-    async def _before_reset_wordle_word(self):
-        await self.client.wait_until_ready()
-
     @check_birthdays.error
     @pull_schedules.error
     @pull_ufora_announcements.error
     @reminders.error
     @remove_old_ufora_announcements.error
-    @reset_wordle_word.error
     async def _on_tasks_error(self, error: BaseException):
         """Error handler for all tasks"""
         self.client.dispatch("task_error", error)
 
 
 async def setup(client: Didier):
-    """Load the cog
-
-    Initially fetch the wordle word from the database, or reset it
-    if there hasn't been a reset yet today
-    """
-    cog = Tasks(client)
-    await client.add_cog(cog)
-    await cog.reset_wordle_word()
+    """Load the cog"""
+    await client.add_cog(Tasks(client))

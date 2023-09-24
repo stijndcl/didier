@@ -38,4 +38,4 @@ async def get_deadlines(
         statement = statement.where(Deadline.course_id == course.course_id)
 
     statement = statement.options(selectinload(Deadline.course))
-    return (await session.execute(statement)).scalars().all()
+    return list((await session.execute(statement)).scalars().all())

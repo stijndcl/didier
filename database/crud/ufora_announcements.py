@@ -11,7 +11,7 @@ __all__ = ["create_new_announcement", "get_courses_with_announcements", "remove_
 async def get_courses_with_announcements(session: AsyncSession) -> list[UforaCourse]:
     """Get all courses where announcements are enabled"""
     statement = select(UforaCourse).where(UforaCourse.log_announcements)
-    return (await session.execute(statement)).scalars().all()
+    return list((await session.execute(statement)).scalars().all())
 
 
 async def create_new_announcement(

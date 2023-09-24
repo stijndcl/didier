@@ -13,4 +13,4 @@ async def fetch_xkcd_post(http_session: ClientSession, *, num: Optional[int] = N
     url = "https://xkcd.com" + (f"/{num}" if num is not None else "") + "/info.0.json"
 
     async with ensure_get(http_session, url) as response:
-        return XKCDPost.parse_obj(response)
+        return XKCDPost.model_validate(response)

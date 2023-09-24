@@ -42,7 +42,7 @@ class Owner(commands.Cog):
     def __init__(self, client: Didier):
         self.client = client
 
-    async def cog_check(self, ctx: commands.Context) -> bool:
+    async def cog_check(self, ctx: commands.Context) -> bool:  # type: ignore[override]
         """Global check for every command in this cog
 
         This means that we don't have to add is_owner() to every single command separately
@@ -102,7 +102,7 @@ class Owner(commands.Cog):
     async def add_msg(self, ctx: commands.Context):
         """Command group for [add X] message commands"""
 
-    @add_msg.command(name="Alias")
+    @add_msg.command(name="Alias")  # type: ignore[arg-type]
     async def add_alias_msg(self, ctx: commands.Context, command: str, alias: str):
         """Add a new alias for a custom command"""
         async with self.client.postgres_session as session:
@@ -116,7 +116,7 @@ class Owner(commands.Cog):
                 await ctx.reply("There is already a command with this name.")
                 await self.client.reject_message(ctx.message)
 
-    @add_msg.command(name="Custom")
+    @add_msg.command(name="Custom")  # type: ignore[arg-type]
     async def add_custom_msg(self, ctx: commands.Context, name: str, *, response: str):
         """Add a new custom command"""
         async with self.client.postgres_session as session:
@@ -127,7 +127,7 @@ class Owner(commands.Cog):
                 await ctx.reply("There is already a command with this name.")
                 await self.client.reject_message(ctx.message)
 
-    @add_msg.command(name="Link")
+    @add_msg.command(name="Link")  # type: ignore[arg-type]
     async def add_link_msg(self, ctx: commands.Context, name: str, url: str):
         """Add a new link"""
         async with self.client.postgres_session as session:
@@ -136,7 +136,7 @@ class Owner(commands.Cog):
 
         await self.client.confirm_message(ctx.message)
 
-    @add_slash.command(name="custom", description="Add a custom command")
+    @add_slash.command(name="custom", description="Add a custom command")  # type: ignore[arg-type]
     async def add_custom_slash(self, interaction: discord.Interaction):
         """Slash command to add a custom command"""
         if not await self.client.is_owner(interaction.user):
@@ -145,7 +145,7 @@ class Owner(commands.Cog):
         modal = CreateCustomCommand(self.client)
         await interaction.response.send_modal(modal)
 
-    @add_slash.command(name="dadjoke", description="Add a dad joke")
+    @add_slash.command(name="dadjoke", description="Add a dad joke")  # type: ignore[arg-type]
     async def add_dad_joke_slash(self, interaction: discord.Interaction):
         """Slash command to add a dad joke"""
         if not await self.client.is_owner(interaction.user):
@@ -154,7 +154,7 @@ class Owner(commands.Cog):
         modal = AddDadJoke(self.client)
         await interaction.response.send_modal(modal)
 
-    @add_slash.command(name="deadline", description="Add a deadline")
+    @add_slash.command(name="deadline", description="Add a deadline")  # type: ignore[arg-type]
     @app_commands.describe(course="The name of the course to add a deadline for (aliases work too)")
     async def add_deadline_slash(self, interaction: discord.Interaction, course: str):
         """Slash command to add a deadline"""
@@ -174,7 +174,7 @@ class Owner(commands.Cog):
         """Autocompletion for the 'course'-parameter"""
         return self.client.database_caches.ufora_courses.get_autocomplete_suggestions(current)
 
-    @add_slash.command(name="event", description="Add a new event")
+    @add_slash.command(name="event", description="Add a new event")  # type: ignore[arg-type]
     async def add_event_slash(self, interaction: discord.Interaction):
         """Slash command to add new events"""
         if not await self.client.is_owner(interaction.user):
@@ -183,7 +183,7 @@ class Owner(commands.Cog):
         modal = AddEvent(self.client)
         await interaction.response.send_modal(modal)
 
-    @add_slash.command(name="link", description="Add a new link")
+    @add_slash.command(name="link", description="Add a new link")  # type: ignore[arg-type]
     async def add_link_slash(self, interaction: discord.Interaction):
         """Slash command to add new links"""
         if not await self.client.is_owner(interaction.user):
@@ -192,7 +192,7 @@ class Owner(commands.Cog):
         modal = AddLink(self.client)
         await interaction.response.send_modal(modal)
 
-    @add_slash.command(name="meme", description="Add a new meme")
+    @add_slash.command(name="meme", description="Add a new meme")  # type: ignore[arg-type]
     async def add_meme_slash(self, interaction: discord.Interaction, name: str, imgflip_id: int, field_count: int):
         """Slash command to add new memes"""
         await interaction.response.defer(ephemeral=True)
@@ -205,11 +205,11 @@ class Owner(commands.Cog):
             await interaction.followup.send(f"Added meme `{meme.meme_id}`.")
             await self.client.database_caches.memes.invalidate(session)
 
-    @commands.group(name="Edit", case_insensitive=True, invoke_without_command=False)
+    @commands.group(name="Edit", case_insensitive=True, invoke_without_command=False)  # type: ignore[arg-type]
     async def edit_msg(self, ctx: commands.Context):
         """Command group for [edit X] commands"""
 
-    @edit_msg.command(name="Custom")
+    @edit_msg.command(name="Custom")  # type: ignore[arg-type]
     async def edit_custom_msg(self, ctx: commands.Context, command: str, *, flags: EditCustomFlags):
         """Edit an existing custom command"""
         async with self.client.postgres_session as session:
@@ -220,7 +220,7 @@ class Owner(commands.Cog):
                 await ctx.reply(f"No command found matching `{command}`.")
                 return await self.client.reject_message(ctx.message)
 
-    @edit_slash.command(name="custom", description="Edit a custom command")
+    @edit_slash.command(name="custom", description="Edit a custom command")  # type: ignore[arg-type]
     @app_commands.describe(command="The name of the command to edit")
     async def edit_custom_slash(self, interaction: discord.Interaction, command: str):
         """Slash command to edit a custom command"""

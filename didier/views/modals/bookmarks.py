@@ -25,24 +25,24 @@ class CreateBookmark(discord.ui.Modal, title="Create Bookmark"):
 
     @overrides
     async def on_submit(self, interaction: discord.Interaction):
+        await interaction.response.defer(ephemeral=True)
+
         label = self.name.value.strip()
 
         try:
             async with self.client.postgres_session as session:
                 bm = await create_bookmark(session, interaction.user.id, label, self.jump_url)
-                return await interaction.response.send_message(
-                    f"Bookmark `{label}` successfully created (`#{bm.bookmark_id}`).", ephemeral=True
+                return await interaction.followup.send(
+                    f"Bookmark `{label}` successfully created (`#{bm.bookmark_id}`)."
                 )
         except DuplicateInsertException:
             # Label is already in use
-            return await interaction.response.send_message(
-                f"You already have a bookmark named `{label}`.", ephemeral=True
-            )
+            return await interaction.followup.send(f"You already have a bookmark named `{label}`.")
         except ForbiddenNameException:
             # Label isn't allowed
-            return await interaction.response.send_message(f"Bookmarks cannot be named `{label}`.", ephemeral=True)
+            return await interaction.followup.send(f"Bookmarks cannot be named `{label}`.")
 
     @overrides
     async def on_error(self, interaction: discord.Interaction, error: Exception):  # type: ignore
-        await interaction.response.send_message("Something went wrong.", ephemeral=True)
+        await interaction.followup.send("Something went wrong.", ephemeral=True)
         traceback.print_tb(error.__traceback__)

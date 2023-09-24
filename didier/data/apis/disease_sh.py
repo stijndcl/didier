@@ -19,7 +19,7 @@ async def get_country_info(http_session: ClientSession, country: str) -> CovidDa
         yesterday = response
 
     data = {"today": today, "yesterday": yesterday}
-    return CovidData.parse_obj(data)
+    return CovidData.model_validate(data)
 
 
 async def get_global_info(http_session: ClientSession) -> CovidData:
@@ -35,4 +35,4 @@ async def get_global_info(http_session: ClientSession) -> CovidData:
         yesterday = response
 
     data = {"today": today, "yesterday": yesterday}
-    return CovidData.parse_obj(data)
+    return CovidData.model_validate(data)

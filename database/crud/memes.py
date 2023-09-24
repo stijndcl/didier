@@ -23,7 +23,7 @@ async def add_meme(session: AsyncSession, name: str, template_id: int, field_cou
 async def get_all_memes(session: AsyncSession) -> list[MemeTemplate]:
     """Get a list of all memes"""
     statement = select(MemeTemplate)
-    return (await session.execute(statement)).scalars().all()
+    return list((await session.execute(statement)).scalars().all())
 
 
 async def get_meme_by_name(session: AsyncSession, query: str) -> Optional[MemeTemplate]:

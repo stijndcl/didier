@@ -26,12 +26,14 @@ class AddDadJoke(discord.ui.Modal, title="Add Dad Joke"):
 
     @overrides
     async def on_submit(self, interaction: discord.Interaction):
+        await interaction.response.defer(ephemeral=True)
+
         async with self.client.postgres_session as session:
             joke = await add_dad_joke(session, str(self.joke.value))
 
-        await interaction.response.send_message(f"Successfully added joke #{joke.dad_joke_id}", ephemeral=True)
+        await interaction.followup.send(f"Successfully added joke #{joke.dad_joke_id}")
 
     @overrides
     async def on_error(self, interaction: discord.Interaction, error: Exception):  # type: ignore
-        await interaction.response.send_message("Something went wrong.", ephemeral=True)
+        await interaction.followup.send("Something went wrong.", ephemeral=True)
         traceback.print_tb(error.__traceback__)

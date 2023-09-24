@@ -13,7 +13,7 @@ class DebugCog(commands.Cog):
         self.client = client
 
     @overrides
-    async def cog_check(self, ctx: commands.Context) -> bool:
+    async def cog_check(self, ctx: commands.Context) -> bool:  # type:ignore[override]
         return await self.client.is_owner(ctx.author)
 
     @commands.command(aliases=["Dev"])

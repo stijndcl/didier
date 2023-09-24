@@ -1,26 +1,13 @@
 from __future__ import annotations
 
 from datetime import date, datetime
-from typing import Optional
+from typing import List, Optional
 
-from sqlalchemy import (
-    BigInteger,
-    Boolean,
-    Column,
-    Date,
-    DateTime,
-    Enum,
-    ForeignKey,
-    Integer,
-    Text,
-    UniqueConstraint,
-)
-from sqlalchemy.orm import declarative_base, relationship
+from sqlalchemy import BigInteger, ForeignKey, UniqueConstraint
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
+from sqlalchemy.types import DateTime
 
 from database import enums
-
-Base = declarative_base()
-
 
 __all__ = [
     "Base",
@@ -45,10 +32,14 @@ __all__ = [
     "UforaCourse",
     "UforaCourseAlias",
     "User",
-    "WordleGuess",
-    "WordleStats",
-    "WordleWord",
 ]
+
+
+class Base(DeclarativeBase):
+    """Required base class for all tables"""
+
+    # Make all DateTimes timezone-aware
+    type_annotation_map = {datetime: DateTime(timezone=True)}
 
 
 class Bank(Base):
@@ -56,22 +47,22 @@ class Bank(Base):
 
     __tablename__ = "bank"
 
-    bank_id: int = Column(Integer, primary_key=True)
-    user_id: int = Column(BigInteger, ForeignKey("users.user_id"))
+    bank_id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int] = mapped_column(BigInteger, ForeignKey("users.user_id"))
 
-    dinks: int = Column(BigInteger, server_default="0", nullable=False)
-    invested: int = Column(BigInteger, server_default="0", nullable=False)
+    dinks: Mapped[int] = mapped_column(BigInteger, server_default="0", nullable=False)
+    invested: Mapped[int] = mapped_column(BigInteger, server_default="0", nullable=False)
 
     # Interest rate
-    interest_level: int = Column(Integer, server_default="1", nullable=False)
+    interest_level: Mapped[int] = mapped_column(server_default="1", nullable=False)
 
     # Maximum amount that can be stored in the bank
-    capacity_level: int = Column(Integer, server_default="1", nullable=False)
+    capacity_level: Mapped[int] = mapped_column(server_default="1", nullable=False)
 
     # Maximum amount that can be robbed
-    rob_level: int = Column(Integer, server_default="1", nullable=False)
+    rob_level: Mapped[int] = mapped_column(server_default="1", nullable=False)
 
-    user: User = relationship("User", uselist=False, back_populates="bank", lazy="selectin")
+    user: Mapped[User] = relationship(uselist=False, back_populates="bank", lazy="selectin")
 
 
 class Birthday(Base):
@@ -79,11 +70,11 @@ class Birthday(Base):
 
     __tablename__ = "birthdays"
 
-    birthday_id: int = Column(Integer, primary_key=True)
-    user_id: int = Column(BigInteger, ForeignKey("users.user_id"))
-    birthday: date = Column(Date, nullable=False)
+    birthday_id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int] = mapped_column(BigInteger, ForeignKey("users.user_id"))
+    birthday: Mapped[date] = mapped_column(nullable=False)
 
-    user: User = relationship("User", uselist=False, back_populates="birthday", lazy="selectin")
+    user: Mapped[User] = relationship(uselist=False, back_populates="birthday", lazy="selectin")
 
 
 class Bookmark(Base):
@@ -92,26 +83,26 @@ class Bookmark(Base):
     __tablename__ = "bookmarks"
     __table_args__ = (UniqueConstraint("user_id", "label"),)
 
-    bookmark_id: int = Column(Integer, primary_key=True)
-    label: str = Column(Text, nullable=False)
-    jump_url: str = Column(Text, nullable=False)
-    user_id: int = Column(BigInteger, ForeignKey("users.user_id"))
+    bookmark_id: Mapped[int] = mapped_column(primary_key=True)
+    label: Mapped[str] = mapped_column(nullable=False)
+    jump_url: Mapped[str] = mapped_column(nullable=False)
+    user_id: Mapped[int] = mapped_column(BigInteger, ForeignKey("users.user_id"))
 
-    user: User = relationship("User", back_populates="bookmarks", uselist=False, lazy="selectin")
+    user: Mapped[User] = relationship(back_populates="bookmarks", uselist=False, lazy="selectin")
 
 
 class CommandStats(Base):
     """Metrics on how often commands are used"""
 
     __tablename__ = "command_stats"
-    command_stats_id: int = Column(Integer, primary_key=True)
-    command: str = Column(Text, nullable=False)
-    timestamp: datetime = Column(DateTime(timezone=True), nullable=False)
-    user_id: int = Column(BigInteger, ForeignKey("users.user_id"))
-    slash: bool = Column(Boolean, nullable=False)
-    context_menu: bool = Column(Boolean, nullable=False)
+    command_stats_id: Mapped[int] = mapped_column(primary_key=True)
+    command: Mapped[str] = mapped_column(nullable=False)
+    timestamp: Mapped[datetime] = mapped_column(nullable=False)
+    user_id: Mapped[int] = mapped_column(BigInteger, ForeignKey("users.user_id"))
+    slash: Mapped[bool] = mapped_column(nullable=False)
+    context_menu: Mapped[bool] = mapped_column(nullable=False)
 
-    user: User = relationship("User", back_populates="command_stats", uselist=False, lazy="selectin")
+    user: Mapped[User] = relationship(back_populates="command_stats", uselist=False, lazy="selectin")
 
 
 class CustomCommand(Base):
@@ -119,13 +110,13 @@ class CustomCommand(Base):
 
     __tablename__ = "custom_commands"
 
-    command_id: int = Column(Integer, primary_key=True)
-    name: str = Column(Text, nullable=False, unique=True)
-    indexed_name: str = Column(Text, nullable=False, index=True)
-    response: str = Column(Text, nullable=False)
+    command_id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str] = mapped_column(nullable=False, unique=True)
+    indexed_name: Mapped[str] = mapped_column(nullable=False, index=True)
+    response: Mapped[str] = mapped_column(nullable=False)
 
-    aliases: list[CustomCommandAlias] = relationship(
-        "CustomCommandAlias", back_populates="command", uselist=True, cascade="all, delete-orphan", lazy="selectin"
+    aliases: Mapped[List[CustomCommandAlias]] = relationship(
+        back_populates="command", uselist=True, cascade="all, delete-orphan", lazy="selectin"
     )
 
 
@@ -134,12 +125,12 @@ class CustomCommandAlias(Base):
 
     __tablename__ = "custom_command_aliases"
 
-    alias_id: int = Column(Integer, primary_key=True)
-    alias: str = Column(Text, nullable=False, unique=True)
-    indexed_alias: str = Column(Text, nullable=False, index=True)
-    command_id: int = Column(Integer, ForeignKey("custom_commands.command_id"))
+    alias_id: Mapped[int] = mapped_column(primary_key=True)
+    alias: Mapped[str] = mapped_column(nullable=False, unique=True)
+    indexed_alias: Mapped[str] = mapped_column(nullable=False, index=True)
+    command_id: Mapped[int] = mapped_column(ForeignKey("custom_commands.command_id"))
 
-    command: CustomCommand = relationship("CustomCommand", back_populates="aliases", uselist=False, lazy="selectin")
+    command: Mapped[CustomCommand] = relationship(back_populates="aliases", uselist=False, lazy="selectin")
 
 
 class DadJoke(Base):
@@ -147,8 +138,8 @@ class DadJoke(Base):
 
     __tablename__ = "dad_jokes"
 
-    dad_joke_id: int = Column(Integer, primary_key=True)
-    joke: str = Column(Text, nullable=False)
+    dad_joke_id: Mapped[int] = mapped_column(primary_key=True)
+    joke: Mapped[str] = mapped_column(nullable=False)
 
 
 class Deadline(Base):
@@ -156,12 +147,12 @@ class Deadline(Base):
 
     __tablename__ = "deadlines"
 
-    deadline_id: int = Column(Integer, primary_key=True)
-    course_id: int = Column(Integer, ForeignKey("ufora_courses.course_id"))
-    name: str = Column(Text, nullable=False)
-    deadline: datetime = Column(DateTime(timezone=True), nullable=False)
+    deadline_id: Mapped[int] = mapped_column(primary_key=True)
+    course_id: Mapped[int] = mapped_column(ForeignKey("ufora_courses.course_id"))
+    name: Mapped[str] = mapped_column(nullable=False)
+    deadline: Mapped[datetime] = mapped_column(nullable=False)
 
-    course: UforaCourse = relationship("UforaCourse", back_populates="deadlines", uselist=False, lazy="selectin")
+    course: Mapped[UforaCourse] = relationship(back_populates="deadlines", uselist=False, lazy="selectin")
 
 
 class EasterEgg(Base):
@@ -169,11 +160,11 @@ class EasterEgg(Base):
 
     __tablename__ = "easter_eggs"
 
-    easter_egg_id: int = Column(Integer, primary_key=True)
-    match: str = Column(Text, nullable=False)
-    response: str = Column(Text, nullable=False)
-    exact: bool = Column(Boolean, nullable=False, server_default="1")
-    startswith: bool = Column(Boolean, nullable=False, server_default="1")
+    easter_egg_id: Mapped[int] = mapped_column(primary_key=True)
+    match: Mapped[str] = mapped_column(nullable=False)
+    response: Mapped[str] = mapped_column(nullable=False)
+    exact: Mapped[bool] = mapped_column(nullable=False, server_default="1")
+    startswith: Mapped[bool] = mapped_column(nullable=False, server_default="1")
 
 
 class Event(Base):
@@ -181,11 +172,11 @@ class Event(Base):
 
     __tablename__ = "events"
 
-    event_id: int = Column(Integer, primary_key=True)
-    name: str = Column(Text, nullable=False)
-    description: Optional[str] = Column(Text, nullable=True)
-    notification_channel: int = Column(BigInteger, nullable=False)
-    timestamp: datetime = Column(DateTime(timezone=True), nullable=False)
+    event_id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str] = mapped_column(nullable=False)
+    description: Mapped[Optional[str]] = mapped_column(nullable=True)
+    notification_channel: Mapped[int] = mapped_column(BigInteger, nullable=False)
+    timestamp: Mapped[datetime] = mapped_column(nullable=False)
 
 
 class FreeGame(Base):
@@ -193,7 +184,7 @@ class FreeGame(Base):
 
     __tablename__ = "free_games"
 
-    free_game_id: int = Column(Integer, primary_key=True)
+    free_game_id: Mapped[int] = mapped_column(primary_key=True)
 
 
 class GitHubLink(Base):
@@ -201,11 +192,11 @@ class GitHubLink(Base):
 
     __tablename__ = "github_links"
 
-    github_link_id: int = Column(Integer, primary_key=True)
-    url: str = Column(Text, nullable=False, unique=True)
-    user_id: int = Column(BigInteger, ForeignKey("users.user_id"))
+    github_link_id: Mapped[int] = mapped_column(primary_key=True)
+    url: Mapped[str] = mapped_column(nullable=False, unique=True)
+    user_id: Mapped[int] = mapped_column(BigInteger, ForeignKey("users.user_id"))
 
-    user: User = relationship("User", back_populates="github_links", uselist=False, lazy="selectin")
+    user: Mapped[User] = relationship(back_populates="github_links", uselist=False, lazy="selectin")
 
 
 class Link(Base):
@@ -213,9 +204,9 @@ class Link(Base):
 
     __tablename__ = "links"
 
-    link_id: int = Column(Integer, primary_key=True)
-    name: str = Column(Text, nullable=False, unique=True)
-    url: str = Column(Text, nullable=False)
+    link_id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str] = mapped_column(nullable=False, unique=True)
+    url: Mapped[str] = mapped_column(nullable=False)
 
 
 class MemeTemplate(Base):
@@ -223,10 +214,10 @@ class MemeTemplate(Base):
 
     __tablename__ = "meme"
 
-    meme_id: int = Column(Integer, primary_key=True)
-    name: str = Column(Text, nullable=False, unique=True)
-    template_id: int = Column(Integer, nullable=False, unique=True)
-    field_count: int = Column(Integer, nullable=False)
+    meme_id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str] = mapped_column(nullable=False, unique=True)
+    template_id: Mapped[int] = mapped_column(nullable=False, unique=True)
+    field_count: Mapped[int] = mapped_column(nullable=False)
 
 
 class NightlyData(Base):
@@ -234,12 +225,12 @@ class NightlyData(Base):
 
     __tablename__ = "nightly_data"
 
-    nightly_id: int = Column(Integer, primary_key=True)
-    user_id: int = Column(BigInteger, ForeignKey("users.user_id"))
-    last_nightly: Optional[date] = Column(Date, nullable=True)
-    count: int = Column(Integer, server_default="0", nullable=False)
+    nightly_id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int] = mapped_column(BigInteger, ForeignKey("users.user_id"))
+    last_nightly: Mapped[Optional[date]] = mapped_column(nullable=True)
+    count: Mapped[int] = mapped_column(server_default="0", nullable=False)
 
-    user: User = relationship("User", back_populates="nightly_data", uselist=False, lazy="selectin")
+    user: Mapped[User] = relationship(back_populates="nightly_data", uselist=False, lazy="selectin")
 
 
 class Reminder(Base):
@@ -247,11 +238,11 @@ class Reminder(Base):
 
     __tablename__ = "reminders"
 
-    reminder_id: int = Column(Integer, primary_key=True)
-    user_id: int = Column(BigInteger, ForeignKey("users.user_id"))
-    category: enums.ReminderCategory = Column(Enum(enums.ReminderCategory), nullable=False)
+    reminder_id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int] = mapped_column(BigInteger, ForeignKey("users.user_id"))
+    category: Mapped[enums.ReminderCategory] = mapped_column(nullable=False)
 
-    user: User = relationship("User", back_populates="reminders", uselist=False, lazy="selectin")
+    user: Mapped[User] = relationship(back_populates="reminders", uselist=False, lazy="selectin")
 
 
 class Task(Base):
@@ -259,9 +250,9 @@ class Task(Base):
 
     __tablename__ = "tasks"
 
-    task_id: int = Column(Integer, primary_key=True)
-    task: enums.TaskType = Column(Enum(enums.TaskType), nullable=False, unique=True)
-    previous_run: datetime = Column(DateTime(timezone=True), nullable=True)
+    task_id: Mapped[int] = mapped_column(primary_key=True)
+    task: Mapped[enums.TaskType] = mapped_column(nullable=False, unique=True)
+    previous_run: Mapped[datetime] = mapped_column(nullable=True)
 
 
 class UforaCourse(Base):
@@ -269,25 +260,25 @@ class UforaCourse(Base):
 
     __tablename__ = "ufora_courses"
 
-    course_id: int = Column(Integer, primary_key=True)
-    name: str = Column(Text, nullable=False, unique=True)
-    code: str = Column(Text, nullable=False, unique=True)
-    year: int = Column(Integer, nullable=False)
-    compulsory: bool = Column(Boolean, server_default="1", nullable=False)
-    role_id: Optional[int] = Column(BigInteger, nullable=True, unique=False)
-    overarching_role_id: Optional[int] = Column(BigInteger, nullable=True, unique=False)
+    course_id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str] = mapped_column(nullable=False, unique=True)
+    code: Mapped[str] = mapped_column(nullable=False, unique=True)
+    year: Mapped[int] = mapped_column(nullable=False)
+    compulsory: Mapped[bool] = mapped_column(server_default="1", nullable=False)
+    role_id: Mapped[Optional[int]] = mapped_column(BigInteger, nullable=True, unique=False)
+    overarching_role_id: Mapped[Optional[int]] = mapped_column(BigInteger, nullable=True, unique=False)
     # This is not the greatest fix, but there can only ever be two, so it will do the job
-    alternative_overarching_role_id: Optional[int] = Column(BigInteger, nullable=True, unique=False)
-    log_announcements: bool = Column(Boolean, server_default="0", nullable=False)
+    alternative_overarching_role_id: Mapped[Optional[int]] = mapped_column(BigInteger, nullable=True, unique=False)
+    log_announcements: Mapped[bool] = mapped_column(server_default="0", nullable=False)
 
-    announcements: list[UforaAnnouncement] = relationship(
-        "UforaAnnouncement", back_populates="course", cascade="all, delete-orphan", lazy="selectin"
+    announcements: Mapped[List[UforaAnnouncement]] = relationship(
+        back_populates="course", cascade="all, delete-orphan", lazy="selectin"
     )
-    aliases: list[UforaCourseAlias] = relationship(
-        "UforaCourseAlias", back_populates="course", cascade="all, delete-orphan", lazy="selectin"
+    aliases: Mapped[List[UforaCourseAlias]] = relationship(
+        back_populates="course", cascade="all, delete-orphan", lazy="selectin"
     )
-    deadlines: list[Deadline] = relationship(
-        "Deadline", back_populates="course", cascade="all, delete-orphan", lazy="selectin"
+    deadlines: Mapped[List[Deadline]] = relationship(
+        back_populates="course", cascade="all, delete-orphan", lazy="selectin"
     )
 
 
@@ -296,11 +287,11 @@ class UforaCourseAlias(Base):
 
     __tablename__ = "ufora_course_aliases"
 
-    alias_id: int = Column(Integer, primary_key=True)
-    alias: str = Column(Text, nullable=False, unique=True)
-    course_id: int = Column(Integer, ForeignKey("ufora_courses.course_id"))
+    alias_id: Mapped[int] = mapped_column(primary_key=True)
+    alias: Mapped[str] = mapped_column(nullable=False, unique=True)
+    course_id: Mapped[int] = mapped_column(ForeignKey("ufora_courses.course_id"))
 
-    course: UforaCourse = relationship("UforaCourse", back_populates="aliases", uselist=False, lazy="selectin")
+    course: Mapped[UforaCourse] = relationship(back_populates="aliases", uselist=False, lazy="selectin")
 
 
 class UforaAnnouncement(Base):
@@ -308,11 +299,11 @@ class UforaAnnouncement(Base):
 
     __tablename__ = "ufora_announcements"
 
-    announcement_id: int = Column(Integer, primary_key=True)
-    course_id: int = Column(Integer, ForeignKey("ufora_courses.course_id"))
-    publication_date: date = Column(Date)
+    announcement_id: Mapped[int] = mapped_column(primary_key=True)
+    course_id: Mapped[int] = mapped_column(ForeignKey("ufora_courses.course_id"))
+    publication_date: Mapped[date] = mapped_column()
 
-    course: UforaCourse = relationship("UforaCourse", back_populates="announcements", uselist=False, lazy="selectin")
+    course: Mapped[UforaCourse] = relationship(back_populates="announcements", uselist=False, lazy="selectin")
 
 
 class User(Base):
@@ -320,70 +311,26 @@ class User(Base):
 
     __tablename__ = "users"
 
-    user_id: int = Column(BigInteger, primary_key=True)
+    user_id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
 
-    bank: Bank = relationship(
-        "Bank", back_populates="user", uselist=False, lazy="selectin", cascade="all, delete-orphan"
+    bank: Mapped[Bank] = relationship(
+        back_populates="user", uselist=False, lazy="selectin", cascade="all, delete-orphan"
     )
-    birthday: Optional[Birthday] = relationship(
-        "Birthday", back_populates="user", uselist=False, lazy="selectin", cascade="all, delete-orphan"
+    birthday: Mapped[Optional[Birthday]] = relationship(
+        back_populates="user", uselist=False, lazy="selectin", cascade="all, delete-orphan"
     )
-    bookmarks: list[Bookmark] = relationship(
-        "Bookmark", back_populates="user", uselist=True, lazy="selectin", cascade="all, delete-orphan"
+    bookmarks: Mapped[List[Bookmark]] = relationship(
+        back_populates="user", uselist=True, lazy="selectin", cascade="all, delete-orphan"
     )
-    command_stats: list[CommandStats] = relationship(
-        "CommandStats", back_populates="user", uselist=True, lazy="selectin", cascade="all, delete-orphan"
+    command_stats: Mapped[List[CommandStats]] = relationship(
+        back_populates="user", uselist=True, lazy="selectin", cascade="all, delete-orphan"
     )
-    github_links: list[GitHubLink] = relationship(
-        "GitHubLink", back_populates="user", uselist=True, lazy="selectin", cascade="all, delete-orphan"
+    github_links: Mapped[List[GitHubLink]] = relationship(
+        back_populates="user", uselist=True, lazy="selectin", cascade="all, delete-orphan"
     )
-    nightly_data: NightlyData = relationship(
-        "NightlyData", back_populates="user", uselist=False, lazy="selectin", cascade="all, delete-orphan"
+    nightly_data: Mapped[NightlyData] = relationship(
+        back_populates="user", uselist=False, lazy="selectin", cascade="all, delete-orphan"
     )
-    reminders: list[Reminder] = relationship(
-        "Reminder", back_populates="user", uselist=True, lazy="selectin", cascade="all, delete-orphan"
+    reminders: Mapped[List[Reminder]] = relationship(
+        back_populates="user", uselist=True, lazy="selectin", cascade="all, delete-orphan"
     )
-    wordle_guesses: list[WordleGuess] = relationship(
-        "WordleGuess", back_populates="user", uselist=True, lazy="selectin", cascade="all, delete-orphan"
-    )
-    wordle_stats: WordleStats = relationship(
-        "WordleStats", back_populates="user", uselist=False, lazy="selectin", cascade="all, delete-orphan"
-    )
-
-
-class WordleGuess(Base):
-    """A user's Wordle guesses for today"""
-
-    __tablename__ = "wordle_guesses"
-
-    wordle_guess_id: int = Column(Integer, primary_key=True)
-    user_id: int = Column(BigInteger, ForeignKey("users.user_id"))
-    guess: str = Column(Text, nullable=False)
-
-    user: User = relationship("User", back_populates="wordle_guesses", uselist=False, lazy="selectin")
-
-
-class WordleStats(Base):
-    """Stats about a user's wordle performance"""
-
-    __tablename__ = "wordle_stats"
-
-    wordle_stats_id: int = Column(Integer, primary_key=True)
-    user_id: int = Column(BigInteger, ForeignKey("users.user_id"))
-    last_win: Optional[date] = Column(Date, nullable=True)
-    games: int = Column(Integer, server_default="0", nullable=False)
-    wins: int = Column(Integer, server_default="0", nullable=False)
-    current_streak: int = Column(Integer, server_default="0", nullable=False)
-    highest_streak: int = Column(Integer, server_default="0", nullable=False)
-
-    user: User = relationship("User", back_populates="wordle_stats", uselist=False, lazy="selectin")
-
-
-class WordleWord(Base):
-    """The current Wordle word"""
-
-    __tablename__ = "wordle_word"
-
-    word_id: int = Column(Integer, primary_key=True)
-    word: str = Column(Text, nullable=False)
-    day: date = Column(Date, nullable=False, unique=True)
