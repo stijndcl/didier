@@ -1,10 +1,26 @@
 from sqlalchemy import delete, select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 from database.engine import DBSession
 from database.schemas import UforaCourse, UforaCourseAlias
 
 __all__ = ["main"]
+
+
+async def purge_aliases(session: AsyncSession):
+    """Delete old aliases for courses that will get a new id"""
+    codes = ["C004074", "C004073", "C004075", "C002309"]
+    for course_code in codes:
+        select_stmt = (
+            select(UforaCourse).where(UforaCourse.code == course_code).options(selectinload(UforaCourse.aliases))
+        )
+        course: UforaCourse = (await session.execute(select_stmt)).scalar_one()
+
+        for alias in list(course.aliases):
+            await session.delete(alias)
+
+    await session.commit()
 
 
 async def main():
@@ -15,6 +31,9 @@ async def main():
         delete_stmt = delete(UforaCourse).where(UforaCourse.code == "E018441")
         await session.execute(delete_stmt)
         await session.commit()
+
+        # Delete aliases of courses with new IDs
+        await purge_aliases(session)
 
         # Fix IDs of compulsory courses and enable announcements
         select_stmt = select(UforaCourse).where(UforaCourse.code == "C004074")
@@ -27,7 +46,7 @@ async def main():
         cg: UforaCourse = (await session.execute(select_stmt)).scalar_one()
         cg.course_id = 828293
         cg.log_announcements = True
-        session.add(bds)
+        session.add(cg)
 
         select_stmt = select(UforaCourse).where(UforaCourse.code == "C004075")
         stage: UforaCourse = (await session.execute(select_stmt)).scalar_one()
@@ -41,6 +60,14 @@ async def main():
         thesis.log_announcements = True
         session.add(thesis)
 
+        await session.commit()
+
+        # Add new aliases for these courses
+        cg_alias = UforaCourseAlias(course_id=cg.course_id, alias="Computer Graphics")
+        stage_alias = UforaCourseAlias(course_id=stage.course_id, alias="Stage")
+        thesis_alias = UforaCourseAlias(course_id=thesis.course_id, alias="Thesis")
+
+        session.add_all([cg_alias, stage_alias, thesis_alias])
         await session.commit()
 
         # New elective courses
