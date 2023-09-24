@@ -16,30 +16,29 @@ async def main():
         await session.execute(delete_stmt)
         await session.commit()
 
-        # Enable announcements for current courses
-        select_stmt = select(UforaCourse).where(UforaCourse.compulsory & (UforaCourse.year == 5))
-        second_master_courses: list[UforaCourse] = list((await session.execute(select_stmt)).scalars().all())
+        # Fix IDs of compulsory courses and enable announcements
+        select_stmt = select(UforaCourse).where(UforaCourse.code == "C004074")
+        bds: UforaCourse = (await session.execute(select_stmt)).scalar_one()
+        bds.course_id = 828305
+        bds.log_announcements = True
+        session.add(bds)
 
-        for course in second_master_courses:
-            course.log_announcements = True
-            session.add(course)
+        select_stmt = select(UforaCourse).where(UforaCourse.code == "C004073")
+        cg: UforaCourse = (await session.execute(select_stmt)).scalar_one()
+        cg.course_id = 828293
+        cg.log_announcements = True
+        session.add(bds)
 
-        select_stmt = select(UforaCourse).where(UforaCourse.code == "C003711")
-        comp_bio: UforaCourse = (await session.execute(select_stmt)).scalar_one()
-        comp_bio.log_announcements = True
-        session.add(comp_bio)
-
-        await session.commit()
-
-        # Fix IDs of courses
         select_stmt = select(UforaCourse).where(UforaCourse.code == "C004075")
         stage: UforaCourse = (await session.execute(select_stmt)).scalar_one()
         stage.course_id = 857878
+        stage.log_announcements = True
         session.add(stage)
 
-        select_stmt = select(UforaCourse).where(UforaCourse.code == "C002309A")
+        select_stmt = select(UforaCourse).where(UforaCourse.code == "C002309")
         thesis: UforaCourse = (await session.execute(select_stmt)).scalar_one()
         thesis.course_id = 828446
+        thesis.log_announcements = True
         session.add(thesis)
 
         await session.commit()
