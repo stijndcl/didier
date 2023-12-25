@@ -15,7 +15,7 @@ from didier.utils.types.string import abbreviate
 
 __all__ = ["SEPARATOR", "FreeGameEmbed"]
 
-SEPARATOR = " • Free • "
+SEPARATOR = " is free to claim at "
 
 
 def _get_store_info(store: str) -> tuple[Optional[str], discord.Colour]:
@@ -48,7 +48,7 @@ def _get_store_info(store: str) -> tuple[Optional[str], discord.Colour]:
 class FreeGameEmbed(EmbedPydantic):
     """Embed for free games"""
 
-    dc_identifier: int
+    id: int
     link: str
     title: str
 
@@ -103,15 +103,13 @@ class FreeGameEmbed(EmbedPydantic):
                     inline=False,
                 )
 
-            embed.add_field(name="Open in browser", value=f"[{self.link}]({self.link})")
+            embed.add_field(name="Open in browser", value=self.link)
 
             if self.store_page.xdg_open_url is not None:
-                embed.add_field(
-                    name="Open in app", value=f"[{self.store_page.xdg_open_url}]({self.store_page.xdg_open_url})"
-                )
+                embed.add_field(name="Open in app", value=self.store_page.xdg_open_url)
         else:
             embed.title = self.name
-            embed.add_field(name="Open in browser", value=f"[{self.link}]({self.link})")
+            embed.add_field(name="Open in browser", value=self.link)
 
         embed.url = self.link
 

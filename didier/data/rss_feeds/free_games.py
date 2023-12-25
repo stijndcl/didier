@@ -16,7 +16,7 @@ __all__ = ["fetch_free_games"]
 
 async def fetch_free_games(http_session: ClientSession, database_session: AsyncSession) -> list[FreeGameEmbed]:
     """Get a fresh list of free games"""
-    url = "https://pepeizqdeals.com/?call_custom_simple_rss=1&csrp_cat=12"
+    url = "https://pepeizqdeals.com/rss-en.xml"
     async with http_session.get(url) as response:
         if response.status != HTTPStatus.OK:
             logger.error("Free games GET-request failed with status code %d." % response.status)
@@ -34,7 +34,7 @@ async def fetch_free_games(http_session: ClientSession, database_session: AsyncS
 
         game = FreeGameEmbed.model_validate(entry)
         games.append(game)
-        game_ids.append(game.dc_identifier)
+        game_ids.append(game.id)
 
     # Filter out games that we already know
     filtered_ids = await filter_present_games(database_session, game_ids)
@@ -42,7 +42,7 @@ async def fetch_free_games(http_session: ClientSession, database_session: AsyncS
     # Insert new games into the database
     await add_free_games(database_session, filtered_ids)
 
-    games = list(filter(lambda x: x.dc_identifier in filtered_ids, games))
+    games = list(filter(lambda x: x.id in filtered_ids, games))
 
     # Look up additional info
     for game in games:
