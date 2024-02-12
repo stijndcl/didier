@@ -121,10 +121,6 @@ class Didier(commands.Bot):
             # Allow checking against initial extensions more easily
             full_name = parent_path + file
 
-            # The currency cog is disabled
-            if "currency" in file:
-                continue
-
             # Only take Python files, and ignore the ones starting with an underscore (like __init__ and __pycache__)
             # Also ignore the files that we have already loaded previously
             if file.endswith(".py") and not file.startswith("_") and not full_name.startswith(self.initial_extensions):

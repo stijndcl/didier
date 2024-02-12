@@ -15,12 +15,14 @@ from database.utils.math.currency import (
 __all__ = [
     "add_dinks",
     "claim_nightly",
+    "gamble_dinks",
     "get_bank",
     "get_nightly_data",
     "invest",
     "upgrade_capacity",
     "upgrade_interest",
     "upgrade_rob",
+    "withdraw",
     "NIGHTLY_AMOUNT",
 ]
 
@@ -40,7 +42,7 @@ async def get_nightly_data(session: AsyncSession, user_id: int) -> NightlyData:
 
 
 async def invest(session: AsyncSession, user_id: int, amount: Union[str, int]) -> int:
-    """Invest all your Dinks"""
+    """Invest some of your Dinks"""
     bank = await get_bank(session, user_id)
     if amount == "all":
         amount = bank.dinks
@@ -54,6 +56,22 @@ async def invest(session: AsyncSession, user_id: int, amount: Union[str, int]) -
     session.add(bank)
     await session.commit()
 
+    return amount
+
+
+async def withdraw(session: AsyncSession, user_id: int, amount: Union[str, int]) -> int:
+    """Withdraw your invested Dinks"""
+    bank = await get_bank(session, user_id)
+    if amount == "all":
+        amount = bank.invested
+
+    # Don't allow withdrawing more dinks than you own
+    amount = min(bank.invested, int(amount))
+
+    bank.dinks += amount
+    bank.invested -= amount
+
+    await session.commit()
     return amount
 
 
@@ -135,3 +153,20 @@ async def upgrade_rob(session: AsyncSession, user_id: int) -> int:
     await session.commit()
 
     return bank.rob_level
+
+
+async def gamble_dinks(
+    session: AsyncSession, user_id: int, amount: Union[str, int], payout_factor: int, won: bool
+) -> int:
+    """Gamble some of your Dinks"""
+    bank = await get_bank(session, user_id)
+    if amount == "all":
+        amount = bank.dinks
+
+    amount = min(amount, bank.dinks)
+
+    sign = 1 if won else -1
+    factor = (payout_factor - 1) if won else 1
+    await add_dinks(session, user_id, sign * amount * factor)
+
+    return amount * factor

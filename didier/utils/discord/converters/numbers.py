@@ -14,7 +14,7 @@ def abbreviated_number(argument: str) -> Union[str, int]:
     if not argument:
         raise ValueError
 
-    if argument.lower() == "all":
+    if argument.lower() == "all" or argument == "*":
         return "all"
 
     if argument.isdecimal():

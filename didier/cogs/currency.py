@@ -1,3 +1,4 @@
+# flake8: noqa: E800
 import typing
 
 import discord
@@ -38,7 +39,7 @@ class Currency(commands.Cog):
             await crud.add_dinks(session, user.id, amount)
             plural = pluralize("Didier Dink", amount)
             await ctx.reply(
-                f"**{ctx.author.display_name}** has awarded **{user.display_name}** **{amount}** {plural}.",
+                f"**{ctx.author.display_name}** has awarded **{user.display_name}** with **{amount}** {plural}.",
                 mention_author=False,
             )
 
@@ -48,7 +49,8 @@ class Currency(commands.Cog):
         async with self.client.postgres_session as session:
             bank = await crud.get_bank(session, ctx.author.id)
 
-        embed = discord.Embed(title=f"{ctx.author.display_name}'s Bank", colour=discord.Colour.blue())
+        embed = discord.Embed(title="Bank of Didier", colour=discord.Colour.blue())
+        embed.set_author(name=ctx.author.display_name)
 
         if ctx.author.avatar is not None:
             embed.set_thumbnail(url=ctx.author.avatar.url)
@@ -59,9 +61,9 @@ class Currency(commands.Cog):
 
         await ctx.reply(embed=embed, mention_author=False)
 
-    @bank.group(  # type: ignore[arg-type]
-        name="upgrade", aliases=["u", "upgrades"], case_insensitive=True, invoke_without_command=True
-    )
+    # @bank.group(  # type: ignore[arg-type]
+    #     name="upgrade", aliases=["u", "upgrades"], case_insensitive=True, invoke_without_command=True
+    # )
     async def bank_upgrades(self, ctx: commands.Context):
         """List the upgrades you can buy & their prices."""
         async with self.client.postgres_session as session:
@@ -81,7 +83,7 @@ class Currency(commands.Cog):
 
         await ctx.reply(embed=embed, mention_author=False)
 
-    @bank_upgrades.command(name="capacity", aliases=["c"])  # type: ignore[arg-type]
+    # @bank_upgrades.command(name="capacity", aliases=["c"])  # type: ignore[arg-type]
     async def bank_upgrade_capacity(self, ctx: commands.Context):
         """Upgrade the capacity level of your bank."""
         async with self.client.postgres_session as session:
@@ -92,7 +94,7 @@ class Currency(commands.Cog):
                 await ctx.reply("You don't have enough Didier Dinks to do this.", mention_author=False)
                 await self.client.reject_message(ctx.message)
 
-    @bank_upgrades.command(name="interest", aliases=["i"])  # type: ignore[arg-type]
+    # @bank_upgrades.command(name="interest", aliases=["i"])  # type: ignore[arg-type]
     async def bank_upgrade_interest(self, ctx: commands.Context):
         """Upgrade the interest level of your bank."""
         async with self.client.postgres_session as session:
@@ -103,7 +105,7 @@ class Currency(commands.Cog):
                 await ctx.reply("You don't have enough Didier Dinks to do this.", mention_author=False)
                 await self.client.reject_message(ctx.message)
 
-    @bank_upgrades.command(name="rob", aliases=["r"])  # type: ignore[arg-type]
+    # @bank_upgrades.command(name="rob", aliases=["r"])  # type: ignore[arg-type]
     async def bank_upgrade_rob(self, ctx: commands.Context):
         """Upgrade the rob level of your bank."""
         async with self.client.postgres_session as session:
@@ -122,12 +124,12 @@ class Currency(commands.Cog):
             plural = pluralize("Didier Dink", bank.dinks)
             await ctx.reply(f"**{ctx.author.display_name}** has **{bank.dinks}** {plural}.", mention_author=False)
 
-    @commands.command(name="invest", aliases=["deposit", "dep"])  # type: ignore[arg-type]
+    @commands.command(name="invest", aliases=["deposit", "dep", "i"])  # type: ignore[arg-type]
     async def invest(self, ctx: commands.Context, amount: typing.Annotated[typing.Union[str, int], abbreviated_number]):
         """Invest `amount` Didier Dinks into your bank.
 
         The `amount`-argument can take both raw numbers, and abbreviations of big numbers. Additionally, passing
-        `all` as the value will invest all of your Didier Dinks.
+        `all` or `*` as the value will invest all of your Didier Dinks.
 
         Example usage:
         ```
@@ -137,6 +139,9 @@ class Currency(commands.Cog):
         didier invest 5.3b
         ```
         """
+        if isinstance(amount, int) and amount <= 0:
+            return await ctx.reply("Amount of Didier Dinks to invest must be a strictly positive integer.")
+
         async with self.client.postgres_session as session:
             invested = await crud.invest(session, ctx.author.id, amount)
             plural = pluralize("Didier Dink", invested)
@@ -144,9 +149,24 @@ class Currency(commands.Cog):
             if invested == 0:
                 await ctx.reply("You don't have any Didier Dinks to invest.", mention_author=False)
             else:
-                await ctx.reply(
-                    f"**{ctx.author.display_name}** has invested **{invested}** {plural}.", mention_author=False
-                )
+                await ctx.reply(f"You have invested **{invested}** {plural}.", mention_author=False)
+
+    @commands.command(name="withdraw", aliases=["uninvest", "w"])  # type: ignore[arg-type]
+    async def withdraw(
+        self, ctx: commands.Context, amount: typing.Annotated[typing.Union[str, int], abbreviated_number]
+    ):
+        """Withdraw some of your invested Didier Dinks from your bank."""
+        if isinstance(amount, int) and amount <= 0:
+            return await ctx.reply("Amount of Didier Dinks to invest must be a strictly positive integer.")
+
+        async with self.client.postgres_session as session:
+            withdrawn = await crud.withdraw(session, ctx.author.id, amount)
+            plural = pluralize("Didier Dink", withdrawn)
+
+            if withdrawn == 0:
+                await ctx.reply("You don't have any Didier Dinks to withdraw.", mention_author=False)
+            else:
+                await ctx.reply(f"You have withdrawn **{withdrawn}** {plural}.", mention_author=False)
 
     @commands.hybrid_command(name="nightly")  # type: ignore[arg-type]
     async def nightly(self, ctx: commands.Context):
