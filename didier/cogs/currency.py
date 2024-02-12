@@ -39,7 +39,7 @@ class Currency(commands.Cog):
             await crud.add_dinks(session, user.id, amount)
             plural = pluralize("Didier Dink", amount)
             await ctx.reply(
-                f"**{ctx.author.display_name}** has awarded **{user.display_name}** with **{amount}** {plural}.",
+                f"{ctx.author.display_name} has awarded **{user.display_name}** with **{amount}** {plural}.",
                 mention_author=False,
             )
 
@@ -122,7 +122,7 @@ class Currency(commands.Cog):
         async with self.client.postgres_session as session:
             bank = await crud.get_bank(session, ctx.author.id)
             plural = pluralize("Didier Dink", bank.dinks)
-            await ctx.reply(f"**{ctx.author.display_name}** has **{bank.dinks}** {plural}.", mention_author=False)
+            await ctx.reply(f"You have **{bank.dinks}** {plural}.", mention_author=False)
 
     @commands.command(name="invest", aliases=["deposit", "dep", "i"])  # type: ignore[arg-type]
     async def invest(self, ctx: commands.Context, amount: typing.Annotated[typing.Union[str, int], abbreviated_number]):
@@ -174,7 +174,9 @@ class Currency(commands.Cog):
         async with self.client.postgres_session as session:
             try:
                 await crud.claim_nightly(session, ctx.author.id)
-                await ctx.reply(f"You've claimed your daily **{crud.NIGHTLY_AMOUNT}** Didier Dinks.")
+                await ctx.reply(
+                    f"You've claimed your daily **{crud.NIGHTLY_AMOUNT}** Didier Dinks.", mention_author=False
+                )
             except DoubleNightly:
                 await ctx.reply(
                     "You've already claimed your Didier Nightly today.", mention_author=False, ephemeral=True
