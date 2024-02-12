@@ -54,14 +54,55 @@ class Owner(commands.Cog):
         """Raise an exception for debugging purposes"""
         raise Exception(message)
 
+    @commands.command(name="unload")
+    async def unload(self, ctx: commands.Context, *cogs: str):
+        """Unload the cogs passed as an argument"""
+        unloaded = []
+        skipped = []
+
+        for cog in cogs:
+            try:
+                await self.client.unload_extension(f"didier.cogs.{cog}")
+                unloaded.append(cog)
+            except commands.ExtensionNotLoaded:
+                skipped.append(cog)
+
+        await self.client.confirm_message(ctx.message)
+        loaded_message = ", ".join(unloaded) if unloaded else "none"
+        skipped_message = ", ".join(skipped) if skipped else "none"
+
+        await ctx.reply(f"Successfully unloaded {loaded_message} (skipped {skipped_message}).", mention_author=False)
+
+    @commands.command(name="load")
+    async def load(self, ctx: commands.Context, *cogs: str):
+        """Load the cogs passed as an argument"""
+        loaded = []
+        skipped = []
+
+        for cog in cogs:
+            try:
+                await self.client.load_extension(f"didier.cogs.{cog}")
+                loaded.append(cog)
+            except commands.ExtensionAlreadyLoaded:
+                skipped.append(cog)
+
+        await self.client.confirm_message(ctx.message)
+        loaded_message = ", ".join(loaded) if loaded else "none"
+        skipped_message = ", ".join(skipped) if skipped else "none"
+
+        await ctx.reply(f"Successfully loaded {loaded_message} (skipped {skipped_message}).", mention_author=False)
+
     @commands.command(name="Reload")
     async def reload(self, ctx: commands.Context, *cogs: str):
         """Reload the cogs passed as an argument"""
         for cog in cogs:
-            await self.client.reload_extension(f"didier.cogs.{cog}")
+            try:
+                await self.client.reload_extension(f"didier.cogs.{cog}")
+            except commands.ExtensionNotLoaded:
+                await self.client.load_extension(f"didier.cogs.{cog}")
 
         await self.client.confirm_message(ctx.message)
-        return await ctx.reply(f"Successfully reloaded {', '.join(cogs)}.", mention_author=False)
+        await ctx.reply(f"Successfully reloaded {', '.join(cogs)}.", mention_author=False)
 
     @commands.command(name="Sync")
     async def sync(
