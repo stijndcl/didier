@@ -163,7 +163,7 @@ async def gamble_dinks(
     if amount == "all":
         amount = bank.dinks
 
-    amount = min(amount, bank.dinks)
+    amount = min(int(amount), bank.dinks)
 
     sign = 1 if won else -1
     factor = (payout_factor - 1) if won else 1

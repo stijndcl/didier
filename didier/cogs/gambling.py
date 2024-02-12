@@ -31,11 +31,11 @@ class Gambling(commands.Cog):
         result: str = random.choice(["heads", "tails"])
 
         # No stakes
+        if amount is None:
+            return await ctx.reply(f"{result.capitalize()}!", mention_author=False)
+
         if guess is None:
-            if amount is None:
-                return await ctx.reply(f"{result.capitalize()}!", mention_author=False)
-            else:
-                guess = random.choice(["heads", "tails"])
+            guess = random.choice(["heads", "tails"])
 
         guess = guess.lower()
 
