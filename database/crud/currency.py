@@ -47,6 +47,9 @@ async def invest(session: AsyncSession, user_id: int, amount: Union[str, int]) -
     if amount == "all":
         amount = bank.dinks
 
+    if bank.dinks <= 0:
+        return 0
+
     # Don't allow investing more dinks than you own
     amount = min(bank.dinks, int(amount))
 
@@ -158,10 +161,13 @@ async def upgrade_rob(session: AsyncSession, user_id: int) -> int:
 async def gamble_dinks(
     session: AsyncSession, user_id: int, amount: Union[str, int], payout_factor: int, won: bool
 ) -> int:
-    """Gamble some of your Dinks"""
+    """Gamble some of your Didier Dinks"""
     bank = await get_bank(session, user_id)
     if amount == "all":
         amount = bank.dinks
+
+    if bank.dinks <= 0:
+        return 0
 
     amount = min(int(amount), bank.dinks)
 
@@ -170,3 +176,16 @@ async def gamble_dinks(
     await add_dinks(session, user_id, sign * amount * factor)
 
     return amount * factor
+
+
+async def rob(session: AsyncSession, amount: int, robber_id: int, robbed_id: int):
+    """Rob another user's Didier Dinks"""
+    robber = await get_bank(session, robber_id)
+    robbed = await get_bank(session, robbed_id)
+
+    robber.dinks += amount
+    robbed.dinks -= amount
+
+    session.add(robber)
+    session.add(robbed)
+    await session.commit()

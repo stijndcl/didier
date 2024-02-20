@@ -1,17 +1,25 @@
 # flake8: noqa: E800
+import asyncio
+import math
+import random
 import typing
 
 import discord
 from discord.ext import commands
 
+import settings
 from database.crud import currency as crud
+from database.crud.jail import get_user_jail
 from database.exceptions.currency import DoubleNightly, NotEnoughDinks
 from database.utils.math.currency import (
     capacity_upgrade_price,
     interest_upgrade_price,
+    rob_amount,
+    rob_chance,
     rob_upgrade_price,
 )
 from didier import Didier
+from didier.utils.discord import colours
 from didier.utils.discord.checks import is_owner
 from didier.utils.discord.converters import abbreviated_number
 from didier.utils.types.string import pluralize
@@ -21,10 +29,12 @@ class Currency(commands.Cog):
     """Everything Dinks-related."""
 
     client: Didier
+    _rob_lock: asyncio.Lock
 
     def __init__(self, client: Didier):
         super().__init__()
         self.client = client
+        self._rob_lock = asyncio.Lock()
 
     @commands.command(name="award")  # type: ignore[arg-type]
     @commands.check(is_owner)
@@ -61,9 +71,9 @@ class Currency(commands.Cog):
 
         await ctx.reply(embed=embed, mention_author=False)
 
-    # @bank.group(  # type: ignore[arg-type]
-    #     name="upgrade", aliases=["u", "upgrades"], case_insensitive=True, invoke_without_command=True
-    # )
+    @bank.group(  # type: ignore[arg-type]
+        name="upgrade", aliases=["u", "upgrades"], case_insensitive=True, invoke_without_command=True
+    )
     async def bank_upgrades(self, ctx: commands.Context):
         """List the upgrades you can buy & their prices."""
         async with self.client.postgres_session as session:
@@ -83,7 +93,7 @@ class Currency(commands.Cog):
 
         await ctx.reply(embed=embed, mention_author=False)
 
-    # @bank_upgrades.command(name="capacity", aliases=["c"])  # type: ignore[arg-type]
+    @bank_upgrades.command(name="capacity", aliases=["c"])  # type: ignore[arg-type]
     async def bank_upgrade_capacity(self, ctx: commands.Context):
         """Upgrade the capacity level of your bank."""
         async with self.client.postgres_session as session:
@@ -94,7 +104,7 @@ class Currency(commands.Cog):
                 await ctx.reply("You don't have enough Didier Dinks to do this.", mention_author=False)
                 await self.client.reject_message(ctx.message)
 
-    # @bank_upgrades.command(name="interest", aliases=["i"])  # type: ignore[arg-type]
+    @bank_upgrades.command(name="interest", aliases=["i"])  # type: ignore[arg-type]
     async def bank_upgrade_interest(self, ctx: commands.Context):
         """Upgrade the interest level of your bank."""
         async with self.client.postgres_session as session:
@@ -105,7 +115,7 @@ class Currency(commands.Cog):
                 await ctx.reply("You don't have enough Didier Dinks to do this.", mention_author=False)
                 await self.client.reject_message(ctx.message)
 
-    # @bank_upgrades.command(name="rob", aliases=["r"])  # type: ignore[arg-type]
+    @bank_upgrades.command(name="rob", aliases=["r"])  # type: ignore[arg-type]
     async def bank_upgrade_rob(self, ctx: commands.Context):
         """Upgrade the rob level of your bank."""
         async with self.client.postgres_session as session:
@@ -181,6 +191,70 @@ class Currency(commands.Cog):
                 await ctx.reply(
                     "You've already claimed your Didier Nightly today.", mention_author=False, ephemeral=True
                 )
+
+    @commands.hybrid_command(name="rob")  # type: ignore[arg-type]
+    @commands.cooldown(rate=1, per=10 * 60.0, type=commands.BucketType.user)
+    @commands.guild_only()
+    async def rob(self, ctx: commands.Context, member: discord.Member):
+        """Attempt to rob another user of their Dinks"""
+        if member == ctx.author:
+            return await ctx.reply("You can't rob yourself.", mention_author=False, ephemeral=True)
+
+        if member == self.client.user:
+            return await ctx.reply(settings.DISCORD_BOOS_REACT, mention_author=False)
+
+        if member.bot:
+            return await ctx.reply("You can't rob bots.", mention_author=False, ephemeral=True)
+
+        # Use a Lock for robbing to avoid race conditions when robbing the same person twice
+        # This would cause undefined behaviour
+        async with ctx.typing(), self._rob_lock, self.client.postgres_session as session:
+            robber = await crud.get_bank(session, ctx.author.id)
+            robbed = await crud.get_bank(session, member.id)
+
+            if robber.dinks <= 0:
+                return await ctx.reply(
+                    "You can't rob without dinks. Just stop being poor lol", mention_author=False, ephemeral=True
+                )
+
+            if robbed.dinks <= 0:
+                return await ctx.reply(
+                    f"{member.display_name} doesn't have any dinks to rob.", mention_author=False, ephemeral=True
+                )
+
+            rob_roll = random.random()
+            success_chance = rob_chance(robber.rob_level)
+            success = rob_roll <= success_chance
+
+            if success:
+                max_rob_amount = random.uniform(0.15, 1.0) * rob_amount(robber.rob_level)
+                robbed_amount = min(robbed.dinks, math.floor(max_rob_amount))
+                await crud.rob(session, robbed_amount, ctx.author.id, member.id)
+                return await ctx.reply(
+                    f"{ctx.author.display_name} has robbed **{robbed_amount}** Didier Dinks from {member.display_name}!",
+                    mention_author=False,
+                )
+
+    @commands.hybrid_command(name="jail")
+    async def jail(self, ctx: commands.Context):
+        """Check how long you're still in jail for"""
+        async with self.client.postgres_session as session:
+            entry = await get_user_jail(session, ctx.author.id)
+
+        if entry is None:
+            embed = discord.Embed(
+                title="Didier Jail", colour=colours.error_red(), description="You're not currently in jail."
+            )
+
+            return await ctx.reply(embed=embed, mention_author=False, ephemeral=True)
+
+        embed = discord.Embed(
+            title="Didier Jail",
+            colour=colours.jail_gray(),
+            description=f"You will be released <t:{entry.until.timestamp()}:R>.",
+        )
+
+        return await ctx.reply(embed=embed, mention_author=False)
 
 
 async def setup(client: Didier):

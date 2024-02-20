@@ -310,6 +310,14 @@ class Didier(commands.Bot):
         ):
             return await ctx.reply(str(exception.original), mention_author=False)
 
+        if isinstance(exception, (discord.app_commands.CommandOnCooldown, commands.CommandOnCooldown)):
+            return await ctx.reply(
+                f"You have to wait another {exception.retry_after} seconds before "
+                f"attempting to use this command again.",
+                ephemeral=True,
+                delete_after=10,
+            )
+
         if isinstance(exception, commands.MessageNotFound):
             return await ctx.reply("This message could not be found.", ephemeral=True, delete_after=10)
 
@@ -331,6 +339,12 @@ class Didier(commands.Bot):
             ),
         ):
             return await ctx.reply("Invalid arguments.", ephemeral=True, delete_after=10)
+
+        if isinstance(exception, commands.NoPrivateMessage):
+            if ctx.command.name == "rob":
+                return await ctx.reply("Robbing in DM? That's low, even for you.", ephemeral=True)
+
+            return await ctx.reply("This command cannot be used in DMs.", ephemeral=True)
 
         # Print everything that we care about to the logs/stderr
         await super().on_command_error(ctx, exception)

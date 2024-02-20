@@ -23,6 +23,7 @@ __all__ = [
     "Event",
     "FreeGame",
     "GitHubLink",
+    "Jail",
     "Link",
     "MemeTemplate",
     "NightlyData",
@@ -199,6 +200,18 @@ class GitHubLink(Base):
     user: Mapped[User] = relationship(back_populates="github_links", uselist=False, lazy="selectin")
 
 
+class Jail(Base):
+    """A user sitting in Didier Jail"""
+
+    __tablename__ = "jail"
+
+    jail_entry_i: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int] = mapped_column(BigInteger, ForeignKey("users.user_id"))
+    until: Mapped[datetime] = mapped_column(nullable=False)
+
+    user: Mapped[User] = relationship(back_populates="jail", uselist=False, lazy="selectin")
+
+
 class Link(Base):
     """Useful links that go useful places"""
 
@@ -327,6 +340,9 @@ class User(Base):
     )
     github_links: Mapped[List[GitHubLink]] = relationship(
         back_populates="user", uselist=True, lazy="selectin", cascade="all, delete-orphan"
+    )
+    jail: Mapped[Optional[Jail]] = relationship(
+        back_populates="user", uselist=False, lazy="selectin", cascade="all, delete-orphan"
     )
     nightly_data: Mapped[NightlyData] = relationship(
         back_populates="user", uselist=False, lazy="selectin", cascade="all, delete-orphan"

@@ -7,6 +7,7 @@ __all__ = [
     "ghent_university_blue",
     "ghent_university_yellow",
     "google_blue",
+    "jail_gray",
     "steam_blue",
     "urban_dictionary_green",
     "xkcd_blue",
@@ -39,6 +40,10 @@ def gog_purple() -> discord.Colour:
 
 def google_blue() -> discord.Colour:
     return discord.Colour.from_rgb(66, 133, 244)
+
+
+def jail_gray() -> discord.Colour:
+    return discord.Colour.from_rgb(85, 85, 85)
 
 
 def steam_blue() -> discord.Colour:
