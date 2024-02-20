@@ -1,5 +1,5 @@
 from datetime import date
-from typing import Union
+from typing import Optional, Union
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -15,6 +15,7 @@ from database.utils.math.currency import (
 __all__ = [
     "add_dinks",
     "claim_nightly",
+    "deduct_dinks",
     "gamble_dinks",
     "get_bank",
     "get_nightly_data",
@@ -41,9 +42,9 @@ async def get_nightly_data(session: AsyncSession, user_id: int) -> NightlyData:
     return user.nightly_data
 
 
-async def invest(session: AsyncSession, user_id: int, amount: Union[str, int]) -> int:
+async def invest(session: AsyncSession, user_id: int, amount: Union[str, int], *, bank: Optional[Bank] = None) -> int:
     """Invest some of your Dinks"""
-    bank = await get_bank(session, user_id)
+    bank = bank or await get_bank(session, user_id)
     if amount == "all":
         amount = bank.dinks
 
@@ -62,9 +63,9 @@ async def invest(session: AsyncSession, user_id: int, amount: Union[str, int]) -
     return amount
 
 
-async def withdraw(session: AsyncSession, user_id: int, amount: Union[str, int]) -> int:
+async def withdraw(session: AsyncSession, user_id: int, amount: Union[str, int], *, bank: Optional[Bank] = None) -> int:
     """Withdraw your invested Dinks"""
-    bank = await get_bank(session, user_id)
+    bank = bank or await get_bank(session, user_id)
     if amount == "all":
         amount = bank.invested
 
@@ -74,19 +75,33 @@ async def withdraw(session: AsyncSession, user_id: int, amount: Union[str, int])
     bank.dinks += amount
     bank.invested -= amount
 
+    session.add(bank)
     await session.commit()
     return amount
 
 
-async def add_dinks(session: AsyncSession, user_id: int, amount: int):
+async def add_dinks(session: AsyncSession, user_id: int, amount: int, *, bank: Optional[Bank] = None):
     """Increase the Dinks counter for a user"""
-    bank = await get_bank(session, user_id)
+    bank = bank or await get_bank(session, user_id)
     bank.dinks += amount
     session.add(bank)
     await session.commit()
 
 
-async def claim_nightly(session: AsyncSession, user_id: int):
+async def deduct_dinks(session: AsyncSession, user_id: int, amount: int, *, bank: Optional[Bank] = None) -> int:
+    """Decrease the Dinks counter for a user"""
+    bank = bank or await get_bank(session, user_id)
+
+    deducted_amount = min(amount, bank.dinks)
+
+    bank.dinks -= deducted_amount
+    session.add(bank)
+    await session.commit()
+
+    return deducted_amount
+
+
+async def claim_nightly(session: AsyncSession, user_id: int, *, bank: Optional[Bank] = None):
     """Claim daily Dinks"""
     nightly_data = await get_nightly_data(session, user_id)
 
@@ -95,7 +110,7 @@ async def claim_nightly(session: AsyncSession, user_id: int):
     if nightly_data.last_nightly is not None and nightly_data.last_nightly == now:
         raise exceptions.DoubleNightly
 
-    bank = await get_bank(session, user_id)
+    bank = bank or await get_bank(session, user_id)
     bank.dinks += NIGHTLY_AMOUNT
     nightly_data.last_nightly = now
 
@@ -104,9 +119,9 @@ async def claim_nightly(session: AsyncSession, user_id: int):
     await session.commit()
 
 
-async def upgrade_capacity(session: AsyncSession, user_id: int) -> int:
+async def upgrade_capacity(session: AsyncSession, user_id: int, *, bank: Optional[Bank] = None) -> int:
     """Upgrade capacity level"""
-    bank = await get_bank(session, user_id)
+    bank = bank or await get_bank(session, user_id)
     upgrade_price = capacity_upgrade_price(bank.capacity_level)
 
     # Can't afford this upgrade
@@ -122,9 +137,9 @@ async def upgrade_capacity(session: AsyncSession, user_id: int) -> int:
     return bank.capacity_level
 
 
-async def upgrade_interest(session: AsyncSession, user_id: int) -> int:
+async def upgrade_interest(session: AsyncSession, user_id: int, *, bank: Optional[Bank] = None) -> int:
     """Upgrade interest level"""
-    bank = await get_bank(session, user_id)
+    bank = bank or await get_bank(session, user_id)
     upgrade_price = interest_upgrade_price(bank.interest_level)
 
     # Can't afford this upgrade
@@ -140,9 +155,9 @@ async def upgrade_interest(session: AsyncSession, user_id: int) -> int:
     return bank.interest_level
 
 
-async def upgrade_rob(session: AsyncSession, user_id: int) -> int:
+async def upgrade_rob(session: AsyncSession, user_id: int, *, bank: Optional[Bank] = None) -> int:
     """Upgrade rob level"""
-    bank = await get_bank(session, user_id)
+    bank = bank or await get_bank(session, user_id)
     upgrade_price = rob_upgrade_price(bank.rob_level)
 
     # Can't afford this upgrade
@@ -159,10 +174,16 @@ async def upgrade_rob(session: AsyncSession, user_id: int) -> int:
 
 
 async def gamble_dinks(
-    session: AsyncSession, user_id: int, amount: Union[str, int], payout_factor: int, won: bool
+    session: AsyncSession,
+    user_id: int,
+    amount: Union[str, int],
+    payout_factor: int,
+    won: bool,
+    *,
+    bank: Optional[Bank] = None
 ) -> int:
     """Gamble some of your Didier Dinks"""
-    bank = await get_bank(session, user_id)
+    bank = bank or await get_bank(session, user_id)
     if amount == "all":
         amount = bank.dinks
 
@@ -173,15 +194,23 @@ async def gamble_dinks(
 
     sign = 1 if won else -1
     factor = (payout_factor - 1) if won else 1
-    await add_dinks(session, user_id, sign * amount * factor)
+    await add_dinks(session, user_id, sign * amount * factor, bank=bank)
 
     return amount * factor
 
 
-async def rob(session: AsyncSession, amount: int, robber_id: int, robbed_id: int):
+async def rob(
+    session: AsyncSession,
+    amount: int,
+    robber_id: int,
+    robbed_id: int,
+    *,
+    robber_bank: Optional[Bank] = None,
+    robbed_bank: Optional[Bank] = None
+):
     """Rob another user's Didier Dinks"""
-    robber = await get_bank(session, robber_id)
-    robbed = await get_bank(session, robbed_id)
+    robber = robber_bank or await get_bank(session, robber_id)
+    robbed = robbed_bank or await get_bank(session, robbed_id)
 
     robber.dinks += amount
     robbed.dinks -= amount

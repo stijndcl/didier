@@ -3,17 +3,20 @@ import asyncio
 import math
 import random
 import typing
+from datetime import timedelta
 
 import discord
 from discord.ext import commands
 
 import settings
 from database.crud import currency as crud
-from database.crud.jail import get_user_jail
+from database.crud.jail import get_user_jail, imprison
 from database.exceptions.currency import DoubleNightly, NotEnoughDinks
 from database.utils.math.currency import (
     capacity_upgrade_price,
     interest_upgrade_price,
+    jail_chance,
+    jail_time,
     rob_amount,
     rob_chance,
     rob_upgrade_price,
@@ -22,6 +25,7 @@ from didier import Didier
 from didier.utils.discord import colours
 from didier.utils.discord.checks import is_owner
 from didier.utils.discord.converters import abbreviated_number
+from didier.utils.types.datetime import tz_aware_now
 from didier.utils.types.string import pluralize
 
 
@@ -129,7 +133,7 @@ class Currency(commands.Cog):
     @commands.hybrid_command(name="dinks")  # type: ignore[arg-type]
     async def dinks(self, ctx: commands.Context):
         """Check your Didier Dinks."""
-        async with self.client.postgres_session as session:
+        async with ctx.typing(), self.client.postgres_session as session:
             bank = await crud.get_bank(session, ctx.author.id)
             plural = pluralize("Didier Dink", bank.dinks)
             await ctx.reply(f"You have **{bank.dinks}** {plural}.", mention_author=False)
@@ -181,7 +185,7 @@ class Currency(commands.Cog):
     @commands.hybrid_command(name="nightly")  # type: ignore[arg-type]
     async def nightly(self, ctx: commands.Context):
         """Claim nightly Didier Dinks."""
-        async with self.client.postgres_session as session:
+        async with ctx.typing(), self.client.postgres_session as session:
             try:
                 await crud.claim_nightly(session, ctx.author.id)
                 await ctx.reply(
@@ -207,7 +211,8 @@ class Currency(commands.Cog):
             return await ctx.reply("You can't rob bots.", mention_author=False, ephemeral=True)
 
         # Use a Lock for robbing to avoid race conditions when robbing the same person twice
-        # This would cause undefined behaviour
+        # This would lead to undefined behaviour
+        # Typing() must come first for slash commands
         async with ctx.typing(), self._rob_lock, self.client.postgres_session as session:
             robber = await crud.get_bank(session, ctx.author.id)
             robbed = await crud.get_bank(session, member.id)
@@ -222,39 +227,65 @@ class Currency(commands.Cog):
                     f"{member.display_name} doesn't have any dinks to rob.", mention_author=False, ephemeral=True
                 )
 
+            jail = await get_user_jail(session, ctx.author.id)
+            if jail is not None:
+                return await ctx.reply("You can't rob when in jail.", mention_author=False, ephemeral=True)
+
+            # Here be RNG
             rob_roll = random.random()
             success_chance = rob_chance(robber.rob_level)
             success = rob_roll <= success_chance
+            max_rob_amount = math.floor(random.uniform(0.20, 1.0) * rob_amount(robber.rob_level))
+            robbed_amount = min(robbed.dinks, max_rob_amount)
 
             if success:
-                max_rob_amount = random.uniform(0.15, 1.0) * rob_amount(robber.rob_level)
-                robbed_amount = min(robbed.dinks, math.floor(max_rob_amount))
-                await crud.rob(session, robbed_amount, ctx.author.id, member.id)
+                await crud.rob(session, robbed_amount, ctx.author.id, member.id, robber_bank=robber, robbed_bank=robbed)
                 return await ctx.reply(
                     f"{ctx.author.display_name} has robbed **{robbed_amount}** Didier Dinks from {member.display_name}!",
                     mention_author=False,
                 )
 
+            # Remove the amount of Dinks you would've stolen
+            # Increase the sentence if you can't afford it
+            lost_dinks = await crud.deduct_dinks(session, ctx.author.id, max_rob_amount, bank=robber)
+            couldnt_afford = lost_dinks < robbed_amount
+            punishment_factor = (float(max_rob_amount) / float(lost_dinks)) if couldnt_afford else 1.0
+            punishment_factor = min(punishment_factor, 2)
+
+            to_jail = couldnt_afford or random.random() <= jail_chance(robber.rob_level)
+            if to_jail:
+                jail_t = jail_time(robber.rob_level) * punishment_factor
+                until = tz_aware_now() + timedelta(hours=jail_t)
+                await imprison(session, ctx.author.id, until)
+
+                return await ctx.reply(
+                    f"Robbery attempt failed! You've lost {lost_dinks} Didier Dinks, "
+                    f"and have been sent to Didier Jail until <t:{until.timestamp()}:f>"
+                )
+
+            return await ctx.reply(f"Robbery attempt failed! You've lost {lost_dinks} Didier Dinks.")
+
     @commands.hybrid_command(name="jail")
     async def jail(self, ctx: commands.Context):
         """Check how long you're still in jail for"""
-        async with self.client.postgres_session as session:
-            entry = await get_user_jail(session, ctx.author.id)
+        async with ctx.typing():
+            async with self.client.postgres_session as session:
+                entry = await get_user_jail(session, ctx.author.id)
 
-        if entry is None:
+            if entry is None:
+                embed = discord.Embed(
+                    title="Didier Jail", colour=colours.error_red(), description="You're not currently in jail."
+                )
+
+                return await ctx.reply(embed=embed, mention_author=False, ephemeral=True)
+
             embed = discord.Embed(
-                title="Didier Jail", colour=colours.error_red(), description="You're not currently in jail."
+                title="Didier Jail",
+                colour=colours.jail_gray(),
+                description=f"You will be released <t:{entry.until.timestamp()}:R>.",
             )
 
-            return await ctx.reply(embed=embed, mention_author=False, ephemeral=True)
-
-        embed = discord.Embed(
-            title="Didier Jail",
-            colour=colours.jail_gray(),
-            description=f"You will be released <t:{entry.until.timestamp()}:R>.",
-        )
-
-        return await ctx.reply(embed=embed, mention_author=False)
+            return await ctx.reply(embed=embed, mention_author=False)
 
 
 async def setup(client: Didier):

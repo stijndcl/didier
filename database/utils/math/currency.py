@@ -40,7 +40,7 @@ def jail_chance(level: int) -> float:
     base_chance = 0.35
     growth_rate = 1.15
 
-    return max(0.0, base_chance - (growth_rate**level))
+    return min(0.1, max(0.0, base_chance - (growth_rate**level)))
 
 
 def jail_time(level: int) -> int:
