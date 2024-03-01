@@ -4,6 +4,8 @@ __all__ = [
     "capacity_upgrade_price",
     "interest_upgrade_price",
     "rob_upgrade_price",
+    "interest_rate",
+    "savings_cap",
     "jail_chance",
     "jail_time",
     "rob_amount",
@@ -16,7 +18,7 @@ def interest_upgrade_price(level: int) -> int:
     base_cost = 600
     growth_rate = 1.8
 
-    return math.floor(base_cost * (growth_rate**level))
+    return math.floor(base_cost * (growth_rate ** (level - 1)))
 
 
 def capacity_upgrade_price(level: int) -> int:
@@ -24,7 +26,7 @@ def capacity_upgrade_price(level: int) -> int:
     base_cost = 800
     growth_rate = 1.6
 
-    return math.floor(base_cost * (growth_rate**level))
+    return math.floor(base_cost * (growth_rate ** (level - 1)))
 
 
 def rob_upgrade_price(level: int) -> int:
@@ -32,7 +34,23 @@ def rob_upgrade_price(level: int) -> int:
     base_cost = 950
     growth_rate = 1.9
 
-    return math.floor(base_cost * (growth_rate**level))
+    return math.floor(base_cost * (growth_rate ** (level - 1)))
+
+
+def interest_rate(level: int) -> float:
+    """Calculate the amount of interest you will receive"""
+    base_rate = 1.025
+    growth_rate = 0.03
+
+    return base_rate + (growth_rate * (level - 1))
+
+
+def savings_cap(level: int) -> int:
+    """Calculate the maximum amount you can save"""
+    base_limit = 1000
+    growth_rate = 1.10
+
+    return math.floor(base_limit * (growth_rate ** (level - 1)))
 
 
 def jail_chance(level: int) -> float:

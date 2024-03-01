@@ -3,7 +3,7 @@ from typing import Optional
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from database.schemas import Bank, NightlyData, User
+from database.schemas import Bank, BankSavings, NightlyData, User
 
 __all__ = [
     "get_or_add_user",
@@ -37,8 +37,12 @@ async def get_or_add_user(session: AsyncSession, user_id: int, *, options: Optio
     user.bank = bank
     user.nightly_data = nightly_data
 
+    savings = BankSavings(user_id=user_id)
+    user.savings = savings
+
     session.add(bank)
     session.add(nightly_data)
+    session.add(savings)
     session.add(user)
 
     await session.commit()

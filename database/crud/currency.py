@@ -1,25 +1,29 @@
 from datetime import date
-from typing import Optional, Union
+from typing import List, Optional, Union
 
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from database.crud import users
 from database.exceptions import currency as exceptions
-from database.schemas import Bank, NightlyData
+from database.schemas import Bank, BankSavings, NightlyData
 from database.utils.math.currency import (
     capacity_upgrade_price,
+    interest_rate,
     interest_upgrade_price,
     rob_upgrade_price,
+    savings_cap,
 )
 
 __all__ = [
     "add_dinks",
+    "apply_daily_interest",
     "claim_nightly",
     "deduct_dinks",
     "gamble_dinks",
     "get_bank",
     "get_nightly_data",
-    "invest",
+    "save",
     "upgrade_capacity",
     "upgrade_interest",
     "upgrade_rob",
@@ -36,15 +40,30 @@ async def get_bank(session: AsyncSession, user_id: int) -> Bank:
     return user.bank
 
 
+async def get_savings(session: AsyncSession, user_id: int) -> BankSavings:
+    """Get a user's savings info"""
+    user = await users.get_or_add_user(session, user_id)
+    return user.savings
+
+
 async def get_nightly_data(session: AsyncSession, user_id: int) -> NightlyData:
     """Get a user's nightly info"""
     user = await users.get_or_add_user(session, user_id)
     return user.nightly_data
 
 
-async def invest(session: AsyncSession, user_id: int, amount: Union[str, int], *, bank: Optional[Bank] = None) -> int:
+async def save(
+    session: AsyncSession,
+    user_id: int,
+    amount: Union[str, int],
+    *,
+    bank: Optional[Bank] = None,
+    savings: Optional[BankSavings] = None
+) -> int:
     """Invest some of your Dinks"""
     bank = bank or await get_bank(session, user_id)
+    savings = savings or await get_savings(session, user_id)
+
     if amount == "all":
         amount = bank.dinks
 
@@ -54,29 +73,44 @@ async def invest(session: AsyncSession, user_id: int, amount: Union[str, int], *
     # Don't allow investing more dinks than you own
     amount = min(bank.dinks, int(amount))
 
+    # Don't allow exceeding the limit
+    limit = savings_cap(bank.capacity_level)
+
+    if savings.saved >= limit:
+        raise exceptions.SavingsCapExceeded
+
+    if savings.saved + amount > limit:
+        amount = max(0, limit - savings.saved)
+
     bank.dinks -= amount
-    bank.invested += amount
+    savings.saved += amount
 
     session.add(bank)
+    session.add(savings)
     await session.commit()
 
     return amount
 
 
 async def withdraw(session: AsyncSession, user_id: int, amount: Union[str, int], *, bank: Optional[Bank] = None) -> int:
-    """Withdraw your invested Dinks"""
+    """Withdraw your saved Dinks"""
     bank = bank or await get_bank(session, user_id)
+    savings = await get_savings(session, user_id)
+
     if amount == "all":
-        amount = bank.invested
+        amount = savings.saved
 
     # Don't allow withdrawing more dinks than you own
-    amount = min(bank.invested, int(amount))
+    amount = min(savings.saved, int(amount))
 
     bank.dinks += amount
-    bank.invested -= amount
+    savings.saved -= amount
+    savings.daily_minimum = min(savings.daily_minimum, savings.saved)
 
     session.add(bank)
+    session.add(savings)
     await session.commit()
+
     return amount
 
 
@@ -217,4 +251,23 @@ async def rob(
 
     session.add(robber)
     session.add(robbed)
+    await session.commit()
+
+
+async def apply_daily_interest(session: AsyncSession):
+    """Apply daily interest rates to all accounts with saved Dinks"""
+    statement = select(BankSavings)
+    all_savings: List[BankSavings] = list((await session.execute(statement)).scalars().all())
+
+    for savings_account in all_savings:
+        if savings_account.saved == 0:
+            continue
+
+        bank = await get_bank(session, savings_account.user_id)
+        rate = interest_rate(bank.interest_level)
+
+        savings_account.saved = float(savings_account.saved * rate)
+        savings_account.daily_minimum = savings_account.saved
+        session.add(savings_account)
+
     await session.commit()

@@ -10,6 +10,7 @@ from overrides import overrides
 import settings
 from database import enums
 from database.crud.birthdays import get_birthdays_on_day
+from database.crud.currency import apply_daily_interest
 from database.crud.reminders import get_all_reminders_for_category
 from database.crud.ufora_announcements import remove_old_announcements
 from database.schemas import Reminder
@@ -77,6 +78,7 @@ class Tasks(commands.Cog):
 
         # Start other tasks
         self.reminders.start()
+        self.daily_interest.start()
         asyncio.create_task(self.get_error_channel())
 
     @overrides
@@ -318,11 +320,18 @@ class Tasks(commands.Cog):
         async with self.client.postgres_session as session:
             await remove_old_announcements(session)
 
+    @tasks.loop(time=DAILY_RESET_TIME)
+    async def daily_interest(self):
+        """Give everyone's daily interest"""
+        async with self.client.postgres_session as session:
+            await apply_daily_interest(session)
+
     @check_birthdays.error
     @pull_schedules.error
     @pull_ufora_announcements.error
     @reminders.error
     @remove_old_ufora_announcements.error
+    @daily_interest.error
     async def _on_tasks_error(self, error: BaseException):
         """Error handler for all tasks"""
         self.client.dispatch("task_error", error)

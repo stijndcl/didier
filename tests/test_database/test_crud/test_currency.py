@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from database.crud import currency as crud
 from database.exceptions import currency as exceptions
-from database.schemas import Bank
+from database.schemas import Bank, BankSavings
 
 
 async def test_add_dinks(postgres: AsyncSession, bank: Bank):
@@ -40,40 +40,43 @@ async def test_claim_nightly_unavailable(postgres: AsyncSession, bank: Bank):
     assert bank.dinks == crud.NIGHTLY_AMOUNT
 
 
-async def test_invest(postgres: AsyncSession, bank: Bank):
-    """Test investing some Dinks"""
+async def test_save(postgres: AsyncSession, bank: Bank, savings: BankSavings):
+    """Test saving some Dinks"""
     bank.dinks = 100
     postgres.add(bank)
     await postgres.commit()
 
-    await crud.invest(postgres, bank.user_id, 20)
+    await crud.save(postgres, bank.user_id, 20, bank=bank, savings=savings)
     await postgres.refresh(bank)
+    await postgres.refresh(savings)
 
     assert bank.dinks == 80
-    assert bank.invested == 20
+    assert savings.saved == 20
 
 
-async def test_invest_all(postgres: AsyncSession, bank: Bank):
-    """Test investing all dinks"""
+async def test_save_all(postgres: AsyncSession, bank: Bank, savings: BankSavings):
+    """Test saving all dinks"""
     bank.dinks = 100
     postgres.add(bank)
     await postgres.commit()
 
-    await crud.invest(postgres, bank.user_id, "all")
+    await crud.save(postgres, bank.user_id, "all", bank=bank, savings=savings)
     await postgres.refresh(bank)
+    await postgres.refresh(savings)
 
     assert bank.dinks == 0
-    assert bank.invested == 100
+    assert savings.saved == 100
 
 
-async def test_invest_more_than_owned(postgres: AsyncSession, bank: Bank):
-    """Test investing more Dinks than you own"""
+async def test_save_more_than_owned(postgres: AsyncSession, bank: Bank, savings: BankSavings):
+    """Test saving more Dinks than you own"""
     bank.dinks = 100
     postgres.add(bank)
     await postgres.commit()
 
-    await crud.invest(postgres, bank.user_id, 200)
+    await crud.save(postgres, bank.user_id, 200, bank=bank, savings=savings)
     await postgres.refresh(bank)
+    await postgres.refresh(savings)
 
     assert bank.dinks == 0
-    assert bank.invested == 100
+    assert savings.saved == 100

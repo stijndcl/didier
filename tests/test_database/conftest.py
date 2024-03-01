@@ -6,6 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from database.crud import users
 from database.schemas import (
     Bank,
+    BankSavings,
     UforaAnnouncement,
     UforaCourse,
     UforaCourseAlias,
@@ -36,6 +37,14 @@ async def bank(postgres: AsyncSession, user: User) -> Bank:
     _bank = user.bank
     await postgres.refresh(_bank)
     return _bank
+
+
+@pytest.fixture
+async def savings(postgres: AsyncSession, user: User) -> BankSavings:
+    """Fixture to fetch the test user's savings account"""
+    _savings = user.savings
+    await postgres.refresh(_savings)
+    return _savings
 
 
 @pytest.fixture

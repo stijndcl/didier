@@ -7,3 +7,7 @@ class DoubleNightly(Exception):
 
 class NotEnoughDinks(Exception):
     """Exception raised when trying to do something you don't have the Dinks for"""
+
+
+class SavingsCapExceeded(Exception):
+    """Exception raised when trying to save more Dinks than the cap allows"""

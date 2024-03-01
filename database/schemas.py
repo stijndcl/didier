@@ -12,6 +12,7 @@ from database import enums
 __all__ = [
     "Base",
     "Bank",
+    "BankSavings",
     "Birthday",
     "Bookmark",
     "CommandStats",
@@ -52,7 +53,6 @@ class Bank(Base):
     user_id: Mapped[int] = mapped_column(BigInteger, ForeignKey("users.user_id"))
 
     dinks: Mapped[int] = mapped_column(BigInteger, server_default="0", nullable=False)
-    invested: Mapped[int] = mapped_column(BigInteger, server_default="0", nullable=False)
 
     # Interest rate
     interest_level: Mapped[int] = mapped_column(server_default="1", nullable=False)
@@ -64,6 +64,20 @@ class Bank(Base):
     rob_level: Mapped[int] = mapped_column(server_default="1", nullable=False)
 
     user: Mapped[User] = relationship(uselist=False, back_populates="bank", lazy="selectin")
+
+
+class BankSavings(Base):
+    """Savings information for a user's bank"""
+
+    __tablename__ = "savings"
+
+    savings_id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int] = mapped_column(BigInteger, ForeignKey("users.user_id"))
+
+    saved: Mapped[int] = mapped_column(BigInteger, server_default="0", nullable=False)
+    daily_minimum: Mapped[int] = mapped_column(BigInteger, server_default="0", nullable=False)
+
+    user: Mapped[User] = relationship(uselist=False, back_populates="savings", lazy="selectin")
 
 
 class Birthday(Base):
@@ -349,4 +363,7 @@ class User(Base):
     )
     reminders: Mapped[List[Reminder]] = relationship(
         back_populates="user", uselist=True, lazy="selectin", cascade="all, delete-orphan"
+    )
+    savings: Mapped[List[BankSavings]] = relationship(
+        back_populates="user", uselist=False, lazy="selectin", cascade="all, delete-orphan"
     )
