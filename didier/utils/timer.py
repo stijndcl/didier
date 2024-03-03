@@ -12,10 +12,11 @@ from didier.utils.types.datetime import tz_aware_now
 
 __all__ = ["Timer"]
 
-
 REMINDER_PREDELAY = timedelta(minutes=settings.REMINDER_PRE)
 
 
+# TODO make this generic
+# TODO add timer for jail freeing
 class Timer:
     """Class for scheduled timers"""
 

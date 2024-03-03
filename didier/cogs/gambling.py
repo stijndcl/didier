@@ -3,6 +3,7 @@ from typing import Annotated, Optional, Union
 
 from discord.ext import commands
 
+from database.crud.cf_stats import update_cf_stats
 from database.crud.currency import gamble_dinks
 from didier import Didier
 from didier.utils.discord.converters import abbreviated_number
@@ -17,6 +18,7 @@ class Gambling(commands.Cog):
     def __init__(self, client: Didier):
         self.client = client
 
+    @commands.max_concurrency(1, commands.BucketType.user, wait=True)
     @commands.command(name="coinflip", aliases=["cf", "flip"])  # type: ignore[arg-type]
     async def coinflip(
         self,
@@ -57,8 +59,11 @@ class Gambling(commands.Cog):
         async with self.client.postgres_session as session:
             received = await gamble_dinks(session, ctx.author.id, amount, 2, won)
 
-        if received == 0:
-            return await ctx.reply("You don't have any Didier Dinks to wager.", mention_author=False)
+            if received == 0:
+                return await ctx.reply("You don't have any Didier Dinks to wager.", mention_author=False)
+
+            sign = 1 if won else -1
+            await update_cf_stats(session, ctx.author.id, received * sign)
 
         plural = pluralize("Didier Dink", received)
 

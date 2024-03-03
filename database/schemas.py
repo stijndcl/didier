@@ -15,6 +15,7 @@ __all__ = [
     "BankSavings",
     "Birthday",
     "Bookmark",
+    "CFStats",
     "CommandStats",
     "CustomCommand",
     "CustomCommandAlias",
@@ -104,6 +105,21 @@ class Bookmark(Base):
     user_id: Mapped[int] = mapped_column(BigInteger, ForeignKey("users.user_id"))
 
     user: Mapped[User] = relationship(back_populates="bookmarks", uselist=False, lazy="selectin")
+
+
+class CFStats(Base):
+    """A user's coinflipping stats"""
+
+    __tablename__ = "cf_stats"
+
+    cf_stats_id: Mapped[int] = mapped_column(primary_key=True)
+    games_won: Mapped[int] = mapped_column(BigInteger, server_default="0", nullable=False)
+    games_lost: Mapped[int] = mapped_column(BigInteger, server_default="0", nullable=False)
+    dinks_won: Mapped[int] = mapped_column(BigInteger, server_default="0", nullable=False)
+    dinks_lost: Mapped[int] = mapped_column(BigInteger, server_default="0", nullable=False)
+    user_id: Mapped[int] = mapped_column(BigInteger, ForeignKey("users.user_id"))
+
+    user: Mapped[User] = relationship(back_populates="cf_stats", uselist=False, lazy="selectin")
 
 
 class CommandStats(Base):
@@ -347,6 +363,9 @@ class User(Base):
         back_populates="user", uselist=False, lazy="selectin", cascade="all, delete-orphan"
     )
     bookmarks: Mapped[List[Bookmark]] = relationship(
+        back_populates="user", uselist=True, lazy="selectin", cascade="all, delete-orphan"
+    )
+    cf_stats: Mapped[CFStats] = relationship(
         back_populates="user", uselist=True, lazy="selectin", cascade="all, delete-orphan"
     )
     command_stats: Mapped[List[CommandStats]] = relationship(
