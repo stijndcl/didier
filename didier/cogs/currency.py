@@ -11,7 +11,12 @@ from discord.ext import commands
 import settings
 from database.crud import currency as crud
 from database.crud import users
-from database.crud.jail import get_user_jail, imprison
+from database.crud.jail import (
+    delete_prisoner_by_id,
+    get_jail_entry_by_id,
+    get_user_jail,
+    imprison,
+)
 from database.exceptions.currency import (
     DoubleNightly,
     NotEnoughDinks,
@@ -32,6 +37,7 @@ from didier import Didier
 from didier.utils.discord import colours
 from didier.utils.discord.checks import is_owner
 from didier.utils.discord.converters import abbreviated_number
+from didier.utils.timer import JailTimer
 from didier.utils.types.datetime import tz_aware_now
 from didier.utils.types.string import pluralize
 
@@ -40,11 +46,14 @@ class Currency(commands.Cog):
     """Everything Dinks-related."""
 
     client: Didier
+
+    _jail_timer: JailTimer
     _rob_lock: asyncio.Lock
 
     def __init__(self, client: Didier):
         super().__init__()
         self.client = client
+        self._jail_timer = JailTimer(client)
         self._rob_lock = asyncio.Lock()
 
     @commands.command(name="award")  # type: ignore[arg-type]
@@ -276,7 +285,8 @@ class Currency(commands.Cog):
             if to_jail:
                 jail_t = jail_time(robber.rob_level) * punishment_factor
                 until = tz_aware_now() + timedelta(hours=jail_t)
-                await imprison(session, ctx.author.id, until)
+                jail = await imprison(session, ctx.author.id, until)
+                self._jail_timer.maybe_replace_task(jail)
 
                 return await ctx.reply(
                     f"Robbery attempt failed! You've lost {lost_dinks} Didier Dinks, "
@@ -306,6 +316,19 @@ class Currency(commands.Cog):
             )
 
             return await ctx.reply(embed=embed, mention_author=False)
+
+    @commands.Cog.listener()
+    async def on_jail_release(self, jail_id: int):
+        """Custom listener called when a jail timer ends"""
+        async with self.client.postgres_session as session:
+            entry = await get_jail_entry_by_id(session, jail_id)
+
+            if entry is None:
+                return await self.client.log_error(f"Unable to find jail entry with id {jail_id}.", log_to_discord=True)
+
+            await delete_prisoner_by_id(session, jail_id)
+
+        await self._jail_timer.update()
 
 
 async def setup(client: Didier):

@@ -1,4 +1,4 @@
-__all__ = ["DoubleNightly", "NotEnoughDinks"]
+__all__ = ["DoubleNightly", "NotEnoughDinks", "SavingsCapExceeded"]
 
 
 class DoubleNightly(Exception):

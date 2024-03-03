@@ -19,7 +19,7 @@ from didier.utils.discord import colours
 from didier.utils.discord.assets import get_author_avatar, get_user_avatar
 from didier.utils.discord.channels import NON_MESSAGEABLE_CHANNEL_TYPES
 from didier.utils.discord.constants import Limits
-from didier.utils.timer import Timer
+from didier.utils.timer import EventTimer
 from didier.utils.types.datetime import localize, str_to_date, tz_aware_now
 from didier.utils.types.string import abbreviate, leading
 from didier.views.modals import CreateBookmark
@@ -29,7 +29,7 @@ class Discord(commands.Cog):
     """Commands related to Discord itself, which work with resources like servers and members."""
 
     client: Didier
-    timer: Timer
+    _event_timer: EventTimer
 
     # Context-menu references
     _bookmark_ctx_menu: app_commands.ContextMenu
@@ -42,20 +42,25 @@ class Discord(commands.Cog):
         self._pin_ctx_menu = app_commands.ContextMenu(name="Pin", callback=self._pin_ctx)
         self.client.tree.add_command(self._bookmark_ctx_menu)
         self.client.tree.add_command(self._pin_ctx_menu)
-        self.timer = Timer(self.client)
+        self._event_timer = EventTimer(self.client)
+
+    async def cog_load(self) -> None:
+        """Start any stored timers when the cog is loaded"""
+        await self._event_timer.update()
 
     async def cog_unload(self) -> None:
-        """Remove the commands when the cog is unloaded"""
+        """Remove the commands and timers when the cog is unloaded"""
         self.client.tree.remove_command(self._bookmark_ctx_menu.name, type=self._bookmark_ctx_menu.type)
         self.client.tree.remove_command(self._pin_ctx_menu.name, type=self._pin_ctx_menu.type)
+        self._event_timer.cancel()
 
     @commands.Cog.listener()
     async def on_event_create(self, event: Event):
         """Custom listener called when an event is created"""
-        self.timer.maybe_replace_task(event)
+        self._event_timer.maybe_replace_task(event)
 
     @commands.Cog.listener()
-    async def on_timer_end(self, event_id: int):
+    async def on_event_reminder(self, event_id: int):
         """Custom listener called when an event timer ends"""
         async with self.client.postgres_session as session:
             event = await events.get_event_by_id(session, event_id)
@@ -89,7 +94,7 @@ class Discord(commands.Cog):
             await events.delete_event_by_id(session, event.event_id)
 
         # Set the next timer
-        self.client.loop.create_task(self.timer.update())
+        await self._event_timer.update()
 
     @commands.group(name="birthday", aliases=["bd", "birthdays"], case_insensitive=True, invoke_without_command=True)
     async def birthday(self, ctx: commands.Context, user: Optional[discord.User] = None):

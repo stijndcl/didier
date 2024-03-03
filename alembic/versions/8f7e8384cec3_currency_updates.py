@@ -34,14 +34,14 @@ def upgrade() -> None:
     )
     op.create_table(
         "jail",
-        sa.Column("jail_entry_i", sa.Integer(), nullable=False),
+        sa.Column("jail_entry_id", sa.Integer(), nullable=False),
         sa.Column("user_id", sa.BigInteger(), nullable=False),
         sa.Column("until", sa.DateTime(timezone=True), nullable=False),
         sa.ForeignKeyConstraint(
             ["user_id"],
             ["users.user_id"],
         ),
-        sa.PrimaryKeyConstraint("jail_entry_i"),
+        sa.PrimaryKeyConstraint("jail_entry_id"),
     )
     op.create_table(
         "savings",

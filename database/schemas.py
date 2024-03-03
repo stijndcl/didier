@@ -235,7 +235,7 @@ class Jail(Base):
 
     __tablename__ = "jail"
 
-    jail_entry_i: Mapped[int] = mapped_column(primary_key=True)
+    jail_entry_id: Mapped[int] = mapped_column(primary_key=True)
     user_id: Mapped[int] = mapped_column(BigInteger, ForeignKey("users.user_id"))
     until: Mapped[datetime] = mapped_column(nullable=False)
 
